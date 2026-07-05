@@ -1,0 +1,24 @@
+# WolvenKit (not used by this flat pure-redscript mod; kept for parity)
+*.cpmodproj
+layout.xml
+.projectFiles/
+packed/
+custom_refs.txt
+custom_tweaks.txt
+
+# Editor
+.vscode/
+.history/
+*.log
+
+# Artifacts
+*.zip
+*.xcf
+images/
+GraphEditorStates/
+
+# Local-only
+CLAUDE.md
+
+# Dev-only redscript logging signatures - MUST NOT ship (conflicts with other mods)
+r6/scripts/NCZoningCore/Logs.reds
