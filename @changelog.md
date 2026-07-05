@@ -13,4 +13,8 @@
   natively (DistrictManager) and each location already carries its classification.
 - Added the public NCZoning.Api surface (Version and ApiVersion handshake, ready
   and stale status, dataset version, and query forwarders).
-- Network fetch, ETag revalidation, and the offline cache are not yet implemented.
+- Added NCZoningFetcher: on session start it fetches /v1/locations?full=1 once per
+  launch, parses on the HTTP worker thread, then bounces to the game thread via the
+  DelaySystem before swapping the live store. Retries three times with backoff.
+  (Verified in-game populating 291 locations from the live API.)
+- ETag revalidation and the offline cache are not yet implemented.

@@ -34,27 +34,9 @@ public class NCZoningService extends ScriptableService {
   private cb func OnLoad() -> Void {
     // GetStorage is callable ONCE per session; cache the ref (a second call permanently
     // locks the storage). Name must match [A-Za-z]{3,24}: "NCZoningCore" is valid.
+    // The fetch + Session/Ready lifecycle live in NCZoningFetcher (a ScriptableSystem, so it
+    // has GetGameInstance() for the DelaySystem bounce that a ScriptableService lacks).
     this.m_storage = FileSystem.GetStorage("NCZoningCore");
-    GameInstance.GetCallbackSystem()
-      .RegisterCallback(n"Session/Ready", this, n"OnSessionReady")
-      .SetLifetime(CallbackLifetime.Forever);
-  }
-
-  protected cb func OnSessionReady(event: ref<GameSessionEvent>) -> Void {
-    let reqs = GameInstance.GetSystemRequestsHandler();
-    if IsDefined(reqs) && reqs.IsPreGame() {
-      return;
-    }
-    // M2 / M3 TODO:
-    //  1. Async-load cached locations_full.json + meta.json from m_storage.
-    //     Offline-first: if the cache parses, populate the store, set
-    //     m_ready, set m_stale if fetched_at > 24h, and dispatch NCZoning-DataReady.
-    //  2. Conditional GET /v1/locations?full=1 with If-None-Match: <stored -full etag>.
-    //     304 -> touch timestamp; 200 -> read the ETag header, parse + build the array on
-    //     the HTTP worker thread, write the cache async, then bounce via
-    //     GetDelaySystem().DelayCallback(cb, 0.0) BEFORE swapping the live store and
-    //     dispatching NCZoning-DataRefreshed. Retry x3 with backoff, then NCZoning-DataError.
-    NCZoningLog("Session ready (skeleton: fetch and cache not yet implemented).");
   }
 
   public static func Get() -> ref<NCZoningService> {
@@ -71,6 +53,16 @@ public class NCZoningService extends ScriptableService {
   public func IsReady() -> Bool { return this.m_ready; }
   public func IsStale() -> Bool { return this.m_stale; }
   public func GetDataVersion() -> String { return this.m_datasetVersion; }
+
+  // Swap the live store. Called by NCZoningFetcher ON THE GAME THREAD (via the DelaySystem
+  // bounce) once a fetch or cache load produces new data - never from the HTTP worker
+  // thread, so the read side (Api/queries) stays race-free. See Invariant #1.
+  public func SetStore(locations: array<ref<NCZLocation>>, datasetVersion: String, stale: Bool) -> Void {
+    this.m_locations = locations;
+    this.m_datasetVersion = datasetVersion;
+    this.m_stale = stale;
+    this.m_ready = true;
+  }
 
   // --- location queries (pure; operate on the in-memory store) -----------------
 

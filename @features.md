@@ -4,11 +4,14 @@
 
 - Nothing yet (pre-release).
 
-## Implemented (data model + in-memory queries; not yet wired to a live fetch)
+## Implemented
 
 - NCZLocation data model matching the frozen /v1 API contract, including the
   full-entry fields (description, credits, image URLs) and the per-location
   district / subdistrict classification.
+- Once-per-launch fetch of /v1/locations?full=1 over HTTPS (NCZoningFetcher):
+  parse on the HTTP worker thread, DelaySystem bounce to the game thread, then
+  swap the live store. Retries three times with backoff. (Verified in-game.)
 - In-memory registry queries: all locations, by id, by category, by tag, by
   district, by subdistrict, and near a world position.
 - Public NCZoning.Api surface with a Version (semver) and ApiVersion (breaking
@@ -17,9 +20,7 @@
 
 ## Planned
 
-- One-per-session conditional GET of /v1/locations?full=1, with the ETag read
-  from the response header. (No /v1/districts fetch: the game resolves the
-  player's district natively and each location already carries its own.)
+- Conditional GET with If-None-Match / ETag (304 handling) once the cache lands.
 - Offline-first RedFileSystem cache with ETag revalidation and a stale flag.
 - Dispatch of NCZoning-DataReady, NCZoning-DataRefreshed, and NCZoning-DataError,
   with the worker-thread to game-thread bounce via DelaySystem.
