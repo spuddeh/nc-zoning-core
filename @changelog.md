@@ -17,4 +17,8 @@
   launch, parses on the HTTP worker thread, then bounces to the game thread via the
   DelaySystem before swapping the live store. Retries three times with backoff.
   (Verified in-game populating 291 locations from the live API.)
-- ETag revalidation and the offline cache are not yet implemented.
+- Added the offline-first RedFileSystem cache: a fresh (200) payload and its ETag are
+  written to locations_full.json + meta.json; on the next launch the cache is parsed and
+  served immediately (marked stale until confirmed), then a conditional GET with
+  If-None-Match revalidates. A 304 clears the stale flag with no re-download.
+  (Verified in-game: cold launch writes the cache; warm launch loads it and gets a 304.)

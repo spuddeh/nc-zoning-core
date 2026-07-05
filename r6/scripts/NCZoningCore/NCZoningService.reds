@@ -13,6 +13,7 @@ module NCZoning.Core
 
 import NCZoning.Data.*
 import RedFileSystem.*
+import RedData.Json.*
 
 // Dev-only log wrapper. Codeware (a required dependency) provides FTLog globally, so no
 // Logs.reds signature file is needed and there is no risk of a duplicate native-func
@@ -28,6 +29,7 @@ public class NCZoningService extends ScriptableService {
   private let m_ready: Bool;
   private let m_stale: Bool;
   private let m_datasetVersion: String;
+  private let m_etag: String;                 // last ETag (verbatim, incl. quotes + -full)
 
   // --- lifecycle ---------------------------------------------------------------
 
@@ -53,6 +55,85 @@ public class NCZoningService extends ScriptableService {
   public func IsReady() -> Bool { return this.m_ready; }
   public func IsStale() -> Bool { return this.m_stale; }
   public func GetDataVersion() -> String { return this.m_datasetVersion; }
+  public func GetEtag() -> String { return this.m_etag; }
+  public func SetStale(stale: Bool) -> Void { this.m_stale = stale; }
+  // Inline-safe count (field-internal ArraySize). Callers can use this instead of
+  // ArraySize(GetAllLocations()) which would hit the rvalue-array bug.
+  public func GetLocationCount() -> Int32 { return ArraySize(this.m_locations); }
+
+  // --- offline cache (RedFileSystem) -------------------------------------------
+
+  // Offline-first: parse the cached body into the store and load the ETag. Marks the store
+  // ready but STALE (cache is unverified until the network confirms via 200/304). Returns
+  // true if a usable cache was loaded. Runs on the game thread (called from Session/Ready).
+  public func LoadCache() -> Bool {
+    if !IsDefined(this.m_storage) {
+      return false;
+    }
+    if !Equals(this.m_storage.Exists("locations_full.json"), FileSystemStatus.True) {
+      return false;
+    }
+    let locFile = this.m_storage.GetFile("locations_full.json");
+    if !IsDefined(locFile) {
+      return false;
+    }
+    let body = locFile.ReadAsText();
+    if StrLen(body) == 0 {
+      return false;
+    }
+    let obj = ParseJson(body) as JsonObject;
+    if !IsDefined(obj) {
+      return false;
+    }
+    let dataArr = obj.GetKey("data") as JsonArray;
+    if !IsDefined(dataArr) {
+      return false;
+    }
+    let locs: array<ref<NCZLocation>>;
+    let total = dataArr.GetSize();
+    let k: Uint32 = 0u;
+    while k < total {
+      let item = dataArr.GetItem(k) as JsonObject;
+      if IsDefined(item) {
+        ArrayPush(locs, NCZLocation.FromJsonObject(item));
+      }
+      k += 1u;
+    }
+    this.SetStore(locs, obj.GetKeyString("dataset_version"), true);   // stale until revalidated
+
+    // Load the stored ETag (meta.json) so the next fetch can send If-None-Match.
+    this.m_etag = "";
+    if Equals(this.m_storage.Exists("meta.json"), FileSystemStatus.True) {
+      let metaFile = this.m_storage.GetFile("meta.json");
+      if IsDefined(metaFile) {
+        let metaObj = metaFile.ReadAsJson() as JsonObject;
+        if IsDefined(metaObj) {
+          this.m_etag = metaObj.GetKeyString("etag");
+        }
+      }
+    }
+    return true;
+  }
+
+  // Persist a fresh (200) payload + its ETag. Called on the game thread (via the bounce).
+  // Sync write of ~216 KB happens during the load screen; switch to AsyncFile if it hitches.
+  public func WriteCache(body: String, etag: String, datasetVersion: String) -> Void {
+    if !IsDefined(this.m_storage) {
+      return;
+    }
+    let locFile = this.m_storage.GetFile("locations_full.json");
+    if IsDefined(locFile) {
+      locFile.WriteText(body);
+    }
+    let meta = new JsonObject();
+    meta.SetKeyString("etag", etag);
+    meta.SetKeyString("dataset_version", datasetVersion);
+    let metaFile = this.m_storage.GetFile("meta.json");
+    if IsDefined(metaFile) {
+      metaFile.WriteJson(meta);
+    }
+    this.m_etag = etag;
+  }
 
   // Swap the live store. Called by NCZoningFetcher ON THE GAME THREAD (via the DelaySystem
   // bounce) once a fetch or cache load produces new data - never from the HTTP worker
