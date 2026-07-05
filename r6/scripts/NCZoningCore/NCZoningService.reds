@@ -14,17 +14,17 @@ module NCZoning.Core
 import NCZoning.Data.*
 import RedFileSystem.*
 
-// Dev-only log wrapper (see the redscript-logging skill). Requires the local, gitignored
-// Logs.reds for its native signatures. STRIP this wrapper and every call site before a
-// Nexus release build - shipping native log sigs conflicts with other mods.
+// Dev-only log wrapper. Codeware (a required dependency) provides FTLog globally, so no
+// Logs.reds signature file is needed and there is no risk of a duplicate native-func
+// clash. STRIP this wrapper and every call site before a Nexus release build (see the
+// no-shipped-logging rule).
 public func NCZoningLog(value: script_ref<String>) -> Void {
-  LogChannel(n"NCZoning", s"[NCZoningCore] \(value)");
+  FTLog(s"[NCZoningCore] \(value)");
 }
 
 public class NCZoningService extends ScriptableService {
   private let m_storage: ref<FileSystemStorage>;
   private let m_locations: array<ref<NCZLocation>>;
-  private let m_districts: array<ref<NCZDistrict>>;
   private let m_ready: Bool;
   private let m_stale: Bool;
   private let m_datasetVersion: String;
@@ -46,13 +46,13 @@ public class NCZoningService extends ScriptableService {
       return;
     }
     // M2 / M3 TODO:
-    //  1. Async-load cached locations_full.json + districts.json + meta.json from
-    //     m_storage. Offline-first: if the cache parses, populate the store, set
+    //  1. Async-load cached locations_full.json + meta.json from m_storage.
+    //     Offline-first: if the cache parses, populate the store, set
     //     m_ready, set m_stale if fetched_at > 24h, and dispatch NCZoning-DataReady.
-    //  2. Conditional GET /v1/locations?full=1 with If-None-Match: <stored -full etag>,
-    //     plus /v1/districts. 304 -> touch timestamp; 200 -> read the ETag header, parse
-    //     + build the array on the HTTP worker thread, write the cache async, then bounce
-    //     via GetDelaySystem().DelayCallback(cb, 0.0) BEFORE swapping the live store and
+    //  2. Conditional GET /v1/locations?full=1 with If-None-Match: <stored -full etag>.
+    //     304 -> touch timestamp; 200 -> read the ETag header, parse + build the array on
+    //     the HTTP worker thread, write the cache async, then bounce via
+    //     GetDelaySystem().DelayCallback(cb, 0.0) BEFORE swapping the live store and
     //     dispatching NCZoning-DataRefreshed. Retry x3 with backoff, then NCZoning-DataError.
     NCZoningLog("Session ready (skeleton: fetch and cache not yet implemented).");
   }
@@ -81,7 +81,7 @@ public class NCZoningService extends ScriptableService {
   public func GetLocationById(id: String) -> ref<NCZLocation> {
     let i = 0;
     while i < ArraySize(this.m_locations) {
-      if this.m_locations[i].Id() == id {
+      if UnicodeStringEqual(this.m_locations[i].Id(), id) {
         return this.m_locations[i];
       }
       i += 1;
@@ -93,7 +93,7 @@ public class NCZoningService extends ScriptableService {
     let out: array<ref<NCZLocation>>;
     let i = 0;
     while i < ArraySize(this.m_locations) {
-      if this.m_locations[i].Category() == category {
+      if UnicodeStringEqual(this.m_locations[i].Category(), category) {
         ArrayPush(out, this.m_locations[i]);
       }
       i += 1;
@@ -105,7 +105,37 @@ public class NCZoningService extends ScriptableService {
     let out: array<ref<NCZLocation>>;
     let i = 0;
     while i < ArraySize(this.m_locations) {
-      if ArrayContains(this.m_locations[i].Tags(), tag) {
+      // Bind Tags() to a local FIRST: ArrayContains on an inline array-return reads garbage
+      // in redscript (rvalue-array bug). See wiki learning redscript-arraysize-on-returned-array.
+      let tags = this.m_locations[i].Tags();
+      if ArrayContains(tags, tag) {
+        ArrayPush(out, this.m_locations[i]);
+      }
+      i += 1;
+    }
+    return out;
+  }
+
+  // Registry locations whose server-computed district matches (e.g. "Watson"). The
+  // consumer supplies the district in API vocabulary; joining to the player's live
+  // district is the consumer's job (game DistrictManager + a small normalization map).
+  public func GetLocationsByDistrict(district: String) -> array<ref<NCZLocation>> {
+    let out: array<ref<NCZLocation>>;
+    let i = 0;
+    while i < ArraySize(this.m_locations) {
+      if UnicodeStringEqual(this.m_locations[i].District(), district) {
+        ArrayPush(out, this.m_locations[i]);
+      }
+      i += 1;
+    }
+    return out;
+  }
+
+  public func GetLocationsBySubdistrict(subdistrict: String) -> array<ref<NCZLocation>> {
+    let out: array<ref<NCZLocation>>;
+    let i = 0;
+    while i < ArraySize(this.m_locations) {
+      if UnicodeStringEqual(this.m_locations[i].Subdistrict(), subdistrict) {
         ArrayPush(out, this.m_locations[i]);
       }
       i += 1;
@@ -130,22 +160,5 @@ public class NCZoningService extends ScriptableService {
       i += 1;
     }
     return out;
-  }
-
-  // --- district queries --------------------------------------------------------
-
-  public func GetAllDistricts() -> array<ref<NCZDistrict>> {
-    return this.m_districts;
-  }
-
-  public func GetDistrictById(id: String) -> ref<NCZDistrict> {
-    let i = 0;
-    while i < ArraySize(this.m_districts) {
-      if this.m_districts[i].Id() == id {
-        return this.m_districts[i];
-      }
-      i += 1;
-    }
-    return null;
   }
 }

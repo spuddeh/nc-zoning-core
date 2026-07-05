@@ -13,16 +13,10 @@ module NCZoning.Data
 
 import RedData.Json.*
 
-// Whole /v1/locations?full=1 response, deserialized in a single FromJson call.
-// array<ref<T>> is supported by RedData. If the whole-response bind fails during the
-// M1 parse spike, fall back to: ParseJson(body) -> GetKey("data") as JsonArray ->
-// FromJson(item, n"NCZoning.Data.NCZLocation") per element.
-public class NCZLocationsResponse {
-  let schema: Int32;
-  let generated_at: String;
-  let dataset_version: String;
-  let data: array<ref<NCZLocation>>;
-}
+// The /v1 response is parsed MANUALLY: ParseJson(body) -> GetKey("data") as JsonArray ->
+// NCZLocation.FromJsonObject() per element (explicit field reads, no reflection). The
+// envelope's dataset_version is read from the ETag response header (or GetKeyString on the
+// cached envelope).
 
 // A single registry entry. Slim (/v1/locations) plus the full (?full=1) extras.
 public class NCZLocation {
@@ -33,8 +27,8 @@ public class NCZLocation {
   let coordinates: array<Float>;  // [X, Y, Z] raw CET world floats - NOT a Vector4; see Pos()
   let yaw: Float;                 // may be int / float / negative in JSON; Float binds all
   let category: String;           // location-overhaul | new-location | other
-  let tags: array<String>;
-  let authors: array<String>;
+  let tags: array<String>;        // built in FromJsonObject(); read via TagCount()/TagAt() or a local
+  let authors: array<String>;     // built in FromJsonObject(); read via AuthorCount()/AuthorAt() or a local
   let source: String;             // manual | auto
   let district: String;           // never null (Badlands is the default region)
   let subdistrict: String;        // "" when the JSON value is null / key absent
@@ -51,6 +45,8 @@ public class NCZLocation {
   public func NexusId() -> String { return this.nexus_id; }
   public func Yaw() -> Float { return this.yaw; }
   public func Category() -> String { return this.category; }
+  // Bind the result to a `let` local before ArraySize/ArrayContains/indexing - see the
+  // rvalue-array note on TagCount(); for a size or single element prefer TagCount()/TagAt().
   public func Tags() -> array<String> { return this.tags; }
   public func Authors() -> array<String> { return this.authors; }
   public func Source() -> String { return this.source; }
@@ -73,46 +69,86 @@ public class NCZLocation {
     }
     return v;
   }
-}
 
-// A district (or subdistrict) from /v1/districts. centroid is a nested object
-// (DTO-safe); boundary is a FLATTENED [x1,y1,x2,y2,...] array (no arrays-of-arrays).
-public class NCZDistrict {
-  let id: String;
-  let name: String;
-  let centroid: ref<NCZCentroid>;
-  let boundary: array<Float>;
-  let subdistricts: array<ref<NCZDistrict>>;  // same shape; canonical set on these
-  let canonical: Bool;
-
-  public func Id() -> String { return this.id; }
-  public func Name() -> String { return this.name; }
-  public func Boundary() -> array<Float> { return this.boundary; }
-  public func Subdistricts() -> array<ref<NCZDistrict>> { return this.subdistricts; }
-  public func IsCanonical() -> Bool { return this.canonical; }
-
-  // Centroid on the ground plane (Z = 0, W = 1); zero vector if centroid is missing.
-  public func CentroidPos() -> Vector4 {
-    let v: Vector4;
-    if IsDefined(this.centroid) {
-      v.X = this.centroid.X();
-      v.Y = this.centroid.Y();
-      v.W = 1.0;
+  // Inline-safe count/index accessors. Prefer these when reading sizes or single elements:
+  // applying ArraySize()/ArrayContains()/[] DIRECTLY to a method that returns an array reads
+  // garbage in redscript (an rvalue-temporary bug). These return Int32/String, so they are
+  // always safe inline. See wiki learning redscript-arraysize-on-returned-array.
+  public func TagCount() -> Int32 { return ArraySize(this.tags); }
+  public func TagAt(idx: Int32) -> String {
+    if idx >= 0 && idx < ArraySize(this.tags) {
+      return this.tags[idx];
     }
-    return v;
+    return "";
+  }
+  public func AuthorCount() -> Int32 { return ArraySize(this.authors); }
+  public func AuthorAt(idx: Int32) -> String {
+    if idx >= 0 && idx < ArraySize(this.authors) {
+      return this.authors[idx];
+    }
+    return "";
+  }
+
+  // Build an NCZLocation from one /v1 location element, fully manually (new object +
+  // explicit GetKey* reads). Chosen for explicit control and no reflection dependency.
+  // NOTE: an earlier belief that FromJson fails to bind array<String> was a measurement
+  // artifact of the rvalue-ArraySize bug (wiki learning redscript-arraysize-on-returned-array)
+  // and was never actually confirmed; the manual factory is kept for robustness regardless.
+  public static func FromJsonObject(item: ref<JsonObject>) -> ref<NCZLocation> {
+    let loc = new NCZLocation();
+    if !IsDefined(item) {
+      return loc;
+    }
+    loc.id = item.GetKeyString("id");
+    loc.name = item.GetKeyString("name");
+    loc.nexus_id = item.GetKeyString("nexus_id");
+    loc.yaw = Cast<Float>(item.GetKeyDouble("yaw"));
+    loc.category = item.GetKeyString("category");
+    loc.source = item.GetKeyString("source");
+    loc.district = item.GetKeyString("district");
+    loc.subdistrict = item.GetKeyString("subdistrict");
+    loc.description = item.GetKeyString("description");
+    loc.credits = item.GetKeyString("credits");
+    loc.thumbnail_url = item.GetKeyString("thumbnail_url");
+    loc.picture_url = item.GetKeyString("picture_url");
+    loc.updated_at = item.GetKeyString("updated_at");
+
+    let coords = item.GetKey("coordinates") as JsonArray;
+    if IsDefined(coords) {
+      let cn = coords.GetSize();
+      let ci: Uint32 = 0u;
+      while ci < cn {
+        ArrayPush(loc.coordinates, Cast<Float>(coords.GetItemDouble(ci)));
+        ci += 1u;
+      }
+    }
+    loc.tags = NCZLocation.ReadStrArr(item, "tags");
+    loc.authors = NCZLocation.ReadStrArr(item, "authors");
+    return loc;
+  }
+
+  private static func ReadStrArr(item: ref<JsonObject>, key: String) -> array<String> {
+    let out: array<String>;
+    let arr = item.GetKey(key) as JsonArray;
+    if !IsDefined(arr) {
+      return out;
+    }
+    let n = arr.GetSize();
+    let i: Uint32 = 0u;
+    while i < n {
+      ArrayPush(out, arr.GetItemString(i));
+      i += 1u;
+    }
+    return out;
   }
 }
 
-// Whole /v1/districts response. Only the data array is captured; the envelope's
-// schema / generated_at / dataset_version are read separately from the transport layer.
-public class NCZDistrictsResponse {
-  let data: array<ref<NCZDistrict>>;
-}
-
-public class NCZCentroid {
-  let x: Float;
-  let y: Float;
-
-  public func X() -> Float { return this.x; }
-  public func Y() -> Float { return this.y; }
-}
+// NOTE: There is deliberately no district-geometry DTO here. Each NCZLocation already
+// carries its server-computed district / subdistrict (the API mirrors the game's district
+// rules), and the game resolves the PLAYER's current district natively and far more richly
+// via DistrictManager.GetCurrentDistrict() + the gamedataDistrict enum. Fetching the API's
+// /v1/districts boundary polygons to re-run point-in-polygon in-game would be a worse
+// reimplementation of what the engine already does, so NCZoningCore does not consume it.
+// Consumers join "player's current district" (from the game) to a location's District() /
+// Subdistrict() string; a small game-vocabulary -> API-string normalization map lives with
+// the district-guide demo, not in the core data model.

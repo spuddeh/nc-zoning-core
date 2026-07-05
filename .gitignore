@@ -20,5 +20,5 @@ GraphEditorStates/
 # Local-only
 CLAUDE.md
 
-# Dev-only redscript logging signatures - MUST NOT ship (conflicts with other mods)
-r6/scripts/NCZoningCore/Logs.reds
+# Temporary dev spike (M1 parse verification) - not part of the shipped mod
+r6/scripts/NCZoningCore/NCZParseSpike.reds

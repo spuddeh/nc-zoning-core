@@ -87,21 +87,23 @@ public func GetLocationsNear(pos: Vector4, radius: Float) -> array<ref<NCZLocati
   return out;
 }
 
-// --- district queries ----------------------------------------------------------
-
-public func GetAllDistricts() -> array<ref<NCZDistrict>> {
-  let out: array<ref<NCZDistrict>>;
+// District filters over the registry, keyed by the API's district vocabulary. To answer
+// "what is in the player's current district", pair these with the game's own
+// DistrictManager.GetCurrentDistrict() (NCZoningCore does not fetch district geometry).
+public func GetLocationsByDistrict(district: String) -> array<ref<NCZLocation>> {
+  let out: array<ref<NCZLocation>>;
   let s = NCZoningService.Get();
   if IsDefined(s) {
-    out = s.GetAllDistricts();
+    out = s.GetLocationsByDistrict(district);
   }
   return out;
 }
 
-public func GetDistrictById(id: String) -> ref<NCZDistrict> {
+public func GetLocationsBySubdistrict(subdistrict: String) -> array<ref<NCZLocation>> {
+  let out: array<ref<NCZLocation>>;
   let s = NCZoningService.Get();
   if IsDefined(s) {
-    return s.GetDistrictById(id);
+    out = s.GetLocationsBySubdistrict(subdistrict);
   }
-  return null;
+  return out;
 }
