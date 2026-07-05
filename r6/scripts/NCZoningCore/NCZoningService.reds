@@ -39,6 +39,7 @@ public class NCZoningService extends ScriptableService {
     // The fetch + Session/Ready lifecycle live in NCZoningFetcher (a ScriptableSystem, so it
     // has GetGameInstance() for the DelaySystem bounce that a ScriptableService lacks).
     this.m_storage = FileSystem.GetStorage("NCZoningCore");
+    NCZoningDataEvent.RegisterNames();   // declare the public event names before anyone subscribes
   }
 
   public static func Get() -> ref<NCZoningService> {

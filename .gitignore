@@ -20,5 +20,6 @@ GraphEditorStates/
 # Local-only
 CLAUDE.md
 
-# Temporary dev spike (M1 parse verification) - not part of the shipped mod
+# Temporary dev spikes/probes - not part of the shipped mod
 r6/scripts/NCZoningCore/NCZParseSpike.reds
+r6/scripts/NCZoningCore/NCZEventProbe.reds

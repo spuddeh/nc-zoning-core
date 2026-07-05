@@ -20,11 +20,12 @@
   district, by subdistrict, and near a world position.
 - Public NCZoning.Api surface with a Version (semver) and ApiVersion (breaking
   change handshake) plus ready, stale, and dataset-version status.
-- NCZoningDataEvent carrying dataset version, count, and an error reason.
+- Public lifecycle events dispatched via Codeware's CallbackSystem under the frozen
+  names NCZoning-DataReady, NCZoning-DataRefreshed, and NCZoning-DataError (consumable
+  from redscript and CET Lua), carrying dataset version, count, and an error reason.
+  Dispatched on the game thread after the DelaySystem bounce. (Verified in-game.)
 
 ## Planned
 
-- Dispatch of NCZoning-DataReady, NCZoning-DataRefreshed, and NCZoning-DataError,
-  with the worker-thread to game-thread bounce via DelaySystem.
 - CET Lua bridge examples and consumer documentation (soft-dep, events, threading).
 - v1.0 Nexus release against the /v1 contract.

@@ -21,6 +21,7 @@ public class NCZoningFetcher extends ScriptableSystem {
   private let m_gi: GameInstance;   // captured on the game thread; used to arm the bounce
   private let m_done: Bool;         // one fetch per game launch (system persists across saves)
   private let m_retries: Int32;
+  private let m_readyDispatched: Bool;   // NCZoning-DataReady fired once (cache load or first 200)
 
   private func OnAttach() -> Void {
     GameInstance.GetCallbackSystem()
@@ -42,8 +43,10 @@ public class NCZoningFetcher extends ScriptableSystem {
     // Offline-first: load the cache now (store becomes ready + stale), then revalidate.
     let svc = NCZoningService.Get();
     if IsDefined(svc) && svc.LoadCache() {
-      NCZoningLog(s"loaded \(svc.GetLocationCount()) locations from cache (stale until revalidated)");
-      // M4: dispatch NCZoning-DataReady here.
+      let count = svc.GetLocationCount();
+      NCZoningLog(s"loaded \(count) locations from cache (stale until revalidated)");
+      NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", svc.GetDataVersion(), count, "");
+      this.m_readyDispatched = true;
     }
     this.DoFetch();
   }
@@ -134,21 +137,40 @@ public class NCZoningFetcher extends ScriptableSystem {
       NCZoningLog("apply: NCZoningService missing");
       return;
     }
+    if r.m_error {
+      // All retries failed. Consumers can still check IsReady() (cache may be serving data).
+      NCZoningDataEvent.Dispatch(n"NCZoning-DataError", svc.GetDataVersion(), svc.GetLocationCount(), r.m_reason);
+      NCZoningLog(s"DataError dispatched (\(r.m_reason)); ready=\(svc.IsReady())");
+      return;
+    }
     if r.m_notModified {
       svc.SetStale(false);                       // cache confirmed current by the server
       NCZoningLog("cache confirmed current (304)");
-    } else {
-      svc.SetStore(r.m_locations, r.m_datasetVersion, false);
-      svc.WriteCache(r.m_body, r.m_etag, r.m_datasetVersion);
-      NCZoningLog(s"store updated + cache written: \(ArraySize(r.m_locations)) locations, dataset=\(r.m_datasetVersion)");
+      return;
     }
-    // M4 will dispatch NCZoning-DataReady / NCZoning-DataRefreshed here.
+    // 200: swap the store and persist, then signal Ready (first) or Refreshed (subsequent).
+    svc.SetStore(r.m_locations, r.m_datasetVersion, false);
+    svc.WriteCache(r.m_body, r.m_etag, r.m_datasetVersion);
+    let count = svc.GetLocationCount();
+    if this.m_readyDispatched {
+      NCZoningDataEvent.Dispatch(n"NCZoning-DataRefreshed", r.m_datasetVersion, count, "");
+      NCZoningLog(s"store refreshed + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
+    } else {
+      NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", r.m_datasetVersion, count, "");
+      this.m_readyDispatched = true;
+      NCZoningLog(s"store ready + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
+    }
   }
 
   private func ScheduleRetry() -> Void {
     if this.m_retries >= 3 {
       NCZoningLog("fetch giving up after 3 retries");
-      // M4 will dispatch NCZoning-DataError here.
+      // Bounce a DataError to the game thread (event dispatch must not run on the worker).
+      let err = new NCZApplyResult();
+      err.m_fetcher = this;
+      err.m_error = true;
+      err.m_reason = "fetch_failed";
+      GameInstance.GetDelaySystem(this.m_gi).DelayCallback(err, 0.0);
       return;
     }
     this.m_retries += 1;
@@ -165,6 +187,8 @@ public class NCZoningFetcher extends ScriptableSystem {
 public class NCZApplyResult extends DelayCallback {
   public let m_fetcher: wref<NCZoningFetcher>;
   public let m_notModified: Bool;                     // true for a 304 (no payload)
+  public let m_error: Bool;                           // true for a give-up -> dispatch DataError
+  public let m_reason: String;
   public let m_locations: array<ref<NCZLocation>>;
   public let m_datasetVersion: String;
   public let m_etag: String;

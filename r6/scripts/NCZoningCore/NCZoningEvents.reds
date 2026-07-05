@@ -11,7 +11,9 @@
 
 module NCZoning.Data
 
-// One payload class, dispatched (in M4) under the three frozen PUBLIC string names:
+// One payload class, dispatched under the three frozen PUBLIC string names (verified: the
+// CallbackSystem delivers these custom names as typed events - see the wiki learning
+// codeware-custom-event-names):
 //   NCZoning-DataReady      - store is populated and queryable (from cache or network)
 //   NCZoning-DataRefreshed  - a network fetch replaced the store with newer data
 //   NCZoning-DataError      - a fetch failed after retries; Reason() holds a code
@@ -34,5 +36,21 @@ public class NCZoningDataEvent extends CallbackSystemEvent {
     e.count = count;
     e.reason = reason;
     return e;
+  }
+
+  // Declare the three frozen public event names once (call at startup). Binding each to the
+  // NCZoningDataEvent type lets the callback system deliver a typed event to subscribers.
+  public static func RegisterNames() -> Void {
+    let cs = GameInstance.GetCallbackSystem();
+    cs.RegisterEvent(n"NCZoning-DataReady", n"NCZoning.Data.NCZoningDataEvent");
+    cs.RegisterEvent(n"NCZoning-DataRefreshed", n"NCZoning.Data.NCZoningDataEvent");
+    cs.RegisterEvent(n"NCZoning-DataError", n"NCZoning.Data.NCZoningDataEvent");
+  }
+
+  // Dispatch a NCZoningDataEvent under one of the frozen names (DispatchEventAs lets us fire
+  // under an arbitrary name rather than the class FQN). Must run on the game thread.
+  public static func Dispatch(eventName: CName, datasetVersion: String, count: Int32, reason: String) -> Void {
+    GameInstance.GetCallbackSystem()
+      .DispatchEventAs(eventName, NCZoningDataEvent.Create(datasetVersion, count, reason));
   }
 }
