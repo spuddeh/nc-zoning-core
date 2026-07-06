@@ -69,7 +69,8 @@ Install it once as a standalone dependency, like Codeware.
 
 - [Kaoziun](https://www.nexusmods.com/profile/Kaoziun) for the original NC Zoning
   vision and community leadership.
-- [Akiway](https://www.nexusmods.com/profile/Akiway) for the NC Zoning map UI and design.
+- [Akiway](https://www.nexusmods.com/profile/Akiway) for improvements to the NC Zoning
+  map UI and UX.
 - [manavortex](https://www.nexusmods.com/profile/manavortex) for the initial data
   structure and guidance.
 - [psiberx](https://www.nexusmods.com/profile/psiberx/mods) for Codeware.

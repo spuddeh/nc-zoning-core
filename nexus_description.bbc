@@ -59,7 +59,7 @@ NCZoningCore is pure redscript and survives game patches on its own, but its plu
 [color=#ffff00][size=5][b]Credits[/b][/size][/color]
 [list]
 [*][b][url=https://www.nexusmods.com/profile/Kaoziun]Kaoziun[/url][/b] for the original NC Zoning vision and community leadership.
-[*][b][url=https://www.nexusmods.com/profile/Akiway]Akiway[/url][/b] for the NC Zoning map UI and design.
+[*][b][url=https://www.nexusmods.com/profile/Akiway]Akiway[/url][/b] for improvements to the NC Zoning map UI and UX.
 [*][b][url=https://www.nexusmods.com/profile/manavortex]manavortex[/url][/b] for the initial data structure and guidance.
 [*][b][url=https://www.nexusmods.com/profile/psiberx/mods]psiberx[/url][/b] for Codeware.
 [*][b][url=https://www.nexusmods.com/profile/RayshaderFR]rayshader[/url][/b] for RedHttpClient, RedData, and RedFileSystem.
