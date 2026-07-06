@@ -6,7 +6,18 @@
 [b]NCZoningCore[/b] is a framework (a modder's resource). It fetches the [b]NC Zoning[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
 
 [b]It has no menu and does nothing on its own.[/b] You only need it if another mod lists it as a requirement. Installing it by itself has no visible effect.
-
+[line]
+[color=#ffff00][size=5][b]Part of the NC Zoning project[/b][/size][/color]
+NCZoningCore is the in-game half of [b]NC Zoning[/b], the interactive map of Cyberpunk 2077 location mods.
+[list]
+[*][b]Explore the map:[/b] [url=https://nczoning.net]nczoning.net[/url]
+[*][b]Join the community:[/b] [url=https://discord.gg/sc4yEx2fNf]Locations Hub Discord[/url]
+[/list]
+[center][b]Showcase[/b]
+[youtube]30Daism2E-c[/youtube]
+[b]Trailer[/b]
+[youtube]LJVJ2lN4aQ0[/youtube][/center]
+[line]
 [color=#ffff00][size=5][b]Do I need to install this?[/b][/size][/color]
 Only if a mod you want tells you to. NCZoningCore is a shared dependency, like Codeware or RED4ext: it sits in the background and provides data to the mods that ask for it.
 
@@ -47,9 +58,12 @@ NCZoningCore is pure redscript and survives game patches on its own, but its plu
 [line]
 [color=#ffff00][size=5][b]Credits[/b][/size][/color]
 [list]
+[*][b]Kaoziun[/b] for the original NC Zoning vision and community leadership.
+[*][b]Akiway[/b] for the NC Zoning map UI and design.
+[*][b]manavortex[/b] for data structure and guidance.
 [*][b]psiberx[/b] for Codeware.
 [*][b]rayshader[/b] for RedHttpClient, RedData, and RedFileSystem.
-[*][b]The NC Zoning[/b] project and the location-mod authors it maps.
+[*]The location-mod authors the registry maps, and the Locations Hub community.
 [/list]
 [line]
 [color=#ffff00][size=5][b]Disclaimer[/b][/size][/color]

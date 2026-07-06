@@ -6,10 +6,21 @@ registry (an interactive map of location mods at nczoning.net) from
 game as a public redscript API that other mods can build on. It has no UI of
 its own, makes no writes, and sends no telemetry.
 
+## The NC Zoning project
+
+NCZoningCore is the in-game half of [NC Zoning](https://nczoning.net), the
+interactive map of Cyberpunk 2077 location mods.
+
+- Explore the map: <https://nczoning.net>
+- Join the community: [Locations Hub Discord](https://discord.gg/sc4yEx2fNf)
+- Showcase: <https://www.youtube.com/watch?v=30Daism2E-c>
+- Trailer: <https://www.youtube.com/watch?v=LJVJ2lN4aQ0>
+
 ## Status
 
-In development, v0.1.0 (pre-release). The scaffold and data model are in place;
-the network fetch and offline cache are being built.
+Feature complete and verified in game, v0.1.0 (pre-release): fetch, offline cache
+with ETag revalidation, the public API and events, and the CET Lua bridge are all
+implemented and tested. Preparing the first public release.
 
 ## What consumers get
 
