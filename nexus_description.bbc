@@ -1,0 +1,56 @@
+[center]
+[color=#ffff00][size=6][b]NCZoningCore[/b][/size][/color]
+[i]The NC Zoning registry, in game, for other mods to build on.[/i][/center]
+[line]
+[color=#ffff00][size=5][b]What is this?[/b][/size][/color]
+[b]NCZoningCore[/b] is a framework (a modder's resource). It fetches the [b]NC Zoning[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
+
+[b]It has no menu and does nothing on its own.[/b] You only need it if another mod lists it as a requirement. Installing it by itself has no visible effect.
+
+[color=#ffff00][size=5][b]Do I need to install this?[/b][/size][/color]
+Only if a mod you want tells you to. NCZoningCore is a shared dependency, like Codeware or RED4ext: it sits in the background and provides data to the mods that ask for it.
+
+[color=#ffff00][size=5][b]What it does under the hood[/b][/size][/color]
+[list]
+[*]Downloads the registry once per game session over HTTPS.
+[*]Caches it on disk, so it works offline after the first online launch and revalidates efficiently (no re-download when nothing changed).
+[*]Serves the data to redscript and CET Lua mods through a small, stable API.
+[/list]
+It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tracking, no UI.
+[line]
+[color=#ffff00][size=5][b]Requirements[/b][/size][/color]
+[list]
+[*]RED4ext
+[*]redscript
+[*]Codeware
+[*]RedData
+[*]RedFileSystem
+[*]RedHttpClient
+[/list]
+[i]Cyber Engine Tweaks is [b]not[/b] required by NCZoningCore itself. It is only needed if the consumer mod using NCZoningCore is a CET Lua mod.[/i]
+[line]
+[color=#ffff00][size=5][b]Installation[/b][/size][/color]
+[list=1]
+[*]Install the requirements above.
+[*]Download NCZoningCore and extract the [font=Courier New]r6[/font] folder into your Cyberpunk 2077 root directory.
+[i]Final path should look like:[/i] [font=Courier New]Cyberpunk 2077\r6\scripts\NCZoningCore\[/font]
+[/list]
+Works with mod managers, or install manually.
+[line]
+[color=#ffff00][size=5][b]For mod authors[/b][/size][/color]
+Build on NCZoningCore from redscript or CET Lua. The full consumer guide and worked examples for both are in the GitHub repository linked on this page.
+
+In short: redscript consumers [font=Courier New]import NCZoning.Api.*[/font] (or guard with [font=Courier New]@if(ModuleExists("NCZoning.Api"))[/font] for a soft dependency) and subscribe to the [font=Courier New]NCZoning-DataReady[/font] / [font=Courier New]-DataRefreshed[/font] / [font=Courier New]-DataError[/font] events. CET Lua consumers call the [font=Courier New]NCZoningApi[/font] facade and observe [font=Courier New]NCZoningApi.OnDataReady[/font] for the data-ready signal.
+[line]
+[color=#ffff00][size=5][b]A note on game updates[/b][/size][/color]
+NCZoningCore is pure redscript and survives game patches on its own, but its plugin requirements (Codeware and the Red* plugins) usually need a rebuild by their authors after each Cyberpunk update. Right after a game update the framework can be temporarily unavailable until those catch up. Mods that depend on it with a soft dependency keep working in that window.
+[line]
+[color=#ffff00][size=5][b]Credits[/b][/size][/color]
+[list]
+[*][b]psiberx[/b] for Codeware.
+[*][b]rayshader[/b] for RedHttpClient, RedData, and RedFileSystem.
+[*][b]The NC Zoning[/b] project and the location-mod authors it maps.
+[/list]
+[line]
+[color=#ffff00][size=5][b]Disclaimer[/b][/size][/color]
+This mod was developed with the assistance of an LLM. All in-game testing and code validation was performed by a human. No rogue AIs were permitted through the Blackwall.

@@ -1,0 +1,165 @@
+name: Release
+
+# Publishes the mod to GitHub Releases and Nexus Mods. Trigger by publishing a
+# GitHub Release whose tag follows "<artifact>-v<version>" (e.g. nczoningcore-v1.0.0).
+# The artifact id must exist in release-manifest.json. See RELEASING.md.
+#
+# The first Nexus upload must be done manually (a file_id does not exist until a file
+# has been uploaded once). Until release-manifest.json has a real file_id, this
+# workflow hard-fails on the REPLACE_WITH placeholder rather than uploading nothing.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: "Artifact id from release-manifest.json (e.g. nczoningcore)"
+        required: true
+      version:
+        description: "Version string (e.g. 1.0.0)"
+        required: true
+      tag:
+        description: "Existing release tag to attach the zip to (optional; leave blank to skip GitHub asset upload)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.release.tag_name || github.event.inputs.tag || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Skip any GitHub-only release marked invisibly in the body.
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.release.body, '<!-- skip-nexus -->') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve artifact and version
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ART="${{ github.event.inputs.artifact }}"
+            VER="${{ github.event.inputs.version }}"
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+            # Split on the first "-v": "<artifact>-v<version>"
+            ART="${TAG%%-v*}"
+            VER="${TAG#*-v}"
+          fi
+          if [ -z "$ART" ] || [ -z "$VER" ]; then
+            echo "::error::Could not resolve artifact/version (tag '$TAG'). Expected '<artifact>-v<version>'."
+            exit 1
+          fi
+          echo "artifact=$ART" >> "$GITHUB_OUTPUT"
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Resolved artifact='$ART' version='$VER' tag='$TAG'"
+
+      - name: Look up artifact in manifest
+        id: art
+        run: |
+          ART='${{ steps.meta.outputs.artifact }}'
+          if ! jq -e --arg a "$ART" '.artifacts[$a]' release-manifest.json >/dev/null; then
+            echo "::error::Artifact '$ART' not found in release-manifest.json"
+            exit 1
+          fi
+          get() { jq -r --arg a "$ART" ".artifacts[\$a].$1 // empty" release-manifest.json; }
+          CONTENT="$(get contentDir)"
+          INSTALL="$(get installDir)"
+          FILEID="$(get file_id)"
+          if [ -z "$CONTENT" ] || [ ! -d "$CONTENT" ]; then
+            echo "::error::contentDir '$CONTENT' for artifact '$ART' is missing."
+            exit 1
+          fi
+          if [ -z "$INSTALL" ]; then
+            echo "::error::installDir for artifact '$ART' is not set."
+            exit 1
+          fi
+          if echo "$FILEID" | grep -q "REPLACE_WITH"; then
+            echo "::error::file_id for '$ART' is still a placeholder. Upload the first file to Nexus manually, then set file_id in release-manifest.json (Files tab > API Info on the mod page)."
+            exit 1
+          fi
+          BASENAME="$(get fileBaseName)"
+          [ -z "$BASENAME" ] && BASENAME="$ART"   # fall back to the artifact id
+          {
+            echo "content_dir=$CONTENT"
+            echo "install_dir=$INSTALL"
+            echo "file_id=$FILEID"
+            echo "category=$(get category)"
+            echo "display_name=$(get displayName)"
+            echo "file_base_name=$BASENAME"
+            echo "primary=$(jq -r --arg a "$ART" '.artifacts[$a].primary_mod_manager_download // false' release-manifest.json)"
+            echo "show_reqs=$(jq -r --arg a "$ART" '.artifacts[$a].show_requirements_pop_up // true' release-manifest.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build zip
+        id: zip
+        run: |
+          ZIP="${{ steps.art.outputs.file_base_name }}_v${{ steps.meta.outputs.version }}.zip"
+          CONTENT='${{ steps.art.outputs.content_dir }}'
+          INSTALL='${{ steps.art.outputs.install_dir }}'
+          # Stage contentDir's contents into the in-game install path, then zip the stage
+          # so "r6/..." sits at the zip root exactly as Cyberpunk expects.
+          STAGE="$(mktemp -d)"
+          mkdir -p "$STAGE/$INSTALL"
+          cp -r "$CONTENT/." "$STAGE/$INSTALL/"
+          ( cd "$STAGE" && zip -r -X "$GITHUB_WORKSPACE/$ZIP" . -x '*/.git/*' '*/.DS_Store' )
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          echo "Built $ZIP:"
+          unzip -l "$ZIP"
+
+      - name: Attach zip to GitHub release
+        if: ${{ github.event_name == 'release' || github.event.inputs.tag != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ steps.meta.outputs.tag }}" "${{ steps.zip.outputs.zip }}" --clobber
+
+      # Nexus file description is opt-in and capped at 255 chars. Put a
+      # "<!-- nexus-description-end -->" marker (on its own line) in the release
+      # body; everything BEFORE it becomes the file description. No marker, or
+      # nothing before it => no file description is sent. Over 255 chars is
+      # truncated at a word boundary as a safety net (with a warning).
+      - name: Build Nexus file description (opt-in via marker, <=255 chars)
+        id: desc
+        env:
+          BODY: ${{ github.event.release.body }}
+        run: |
+          MARKER='<!-- nexus-description-end -->'
+          DESC=""
+          if printf '%s' "$BODY" | grep -qF "$MARKER"; then
+            DESC="$(printf '%s' "$BODY" | awk -v m="$MARKER" '{i=index($0,m); if(i){if(i>1)print substr($0,1,i-1); exit} print}')"
+            # strip HTML comments, then trim leading/trailing blank lines
+            DESC="$(printf '%s' "$DESC" | sed 's/<!--[^>]*-->//g' | sed -e '/./,$!d' | tac | sed -e '/./,$!d' | tac)"
+          fi
+          if [ -n "$DESC" ]; then
+            if [ "$(printf '%s' "$DESC" | wc -m)" -gt 255 ]; then
+              DESC="$(printf '%s' "$DESC" | cut -c1-250)"
+              DESC="${DESC% *}…"
+              echo "::warning::Nexus file description exceeded 255 chars; truncated at a word boundary. Shorten the text before '$MARKER'."
+            fi
+            echo "Nexus file description set ($(printf '%s' "$DESC" | wc -m) chars)."
+          else
+            echo "No '$MARKER' content found; leaving the Nexus file description unset."
+          fi
+          { echo "value<<__DESC_EOF__"; printf '%s\n' "$DESC"; echo "__DESC_EOF__"; } >> "$GITHUB_OUTPUT"
+
+      - name: Upload to Nexus Mods
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.8
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_id: ${{ steps.art.outputs.file_id }}
+          filename: ${{ steps.zip.outputs.zip }}
+          version: ${{ steps.meta.outputs.version }}
+          display_name: ${{ steps.art.outputs.display_name }}
+          description: ${{ steps.desc.outputs.value }}
+          category: ${{ steps.art.outputs.category }}
+          archive_existing_version: true
+          allow_mod_manager_download: true
+          primary_mod_manager_download: ${{ steps.art.outputs.primary }}
+          show_requirements_pop_up: ${{ steps.art.outputs.show_reqs }}
