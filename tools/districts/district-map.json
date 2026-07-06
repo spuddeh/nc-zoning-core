@@ -1,0 +1,234 @@
+{
+  "_note": "Generated + verified by build-district-map.py. Do not hand-edit.",
+  "entryCount": 38,
+  "entries": [
+    {
+      "gameEnum": "Badlands",
+      "gamePath": "Districts.Badlands",
+      "district": "Badlands",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "NorthBadlands",
+      "gamePath": "Districts.NorthBadlands",
+      "district": "Badlands",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "SouthBadlands",
+      "gamePath": "Districts.SouthBadlands",
+      "district": "Badlands",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Badlands_BiotechnicaFlats",
+      "gamePath": "Districts.BiotechnicaFlats",
+      "district": "Badlands",
+      "subdistrict": "Biotechnica Flats"
+    },
+    {
+      "gameEnum": "Badlands_JacksonPlains",
+      "gamePath": "Districts.JacksonPlains",
+      "district": "Badlands",
+      "subdistrict": "Jackson Plains"
+    },
+    {
+      "gameEnum": "Badlands_LagunaBend",
+      "gamePath": "Districts.LagunaBend",
+      "district": "Badlands",
+      "subdistrict": "Laguna Bend"
+    },
+    {
+      "gameEnum": "Badlands_NorthSunriseOilField",
+      "gamePath": "Districts.NorthSunriseOilField",
+      "district": "Badlands",
+      "subdistrict": "North Sunrise Oil Field"
+    },
+    {
+      "gameEnum": "Badlands_RattlesnakeCreek",
+      "gamePath": "Districts.RattlesnakeCreek",
+      "district": "Badlands",
+      "subdistrict": "Rattlesnake Creek"
+    },
+    {
+      "gameEnum": "Badlands_RedPeaks",
+      "gamePath": "Districts.RedPeaks",
+      "district": "Badlands",
+      "subdistrict": "Red Peaks"
+    },
+    {
+      "gameEnum": "Badlands_RockyRidge",
+      "gamePath": "Districts.RockyRidge",
+      "district": "Badlands",
+      "subdistrict": "Rocky Ridge"
+    },
+    {
+      "gameEnum": "Badlands_SierraSonora",
+      "gamePath": "Districts.SierraSonora",
+      "district": "Badlands",
+      "subdistrict": "Sierra Sonora"
+    },
+    {
+      "gameEnum": "Badlands_SoCalBorderCrossing",
+      "gamePath": "Districts.SoCalBorderCrossing",
+      "district": "Badlands",
+      "subdistrict": "SoCal Border Crossing"
+    },
+    {
+      "gameEnum": "Badlands_VasquezPass",
+      "gamePath": "Districts.VasquezPass",
+      "district": "Badlands",
+      "subdistrict": "Vasquez Pass"
+    },
+    {
+      "gameEnum": "CityCenter",
+      "gamePath": "Districts.CityCenter",
+      "district": "City Center",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "CorpoPlaza",
+      "gamePath": "Districts.CorpoPlaza",
+      "district": "City Center",
+      "subdistrict": "Corpo Plaza"
+    },
+    {
+      "gameEnum": "Downtown",
+      "gamePath": "Districts.Downtown",
+      "district": "City Center",
+      "subdistrict": "Downtown"
+    },
+    {
+      "gameEnum": "Dogtown",
+      "gamePath": "Districts.Dogtown",
+      "district": "Dogtown",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Heywood",
+      "gamePath": "Districts.Heywood",
+      "district": "Heywood",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Glen",
+      "gamePath": "Districts.Glen",
+      "district": "Heywood",
+      "subdistrict": "The Glen"
+    },
+    {
+      "gameEnum": "VistaDelRey",
+      "gamePath": "Districts.VistaDelRey",
+      "district": "Heywood",
+      "subdistrict": "Vista Del Rey"
+    },
+    {
+      "gameEnum": "Wellsprings",
+      "gamePath": "Districts.Wellsprings",
+      "district": "Heywood",
+      "subdistrict": "Wellsprings"
+    },
+    {
+      "gameEnum": "MorroRock",
+      "gamePath": "Districts.MorroRock",
+      "district": "NCX Spaceport / Morro Rock",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "MorroRock_NCX",
+      "gamePath": "Districts.NCX",
+      "district": "NCX Spaceport / Morro Rock",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Pacifica",
+      "gamePath": "Districts.Pacifica",
+      "district": "Pacifica",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Coastview",
+      "gamePath": "Districts.Coastview",
+      "district": "Pacifica",
+      "subdistrict": "Coastview"
+    },
+    {
+      "gameEnum": "WestWindEstate",
+      "gamePath": "Districts.WestWindEstate",
+      "district": "Pacifica",
+      "subdistrict": "West Wind Estate"
+    },
+    {
+      "gameEnum": "SantoDomingo",
+      "gamePath": "Districts.SantoDomingo",
+      "district": "Santo Domingo",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "Arroyo",
+      "gamePath": "Districts.Arroyo",
+      "district": "Santo Domingo",
+      "subdistrict": "Arroyo"
+    },
+    {
+      "gameEnum": "RanchoCoronado",
+      "gamePath": "Districts.RanchoCoronado",
+      "district": "Santo Domingo",
+      "subdistrict": "Rancho Coronado"
+    },
+    {
+      "gameEnum": "Watson",
+      "gamePath": "Districts.Watson",
+      "district": "Watson",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "ArasakaWaterfront",
+      "gamePath": "Districts.ArasakaWaterfront",
+      "district": "Watson",
+      "subdistrict": "Arasaka Waterfront"
+    },
+    {
+      "gameEnum": "Kabuki",
+      "gamePath": "Districts.Kabuki",
+      "district": "Watson",
+      "subdistrict": "Kabuki"
+    },
+    {
+      "gameEnum": "LittleChina",
+      "gamePath": "Districts.LittleChina",
+      "district": "Watson",
+      "subdistrict": "Little China"
+    },
+    {
+      "gameEnum": "Northside",
+      "gamePath": "Districts.Northside",
+      "district": "Watson",
+      "subdistrict": "Northside Industrial District"
+    },
+    {
+      "gameEnum": "Westbrook",
+      "gamePath": "Districts.Westbrook",
+      "district": "Westbrook",
+      "subdistrict": ""
+    },
+    {
+      "gameEnum": "CharterHill",
+      "gamePath": "Districts.CharterHill",
+      "district": "Westbrook",
+      "subdistrict": "Charter Hill"
+    },
+    {
+      "gameEnum": "JapanTown",
+      "gamePath": "Districts.JapanTown",
+      "district": "Westbrook",
+      "subdistrict": "Japantown"
+    },
+    {
+      "gameEnum": "NorthOaks",
+      "gamePath": "Districts.NorthOaks",
+      "district": "Westbrook",
+      "subdistrict": "North Oak"
+    }
+  ]
+}

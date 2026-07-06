@@ -1,0 +1,798 @@
+{
+ "_source": "map_data_export nczoning_tweakdb_map_data.json (game gamedataDistrict records)",
+ "_count": 132,
+ "districts": [
+  {
+   "path": "Districts.CityCenter",
+   "enumName": "CityCenter",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10950"
+  },
+  {
+   "path": "Districts.Watson",
+   "enumName": "Watson",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10947"
+  },
+  {
+   "path": "Districts.Westbrook",
+   "enumName": "Westbrook",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10948"
+  },
+  {
+   "path": "Districts.Heywood",
+   "enumName": "Heywood",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10945"
+  },
+  {
+   "path": "Districts.SantoDomingo",
+   "enumName": "SantoDomingo",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10949"
+  },
+  {
+   "path": "Districts.Pacifica",
+   "enumName": "Pacifica",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10946"
+  },
+  {
+   "path": "Districts.Badlands",
+   "enumName": "Badlands",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#10951"
+  },
+  {
+   "path": "Districts.Dogtown",
+   "enumName": "Dogtown",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#94156"
+  },
+  {
+   "path": "Districts.Downtown",
+   "enumName": "Downtown",
+   "parentDistrict": "Districts.CityCenter",
+   "localizedName": "LocKey#10953"
+  },
+  {
+   "path": "Districts.CorpoPlaza",
+   "enumName": "CorpoPlaza",
+   "parentDistrict": "Districts.CityCenter",
+   "localizedName": "LocKey#10952"
+  },
+  {
+   "path": "Districts.LittleChina",
+   "enumName": "LittleChina",
+   "parentDistrict": "Districts.Watson",
+   "localizedName": "LocKey#10963"
+  },
+  {
+   "path": "Districts.Kabuki",
+   "enumName": "Kabuki",
+   "parentDistrict": "Districts.Watson",
+   "localizedName": "LocKey#10962"
+  },
+  {
+   "path": "Districts.Northside",
+   "enumName": "Northside",
+   "parentDistrict": "Districts.Watson",
+   "localizedName": "LocKey#10964"
+  },
+  {
+   "path": "Districts.ArasakaWaterfront",
+   "enumName": "ArasakaWaterfront",
+   "parentDistrict": "Districts.Watson",
+   "localizedName": "LocKey#10961"
+  },
+  {
+   "path": "Districts.CharterHill",
+   "enumName": "CharterHill",
+   "parentDistrict": "Districts.Westbrook",
+   "localizedName": "LocKey#10965"
+  },
+  {
+   "path": "Districts.Wellsprings",
+   "enumName": "Wellsprings",
+   "parentDistrict": "Districts.Heywood",
+   "localizedName": "LocKey#10956"
+  },
+  {
+   "path": "Districts.VistaDelRey",
+   "enumName": "VistaDelRey",
+   "parentDistrict": "Districts.Heywood",
+   "localizedName": "LocKey#10955"
+  },
+  {
+   "path": "Districts.Arroyo",
+   "enumName": "Arroyo",
+   "parentDistrict": "Districts.SantoDomingo",
+   "localizedName": "LocKey#10959"
+  },
+  {
+   "path": "Districts.RanchoCoronado",
+   "enumName": "RanchoCoronado",
+   "parentDistrict": "Districts.SantoDomingo",
+   "localizedName": "LocKey#10960"
+  },
+  {
+   "path": "Districts.WestWindEstate",
+   "enumName": "WestWindEstate",
+   "parentDistrict": "Districts.Pacifica",
+   "localizedName": "LocKey#10958"
+  },
+  {
+   "path": "Districts.Coastview",
+   "enumName": "Coastview",
+   "parentDistrict": "Districts.Pacifica",
+   "localizedName": "LocKey#10957"
+  },
+  {
+   "path": "Districts.Cynosure_facility",
+   "enumName": "Dogtown_Cynosure",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#94380"
+  },
+  {
+   "path": "Districts.YuccaRadioTower",
+   "enumName": "Badlands_YuccaRadioTower",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44349"
+  },
+  {
+   "path": "Districts.TrailerPark",
+   "enumName": "SouthBadlands_TrailerPark",
+   "parentDistrict": "Districts.SouthBadlands",
+   "localizedName": "LocKey#44341"
+  },
+  {
+   "path": "Districts.ElCoyoteCojo",
+   "enumName": "Vista_del_rey_ElCoyoteCojo",
+   "parentDistrict": "Districts.VistaDelRey",
+   "localizedName": "LocKey#44365"
+  },
+  {
+   "path": "Districts.VApartment",
+   "enumName": "LittleChina_VApartment",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44392"
+  },
+  {
+   "path": "Districts.JacksonPlains",
+   "enumName": "Badlands_JacksonPlains",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10971"
+  },
+  {
+   "path": "Districts.ArasakaTowerSaburoOffice",
+   "enumName": "CorpoPlaza_ArasakaTowerSaburoOffice",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44354"
+  },
+  {
+   "path": "Districts.ArasakaTowerAtrium",
+   "enumName": "CorpoPlaza_ArasakaTowerAtrium",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44352"
+  },
+  {
+   "path": "Districts.RockyRidge",
+   "enumName": "Badlands_RockyRidge",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10974"
+  },
+  {
+   "path": "Districts.JudysApartment",
+   "enumName": "Kabuki_JudysApartment",
+   "parentDistrict": "Districts.Kabuki",
+   "localizedName": "LocKey#44388"
+  },
+  {
+   "path": "Districts.MusicStore",
+   "enumName": "Glen_MusicStore",
+   "parentDistrict": "Districts.Glen",
+   "localizedName": "LocKey#44361"
+  },
+  {
+   "path": "Districts.ArasakaTowerNest",
+   "enumName": "CorpoPlaza_ArasakaTowerNest",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44353"
+  },
+  {
+   "path": "Districts.RedPeaks",
+   "enumName": "Badlands_RedPeaks",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#51260"
+  },
+  {
+   "path": "Districts.Glen_apart",
+   "enumName": "Glen_Apartment",
+   "parentDistrict": "Districts.Glen",
+   "localizedName": "LocKey#83574"
+  },
+  {
+   "path": "Districts.Caliente",
+   "enumName": "RanchoCoronado_Caliente",
+   "parentDistrict": "Districts.RanchoCoronado",
+   "localizedName": "LocKey#44384"
+  },
+  {
+   "path": "Districts.LizziesBar",
+   "enumName": "Kabuki_LizziesBar",
+   "parentDistrict": "Districts.Kabuki",
+   "localizedName": "LocKey#21193"
+  },
+  {
+   "path": "Districts.DarkMatter",
+   "enumName": "JapanTown_DarkMatter",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44405"
+  },
+  {
+   "path": "Districts.Clouds",
+   "enumName": "JapanTown_Clouds",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44401"
+  },
+  {
+   "path": "Districts.LasPalapas_arr_12",
+   "enumName": "Arroyo_LasPalapas",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44374"
+  },
+  {
+   "path": "Districts.SoCalBorderCrossing",
+   "enumName": "Badlands_SoCalBorderCrossing",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44346"
+  },
+  {
+   "path": "Districts.Jinguji",
+   "enumName": "Downtown_Jinguji",
+   "parentDistrict": "Districts.Downtown",
+   "localizedName": "LocKey#44357"
+  },
+  {
+   "path": "Districts.Embers",
+   "enumName": "Glen_Embers",
+   "parentDistrict": "Districts.Glen",
+   "localizedName": "LocKey#44359"
+  },
+  {
+   "path": "Districts.ArasakaTowerJenkins",
+   "enumName": "CorpoPlaza_ArasakaTowerJenkins",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44355"
+  },
+  {
+   "path": "Districts.NorthSunriseOilField",
+   "enumName": "Badlands_NorthSunriseOilField",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#78523"
+  },
+  {
+   "path": "Districts.ArasakaWarehouse",
+   "enumName": "Arroyo_Arasaka_Warehouse",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#52109"
+  },
+  {
+   "path": "Districts.Corpo_apart",
+   "enumName": "CorpoPlaza_Apartment",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#83575"
+  },
+  {
+   "path": "Districts.PowerPlant",
+   "enumName": "CharterHill_PowerPlant",
+   "parentDistrict": "Districts.CharterHill",
+   "localizedName": "LocKey#44399"
+  },
+  {
+   "path": "Districts.TomsDiner",
+   "enumName": "LittleChina_TomsDiner",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44394"
+  },
+  {
+   "path": "Districts.CleanCut_kab_02",
+   "enumName": "Northside_CleanCut",
+   "parentDistrict": "Districts.Northside",
+   "localizedName": "LocKey#44396"
+  },
+  {
+   "path": "Districts.LakeHut",
+   "enumName": "LagunaBend_LakeHut",
+   "parentDistrict": "Districts.LagunaBend",
+   "localizedName": "LocKey#44343"
+  },
+  {
+   "path": "Districts.ClairesGarage",
+   "enumName": "Arroyo_ClairesGarage",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44373"
+  },
+  {
+   "path": "Districts.NorthBadlands",
+   "enumName": "NorthBadlands",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#34455"
+  },
+  {
+   "path": "Districts.YuccaGarage",
+   "enumName": "Badlands_YuccaGarage",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44348"
+  },
+  {
+   "path": "Districts.JPN_apart",
+   "enumName": "JapanTown_Apartment",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#83572"
+  },
+  {
+   "path": "Districts.ButcherShop",
+   "enumName": "Coastview_ButcherShop",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44368"
+  },
+  {
+   "path": "Districts.Delamain",
+   "enumName": "Vista_del_Rey_Delamain",
+   "parentDistrict": "Districts.VistaDelRey",
+   "localizedName": "LocKey#44364"
+  },
+  {
+   "path": "Districts.VictorsClinic",
+   "enumName": "LittleChina_VictorsClinic",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44393"
+  },
+  {
+   "path": "Districts.TireEmpire_arr_12",
+   "enumName": "Arroyo_TireEmpire",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44375"
+  },
+  {
+   "path": "Districts.Totentaz",
+   "enumName": "Northside_Totentaz",
+   "parentDistrict": "Districts.Northside",
+   "localizedName": "LocKey#37056"
+  },
+  {
+   "path": "Districts.KendachiParking",
+   "enumName": "Arroyo_Kendachi",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44377"
+  },
+  {
+   "path": "Districts.AbandonedWarehouse",
+   "enumName": "ArasakaWaterfront_AbandonedWarehouse",
+   "parentDistrict": "Districts.ArasakaWaterfront",
+   "localizedName": "LocKey#44386"
+  },
+  {
+   "path": "Districts.Afterlife",
+   "enumName": "LittleChina_Afterlife",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44389"
+  },
+  {
+   "path": "Districts.RattlesnakeCreek",
+   "enumName": "Badlands_RattlesnakeCreek",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10970"
+  },
+  {
+   "path": "Districts.Stylishly",
+   "enumName": "RanchoCoronado_Stylishly",
+   "parentDistrict": "Districts.RanchoCoronado",
+   "localizedName": "LocKey#44380"
+  },
+  {
+   "path": "Districts.VDBMaglev",
+   "enumName": "Coastview_VDBMaglev",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44371"
+  },
+  {
+   "path": "Districts.NCX",
+   "enumName": "MorroRock_NCX",
+   "parentDistrict": "Districts.MorroRock",
+   "localizedName": "LocKey#87525"
+  },
+  {
+   "path": "Districts.Glen",
+   "enumName": "Glen",
+   "parentDistrict": "Districts.Heywood",
+   "localizedName": "LocKey#10954"
+  },
+  {
+   "path": "Districts.Arasaka_Estate",
+   "enumName": "NorthOaks_Arasaka_Estate",
+   "parentDistrict": "Districts.NorthOaks",
+   "localizedName": "LocKey#52110"
+  },
+  {
+   "path": "Districts.q110Cyberspace",
+   "enumName": "Coastview_q110Cyberspace",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44372"
+  },
+  {
+   "path": "Districts.LagunaBend",
+   "enumName": "Badlands_LagunaBend",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10972"
+  },
+  {
+   "path": "Districts.CytechFactory",
+   "enumName": "Arroyo_CytechFactory",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44378"
+  },
+  {
+   "path": "Districts.Brooklyn",
+   "enumName": "Dogtown_Brooklyn",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#94384"
+  },
+  {
+   "path": "Districts.EdgewoodFarm",
+   "enumName": "SouthBadlands_EdgewoodFarm",
+   "parentDistrict": "Districts.SouthBadlands",
+   "localizedName": "LocKey#44339"
+  },
+  {
+   "path": "Districts.VasquezPass",
+   "enumName": "Badlands_VasquezPass",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10976"
+  },
+  {
+   "path": "Districts.FourthWallBdStudio",
+   "enumName": "JapanTown_FourthWallBdStudio",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44404"
+  },
+  {
+   "path": "Districts.AuCabanon",
+   "enumName": "CharterHill_AuCabanon",
+   "parentDistrict": "Districts.CharterHill",
+   "localizedName": "LocKey#94398"
+  },
+  {
+   "path": "Districts.ArasakaTowerUpperAtrium",
+   "enumName": "CorpoPlaza_ArasakaTowerUpperAtrium",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#52106"
+  },
+  {
+   "path": "Districts.Red_Dirt",
+   "enumName": "Arroyo_Red_Dirt",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44379"
+  },
+  {
+   "path": "Districts.q201Cyberspace",
+   "enumName": "CorpoPlaza_q201Cyberspace",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44356"
+  },
+  {
+   "path": "Districts.NoTellMotel",
+   "enumName": "Kabuki_NoTellMotel",
+   "parentDistrict": "Districts.Kabuki",
+   "localizedName": "LocKey#44387"
+  },
+  {
+   "path": "Districts.Fingers",
+   "enumName": "JapanTown_Fingers",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44402"
+  },
+  {
+   "path": "Districts.MistysShop",
+   "enumName": "LittleChina_MistysShop",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44390"
+  },
+  {
+   "path": "Districts.WickedTires_gle_06",
+   "enumName": "Glen_WichedTires",
+   "parentDistrict": "Districts.Glen",
+   "localizedName": "LocKey#44360"
+  },
+  {
+   "path": "Districts.NCPDLab",
+   "enumName": "Glen_NCPDLab",
+   "parentDistrict": "Districts.Glen",
+   "localizedName": "LocKey#44362"
+  },
+  {
+   "path": "Districts.CapitanCaliente",
+   "enumName": "Dogtown_CapitanCaliente",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#93534"
+  },
+  {
+   "path": "Districts.WakakosPachinkoParlor",
+   "enumName": "JapanTown_Wakakos_Pachinko_Parlor",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#52355"
+  },
+  {
+   "path": "Districts.Piez",
+   "enumName": "RanchoCoronado_Piez",
+   "parentDistrict": "Districts.RanchoCoronado",
+   "localizedName": "LocKey#44383"
+  },
+  {
+   "path": "Districts.SantaClara",
+   "enumName": "Badlands_SantaClara",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10973"
+  },
+  {
+   "path": "Districts.SouthBadlands",
+   "enumName": "SouthBadlands",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#34454"
+  },
+  {
+   "path": "Districts.HiromisApartment",
+   "enumName": "JapanTown_HiromisApartment",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44403"
+  },
+  {
+   "path": "Districts.Kerry_Estate",
+   "enumName": "NorthOaks_Kerry_Estate",
+   "parentDistrict": "Districts.NorthOaks",
+   "localizedName": "LocKey#44406"
+  },
+  {
+   "path": "Districts.Denny_Estate",
+   "enumName": "NorthOaks_Denny_Estate",
+   "parentDistrict": "Districts.NorthOaks",
+   "localizedName": "LocKey#44407"
+  },
+  {
+   "path": "Districts.ArasakaTowerCEOFloor",
+   "enumName": "CorpoPlaza_ArasakaTowerCEOFloor",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#52107"
+  },
+  {
+   "path": "Districts.q201SpaceStation",
+   "enumName": "SouthBadlands_q201SpaceStation",
+   "parentDistrict": "Districts.SouthBadlands",
+   "localizedName": "LocKey#44342"
+  },
+  {
+   "path": "Districts.LasPalapas",
+   "enumName": "Badlands_LasPalapas",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44344"
+  },
+  {
+   "path": "Districts.VDBChapel",
+   "enumName": "Coastview_VDBChapel",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44367"
+  },
+  {
+   "path": "Districts.LaCatrina",
+   "enumName": "Vista_del_Rey_LaCatrina",
+   "parentDistrict": "Districts.VistaDelRey",
+   "localizedName": "LocKey#44363"
+  },
+  {
+   "path": "Districts.WNS_nid_12",
+   "enumName": "Northside_WNS",
+   "parentDistrict": "Districts.Northside",
+   "localizedName": "LocKey#44397"
+  },
+  {
+   "path": "Districts.BattysHotel",
+   "enumName": "Coastview_BattysHotel",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44369"
+  },
+  {
+   "path": "Districts.Expo",
+   "enumName": "Dogtown_Expo",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#93532"
+  },
+  {
+   "path": "Districts.VR_Tutorial",
+   "enumName": "JapanTown_VR_Tutorial",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#43742"
+  },
+  {
+   "path": "Districts.BiotechnicaFlats",
+   "enumName": "Badlands_BiotechnicaFlats",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10969"
+  },
+  {
+   "path": "Districts.All_Foods",
+   "enumName": "Northside_All_Foods",
+   "parentDistrict": "Districts.Northside",
+   "localizedName": "LocKey#44398"
+  },
+  {
+   "path": "Districts.Columbarium",
+   "enumName": "NorthOaks_Columbarium",
+   "parentDistrict": "Districts.NorthOaks",
+   "localizedName": "LocKey#44408"
+  },
+  {
+   "path": "Districts.ArasakaTowerLobby",
+   "enumName": "CorpoPlaza_ArasakaTowerLobby",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44350"
+  },
+  {
+   "path": "Districts.Akebono",
+   "enumName": "Dogtown_Akebono",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#93531"
+  },
+  {
+   "path": "Districts.RiotClub",
+   "enumName": "LittleChina_RiotClub",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44391"
+  },
+  {
+   "path": "Districts.KenmoreCafe_arr_12",
+   "enumName": "Arroyo_KenmoreCafe",
+   "parentDistrict": "Districts.Arroyo",
+   "localizedName": "LocKey#44376"
+  },
+  {
+   "path": "Districts.PoppyFarm",
+   "enumName": "SouthBadlands_PoppyFarm",
+   "parentDistrict": "Districts.SouthBadlands",
+   "localizedName": "LocKey#44340"
+  },
+  {
+   "path": "Districts.MorroRock",
+   "enumName": "MorroRock",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#87524"
+  },
+  {
+   "path": "Districts.GrandImperialMall",
+   "enumName": "Coastview_GrandImperialMall",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44370"
+  },
+  {
+   "path": "Districts.GunORama",
+   "enumName": "RanchoCoronado_GunORama",
+   "parentDistrict": "Districts.RanchoCoronado",
+   "localizedName": "LocKey#44381"
+  },
+  {
+   "path": "Districts.DryCreek",
+   "enumName": "Badlands_DryCreek",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44345"
+  },
+  {
+   "path": "Districts.NID_apart",
+   "enumName": "Northside_Apartment",
+   "parentDistrict": "Districts.Northside",
+   "localizedName": "LocKey#83573"
+  },
+  {
+   "path": "Districts.AbandonedApartmentBuilding",
+   "enumName": "Vista_del_rey_Abandoned_Apartment_Building",
+   "parentDistrict": "Districts.VistaDelRey",
+   "localizedName": "LocKey#52108"
+  },
+  {
+   "path": "Districts.WorldmapSub",
+   "enumName": "Dogtown_Worldmap_Sub",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#94156"
+  },
+  {
+   "path": "Districts.ArasakaTowerJungle",
+   "enumName": "CorpoPlaza_ArasakaTowerJungle",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#44351"
+  },
+  {
+   "path": "Districts.JapanTown",
+   "enumName": "JapanTown",
+   "parentDistrict": "Districts.Westbrook",
+   "localizedName": "LocKey#10966"
+  },
+  {
+   "path": "Districts.RundownApartment",
+   "enumName": "Coastview_RundownApartment",
+   "parentDistrict": "Districts.Coastview",
+   "localizedName": "LocKey#44366"
+  },
+  {
+   "path": "Districts.Softsys",
+   "enumName": "RanchoCoronado_Softsys",
+   "parentDistrict": "Districts.RanchoCoronado",
+   "localizedName": "LocKey#44382"
+  },
+  {
+   "path": "Districts.MegabuildingH8",
+   "enumName": "JapanTown_MegabuildingH8",
+   "parentDistrict": "Districts.JapanTown",
+   "localizedName": "LocKey#44400"
+  },
+  {
+   "path": "Districts.Yucca",
+   "enumName": "Badlands_Yucca",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#44347"
+  },
+  {
+   "path": "Districts.Hideout",
+   "enumName": "Dogtown_Hideout",
+   "parentDistrict": "Districts.Dogtown",
+   "localizedName": "LocKey#93533"
+  },
+  {
+   "path": "Districts.KonpekiPlaza",
+   "enumName": "ArasakaWaterfront_KonpekiPlaza",
+   "parentDistrict": "Districts.ArasakaWaterfront",
+   "localizedName": "LocKey#44385"
+  },
+  {
+   "path": "Districts.NorthOaks",
+   "enumName": "NorthOaks",
+   "parentDistrict": "Districts.Westbrook",
+   "localizedName": "LocKey#10967"
+  },
+  {
+   "path": "Districts.NCSpaceport",
+   "enumName": "Badlands_Spaceport",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#86297"
+  },
+  {
+   "path": "Districts.TheHammer",
+   "enumName": "Downtown_TheHammer",
+   "parentDistrict": "Districts.Downtown",
+   "localizedName": "LocKey#44358"
+  },
+  {
+   "path": "Districts.SierraSonora",
+   "enumName": "Badlands_SierraSonora",
+   "parentDistrict": "Districts.Badlands",
+   "localizedName": "LocKey#10975"
+  },
+  {
+   "path": "Districts.ArasakaTowerUnlistedFloors",
+   "enumName": "CorpoPlaza_ArasakaTowerUnlistedFloors",
+   "parentDistrict": "Districts.CorpoPlaza",
+   "localizedName": "LocKey#52105"
+  },
+  {
+   "path": "Districts.Q101Cyberspace",
+   "enumName": "LittleChina_Q101Cyberspace",
+   "parentDistrict": "Districts.LittleChina",
+   "localizedName": "LocKey#44395"
+  },
+  {
+   "path": "Districts.q307LangleyClinic",
+   "enumName": "Langley_Clinic",
+   "parentDistrict": "0",
+   "localizedName": "LocKey#94155"
+  }
+ ]
+}
