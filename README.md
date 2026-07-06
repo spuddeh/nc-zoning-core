@@ -36,10 +36,16 @@ gracefully in that window.
 
 ## For mod authors
 
-Hard dependency: `import NCZoning.Api.*` (a missing framework becomes a compile
-error naming it). Soft dependency: guard with
-`@if(ModuleExists("NCZoning.Api"))` and gate at runtime on `ApiVersion()`,
-which increments only on a breaking change.
+Build on NCZoningCore from redscript or CET Lua. See the
+[Consumer Guide](docs/consumer-guide.md) for the full API, both consumption
+patterns, and worked examples in [`examples/`](examples/).
+
+In short: redscript consumers `import NCZoning.Api.*` (or guard with
+`@if(ModuleExists("NCZoning.Api"))` for a soft dependency) and subscribe to the
+`NCZoning-DataReady` / `-DataRefreshed` / `-DataError` CallbackSystem events. CET
+Lua consumers call the `NCZoningApi` facade (`NCZoningApi.GetAllLocations()` etc.)
+and `Observe('NCZoningApi', 'OnDataReady', ...)` for the data-ready signal. Gate
+on `ApiVersion()`, which increments only on a breaking change.
 
 ## Install
 

@@ -31,3 +31,6 @@
   OnDataReady instance hook for the data-ready signal. Added examples/ for both a redscript
   soft-dependency consumer and a CET Lua consumer. Verified in-game from Lua (reads, array
   iteration, DTO methods, and the Observe notification).
+- Added docs/consumer-guide.md: the full consumer reference (requirements, redscript and CET
+  Lua consumption, the data model, how the Lua bridge works, threading), with claims verified
+  against the source or cited to upstream.
