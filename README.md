@@ -65,6 +65,18 @@ bundle these scripts into another mod; redscript compiles everything together,
 so a second copy is a duplicate-class error that breaks every redscript mod.
 Install it once as a standalone dependency, like Codeware.
 
+## Credits
+
+- [Kaoziun](https://www.nexusmods.com/profile/Kaoziun) for the original NC Zoning
+  vision and community leadership.
+- [Akiway](https://www.nexusmods.com/profile/Akiway) for the NC Zoning map UI and design.
+- [manavortex](https://www.nexusmods.com/profile/manavortex) for the initial data
+  structure and guidance.
+- [psiberx](https://www.nexusmods.com/profile/psiberx/mods) for Codeware.
+- [rayshader](https://www.nexusmods.com/profile/RayshaderFR) for RedHttpClient,
+  RedData, and RedFileSystem.
+- The location-mod authors the registry maps, and the Locations Hub community.
+
 ## License
 
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may
