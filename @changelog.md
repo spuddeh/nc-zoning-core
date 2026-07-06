@@ -23,6 +23,11 @@
   If-None-Match revalidates. A 304 clears the stale flag with no re-download.
   (Verified in-game: cold launch writes the cache; warm launch loads it and gets a 304.)
 - Added the public lifecycle events NCZoning-DataReady / NCZoning-DataRefreshed /
-  NCZoning-DataError (Codeware CallbackSystem, consumable from redscript and CET Lua),
-  carrying dataset version, count, and an error reason. Confirmed the frozen event names
-  deliver as typed events in-game.
+  NCZoning-DataError (Codeware CallbackSystem, for redscript consumers), carrying dataset
+  version, count, and an error reason. Confirmed the frozen event names deliver as typed
+  events in-game.
+- Added the CET Lua bridge: a bare-named NCZoningApi facade (read-only static methods) that
+  Lua consumers call directly (NCZoningApi.GetAllLocations() etc.), plus an Observe-able
+  OnDataReady instance hook for the data-ready signal. Added examples/ for both a redscript
+  soft-dependency consumer and a CET Lua consumer. Verified in-game from Lua (reads, array
+  iteration, DTO methods, and the Observe notification).

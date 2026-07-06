@@ -45,7 +45,8 @@ public class NCZoningFetcher extends ScriptableSystem {
     if IsDefined(svc) && svc.LoadCache() {
       let count = svc.GetLocationCount();
       NCZoningLog(s"loaded \(count) locations from cache (stale until revalidated)");
-      NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", svc.GetDataVersion(), count, "");
+      NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", svc.GetDataVersion(), count, "");   // reds consumers
+      NCZoningApi.NotifyDataReady(count, svc.GetDataVersion(), false);                       // CET Lua consumers
       this.m_readyDispatched = true;
     }
     this.DoFetch();
@@ -154,9 +155,11 @@ public class NCZoningFetcher extends ScriptableSystem {
     let count = svc.GetLocationCount();
     if this.m_readyDispatched {
       NCZoningDataEvent.Dispatch(n"NCZoning-DataRefreshed", r.m_datasetVersion, count, "");
+      NCZoningApi.NotifyDataReady(count, r.m_datasetVersion, true);
       NCZoningLog(s"store refreshed + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
     } else {
       NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", r.m_datasetVersion, count, "");
+      NCZoningApi.NotifyDataReady(count, r.m_datasetVersion, false);
       this.m_readyDispatched = true;
       NCZoningLog(s"store ready + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
     }

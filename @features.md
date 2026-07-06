@@ -21,11 +21,14 @@
 - Public NCZoning.Api surface with a Version (semver) and ApiVersion (breaking
   change handshake) plus ready, stale, and dataset-version status.
 - Public lifecycle events dispatched via Codeware's CallbackSystem under the frozen
-  names NCZoning-DataReady, NCZoning-DataRefreshed, and NCZoning-DataError (consumable
-  from redscript and CET Lua), carrying dataset version, count, and an error reason.
-  Dispatched on the game thread after the DelaySystem bounce. (Verified in-game.)
+  names NCZoning-DataReady, NCZoning-DataRefreshed, and NCZoning-DataError (for redscript
+  consumers), carrying dataset version, count, and an error reason. Dispatched on the game
+  thread after the DelaySystem bounce. (Verified in-game.)
+- CET Lua bridge: a bare-named NCZoningApi facade with read-only static reads and an
+  Observe-able OnDataReady hook, so CET Lua mods consume the registry directly. Worked
+  examples in examples/ (redscript soft-dep consumer + CET Lua consumer). (Verified in-game.)
 
 ## Planned
 
-- CET Lua bridge examples and consumer documentation (soft-dep, events, threading).
+- Consumer documentation (threading invariant, soft-dep, events vs Observe) and release pipeline.
 - v1.0 Nexus release against the /v1 contract.
