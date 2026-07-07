@@ -35,11 +35,15 @@ EXTRA = [
     ("NorthBadlands", "Badlands", ""),      # map never splits north/south badlands
     ("SouthBadlands", "Badlands", ""),
     ("MorroRock_NCX", "NCX Spaceport / Morro Rock", ""),
-    # The game has THREE spaceport districts (MorroRock top-level, NCX under it, and
-    # Badlands_Spaceport=Districts.NCSpaceport under BADLANDS). The API models the whole area
-    # as one district "NCX Spaceport / Morro Rock". Live testing (2026-07-07) showed the player
-    # actually stands in Districts.NCSpaceport, whose game parent is Badlands, so it must map
-    # directly here or a parent-walk would wrongly report "Badlands".
+    # The game has THREE spaceport districts, split across two unrelated parents, that the API
+    # models as one district "NCX Spaceport / Morro Rock" (game display names confirmed live via
+    # their LocKeys, 2026-07-07):
+    #   Districts.MorroRock  (top-level)      = "Morro Rock"
+    #     -> Districts.NCX   (child)          = "Night City International and Translunar" (airport)
+    #   Districts.Badlands (top-level)
+    #     -> Districts.NCSpaceport (child)    = "NCX Spaceport"   <- where the player actually stands
+    # NCSpaceport's game parent is Badlands, so it MUST map directly here or a parent-walk would
+    # wrongly report "Badlands". Live round-trip confirmed: NCSpaceport -> "NCX Spaceport / Morro Rock".
     ("Badlands_Spaceport", "NCX Spaceport / Morro Rock", ""),
 ]
 # game enums that must NOT map to any API district (documented so a future regen keeps them out):
