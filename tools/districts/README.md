@@ -74,7 +74,7 @@ walk up the parent chain and retry. Layer 2 lives in the demo/consumer, not here
 
 ## Verifying in-game
 
-`console-commands.md` has the CET console one-liners for checking the map live:
+`../../docs/district-console-commands.md` has the CET console one-liners for checking the map live:
 current district -> API name, a batch table smoke test, LocKey display-name lookup,
 and a self-discovery probe. Those commands also document the confirmed live access
 path (the `districtManager` field, `GetCurrentDistrict`/`GetDistrictID`, and the
