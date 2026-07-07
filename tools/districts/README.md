@@ -58,7 +58,9 @@ These are the only non-mechanical calls. They live at the top of
   player's `DistrictManager` never reports).
 - **`EXTRA`** — game enums that fold into an API district but have no API entry of
   their own: `NorthBadlands` / `SouthBadlands` (the map never splits the Badlands),
-  `MorroRock_NCX`.
+  `MorroRock_NCX`, and `Badlands_Spaceport` (`Districts.NCSpaceport` — the game
+  parents the spaceport under Badlands, so it must map directly or a parent-walk
+  would wrongly report "Badlands"; found by live testing).
 - **`_EXCLUDED`** — game enums that must map to nothing: `Dogtown_Brooklyn` (an NPC
   memory-flashback location in Brooklyn, a different city; never legitimately
   reported in Night City, so `Lookup` returns `null`).
@@ -69,3 +71,11 @@ This tool builds **Layer 1** only: the static game-district -> API-string table.
 A consumer walks **Layer 2** at runtime — read `DistrictManager.GetCurrentDistrict()`,
 call `NCZDistrictMap.Lookup(district.GetDistrictID())`, and if it returns `null`
 walk up the parent chain and retry. Layer 2 lives in the demo/consumer, not here.
+
+## Verifying in-game
+
+`console-commands.md` has the CET console one-liners for checking the map live:
+current district -> API name, a batch table smoke test, LocKey display-name lookup,
+and a self-discovery probe. Those commands also document the confirmed live access
+path (the `districtManager` field, `GetCurrentDistrict`/`GetDistrictID`, and the
+`NCZoning_Api_NCZDistrictMap` Lua global).
