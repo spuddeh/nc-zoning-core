@@ -24,6 +24,7 @@ result, and writes two outputs:
 | in  | `/v1/districts` | fetched live with `curl` (Python's UA gets a 403 from the API WAF), or a local json passed as an argument. |
 | out | `district-map.json` | the verified table (source of truth, human-readable). |
 | out | `../../r6/scripts/NCZoningCore/NCZoningDistricts.reds` | **GENERATED — do not hand-edit.** The shipped `NCZDistrictMap.Lookup(TweakDBID)` Layer-1 lookup. |
+| out | `district-resolution-audit.txt` | reachability report: every one of the 132 game districts and the API name it resolves to (direct or via the simulated parent walk). Review artifact. |
 
 The reds keys on the record's TweakDB **path**, not its enum name: in 105 of 132
 records the two differ (enum `Badlands_BiotechnicaFlats` -> path

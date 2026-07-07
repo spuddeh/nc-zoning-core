@@ -19,7 +19,7 @@ public class NCZDistrictName {
 public class NCZDistrictMap {
   // The game's current district TweakDBID -> API district/subdistrict. Returns null when
   // the game district is not directly on the map; the caller walks up the parent chain
-  // (Layer 2) and retries. 38 entries, verified against /v1/districts.
+  // (Layer 2) and retries. 39 entries, verified against /v1/districts.
   public static func Lookup(gameDistrict: TweakDBID) -> ref<NCZDistrictName> {
     if gameDistrict == t"Districts.Badlands" { return NCZDistrictMap.Make("Badlands", ""); }
     if gameDistrict == t"Districts.NorthBadlands" { return NCZDistrictMap.Make("Badlands", ""); }
@@ -42,6 +42,7 @@ public class NCZDistrictMap {
     if gameDistrict == t"Districts.Glen" { return NCZDistrictMap.Make("Heywood", "The Glen"); }
     if gameDistrict == t"Districts.VistaDelRey" { return NCZDistrictMap.Make("Heywood", "Vista Del Rey"); }
     if gameDistrict == t"Districts.Wellsprings" { return NCZDistrictMap.Make("Heywood", "Wellsprings"); }
+    if gameDistrict == t"Districts.NCSpaceport" { return NCZDistrictMap.Make("NCX Spaceport / Morro Rock", ""); }
     if gameDistrict == t"Districts.MorroRock" { return NCZDistrictMap.Make("NCX Spaceport / Morro Rock", ""); }
     if gameDistrict == t"Districts.NCX" { return NCZDistrictMap.Make("NCX Spaceport / Morro Rock", ""); }
     if gameDistrict == t"Districts.Pacifica" { return NCZDistrictMap.Make("Pacifica", ""); }

@@ -1,6 +1,6 @@
 {
   "_note": "Generated + verified by build-district-map.py. Do not hand-edit.",
-  "entryCount": 38,
+  "entryCount": 39,
   "entries": [
     {
       "gameEnum": "Badlands",
@@ -127,6 +127,12 @@
       "gamePath": "Districts.Wellsprings",
       "district": "Heywood",
       "subdistrict": "Wellsprings"
+    },
+    {
+      "gameEnum": "Badlands_Spaceport",
+      "gamePath": "Districts.NCSpaceport",
+      "district": "NCX Spaceport / Morro Rock",
+      "subdistrict": ""
     },
     {
       "gameEnum": "MorroRock",
