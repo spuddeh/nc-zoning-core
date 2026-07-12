@@ -14,6 +14,7 @@
 
 import NCZoning.Core.*
 import NCZoning.Data.*
+import NCZoning.Api.*
 
 public class NCZoningApi extends ScriptableService {
   public static func Get() -> ref<NCZoningApi> {
@@ -58,10 +59,22 @@ public class NCZoningApi extends ScriptableService {
     return NCZStatusMessage(NCZoningApi.GetStatusReason());
   }
 
-  // Do NOT add the district vocabulary (GetDistricts / GetSubdistricts) here. It would require
-  // `import NCZoning.Api.*`, and in this no-module file that pushes the API's global funcs into
-  // the true global namespace where other mods can collide with them. CET reaches NCZDistrictMap
-  // through RTTI instead.
+  // --- district vocabulary (static; Lua: NCZoningApi.GetDistricts()) -------------
+  // Every district/subdistrict name the registry can attribute a location to, A-Z. Static
+  // (generated from /v1/districts), so unlike the queries below these do not depend on the fetch:
+  // they answer before the data lands and while it is missing.
+  //
+  // Build a district picker from these, not from GetAllLocations() - an area with zero locations
+  // exists here but appears in no location.
+  public static func GetDistricts() -> array<String> {
+    return NCZDistrictMap.AllDistricts();
+  }
+  // Empty for a district with no subdistricts (Dogtown, NCX Spaceport / Morro Rock) or an unknown
+  // one. A district total is NOT the sum of its subdistricts - some locations are attributed to the
+  // district directly. Use GetLocationsByDistrict for a district total.
+  public static func GetSubdistricts(district: String) -> array<String> {
+    return NCZDistrictMap.SubdistrictsOf(district);
+  }
 
   // --- location queries --------------------------------------------------------
   public static func GetAllLocations() -> array<ref<NCZLocation>> {
