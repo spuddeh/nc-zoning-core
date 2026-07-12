@@ -22,8 +22,10 @@
   locations_full.json and either no RedHttpClient or a failed download). This is the framework's
   only UI, and exists because otherwise every consumer mod would silently look broken for a reason
   the user could not discover. It uses the UI_Notifications WarningMessage slot with
-  SimpleMessageType.Neutral (the real warning popup, which honours the duration), not the
-  OnscreenMessage slot (the cinematic-subtitle channel, which fades on its own animation). Timing
+  SimpleMessageType.Negative, which is what renders the red error styling (Neutral renders blue;
+  there is no Warning member in that enum). WarningMessage is the real warning popup and honours
+  the duration, unlike the OnscreenMessage slot (the cinematic-subtitle channel, which fades on
+  its own animation). Timing
   is driven by a QuestTrackerGameController.OnInitialize hook, the established "loading finished"
   marker, plus a 3s settle: the blackboard slot only displays if the warning controller is already
   listening, so this cannot be a plain timer.
