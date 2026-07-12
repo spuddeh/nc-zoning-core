@@ -8,7 +8,7 @@
 //              signal as an Observe-able instance method (Observe('NCZoningApi','OnDataReady')).
 //              A ScriptableService so it has a singleton for the instance hook. Read-only
 //              forwarders to the internal service; redscript consumers use `import NCZoning.Api.*`.
-// Mod Version: 0.2.0 (Pre-release)
+// Mod Version: 0.3.0 (Pre-release)
 // Credits: psiberx (Codeware)
 // ======================================================================================
 
@@ -21,7 +21,7 @@ public class NCZoningApi extends ScriptableService {
   }
 
   // --- version handshake (static; Lua: NCZoningApi.Version()) -------------------
-  public static func Version() -> String { return "0.2.0"; }
+  public static func Version() -> String { return "0.3.0"; }
   public static func ApiVersion() -> Int32 { return 1; }
 
   // --- status ------------------------------------------------------------------
@@ -52,6 +52,16 @@ public class NCZoningApi extends ScriptableService {
     if IsDefined(s) { return s.GetStatusReason(); }
     return "";
   }
+  // The player-facing sentence for the current state; "" when live. Show it INSTEAD of a zero
+  // count when IsReady() is false: a zero count and no-data must not look the same.
+  public static func GetStatusMessage() -> String {
+    return NCZStatusMessage(NCZoningApi.GetStatusReason());
+  }
+
+  // Do NOT add the district vocabulary (GetDistricts / GetSubdistricts) here. It would require
+  // `import NCZoning.Api.*`, and in this no-module file that pushes the API's global funcs into
+  // the true global namespace where other mods can collide with them. CET reaches NCZDistrictMap
+  // through RTTI instead.
 
   // --- location queries --------------------------------------------------------
   public static func GetAllLocations() -> array<ref<NCZLocation>> {

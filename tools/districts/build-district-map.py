@@ -7,9 +7,19 @@ map project's TweakDB dump) against the live NC Zoning API (/v1/districts) and p
   - district-map.json                          the verified table (source of truth)
   - ../../r6/scripts/NCZoningCore/NCZoningDistricts.reds   the shipped reds Layer-1 lookup
 
+The reds file carries TWO things:
+  1. Lookup(TweakDBID)  - game district -> API district/subdistrict (the Layer-1 map).
+  2. AllDistricts() / SubdistrictsOf(district) - the API's district vocabulary, enumerable, so a
+     consumer can build a district picker without deriving it from the locations (which omits any
+     area that has zero locations). Static: no network, no registry data, valid before the fetch.
+
 It VERIFIES that every mapped district/subdistrict string exists in the API and that every
 canonical API district/subdistrict is covered by at least one game enum, and exits non-zero
 on any failure. Re-run it whenever the API district list changes.
+
+The enumeration emits ALL subdistricts, canonical or not: "North Oaks Casino" is non-canonical but
+has locations attributed to it, and omitting it would strand them in Westbrook's total with no
+subdistrict row to reach them from.
 
 Usage:  python build-district-map.py            (fetches /v1/districts with curl)
         python build-district-map.py api.json    (use a local /v1/districts json instead)
@@ -20,7 +30,21 @@ name match. The handful of editorial decisions below were confirmed by the mod a
 import json, os, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REDS = os.path.normpath(os.path.join(HERE, "..", "..", "r6", "scripts", "NCZoningCore", "NCZoningDistricts.reds"))
+SCRIPTS = os.path.normpath(os.path.join(HERE, "..", "..", "r6", "scripts", "NCZoningCore"))
+REDS = os.path.join(SCRIPTS, "NCZoningDistricts.reds")
+API_REDS = os.path.join(SCRIPTS, "Api.reds")
+
+
+def read_version():
+    """The mod version, read from Api.reds's Version(). Never hardcode it here: release-check
+    requires every 'Mod Version:' header to agree, so a hardcoded constant here rewrites the
+    generated file's header back to a stale version on the next regen."""
+    src = open(API_REDS, encoding="utf-8").read()
+    m = re.search(r'func\s+Version\(\)\s*->\s*String\s*\{\s*return\s*"([0-9]+\.[0-9]+\.[0-9]+)"', src)
+    if not m:
+        print("FAILED: cannot read Version() from Api.reds", file=sys.stderr)
+        sys.exit(1)
+    return m.group(1)
 
 # --- confirmed editorial decisions (game enum <-> API), see the wiki decision ------------
 # API entries whose game enum the mechanical matcher can't find, resolved by hand:
@@ -176,7 +200,7 @@ def main():
               open(os.path.join(HERE, "district-map.json"), "w", encoding="utf-8"),
               indent=2, ensure_ascii=False)
 
-    write_reds(entries)
+    write_reds(entries, api)
 
     if errs or miss_d or miss_s or unexpected:
         print("FAILED", file=sys.stderr)
@@ -204,17 +228,29 @@ def esc(s):
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def write_reds(entries):
+def write_reds(entries, api):
+    version = read_version()
+    # The vocabulary, A-Z. ALL subdistricts, canonical or not (see the module docstring).
+    districts = sorted(d["name"] for d in api)
+    subs = {d["name"]: sorted(s["name"] for s in (d.get("subdistricts") or [])) for d in api}
+    nsubs = sum(len(v) for v in subs.values())
+
     lines = [
         "// ======================================================================================",
         "// Mod Name: NCZoningCore",
         "// File: NCZoningDistricts.reds",
         "// Author: Spuddeh",
-        "// Description: GENERATED - do not hand-edit. Static (Layer 1) map from the game's district",
-        "//              TweakDBID (from District.GetDistrictID()) to the NC Zoning API district /",
-        "//              subdistrict strings, for the editorial cases where the two vocabularies",
-        "//              differ. Regenerate + verify with tools/districts/build-district-map.py.",
-        "// Mod Version: 0.1.0 (Pre-release)",
+        "// Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:",
+        "//                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID",
+        "//                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict",
+        "//                   strings, for the editorial cases where the two vocabularies differ.",
+        "//                2. AllDistricts() / SubdistrictsOf() - the API's district VOCABULARY,",
+        "//                   enumerable. Static, so it needs no network and no registry data: a",
+        "//                   consumer can render a district picker before the fetch lands, and an",
+        "//                   area with ZERO locations still appears (deriving the list from the",
+        "//                   locations would silently hide it).",
+        "//              Regenerate + verify with tools/districts/build-district-map.py.",
+        f"// Mod Version: {version} (Pre-release)",
         "// ======================================================================================",
         "",
         "module NCZoning.Api",
@@ -234,6 +270,33 @@ def write_reds(entries):
         lines.append(f'    if gameDistrict == t"{e["gamePath"]}" {{ return NCZDistrictMap.Make("{esc(e["district"])}", "{esc(e["subdistrict"])}"); }}')
     lines += [
         "    return null;",
+        "  }",
+        "",
+        f"  // The {len(districts)} API districts, A-Z. Includes districts with no locations yet.",
+        "  public static func AllDistricts() -> array<String> {",
+        "    let out: array<String>;",
+    ]
+    for d in districts:
+        lines.append(f'    ArrayPush(out, "{esc(d)}");')
+    lines += [
+        "    return out;",
+        "  }",
+        "",
+        f"  // The subdistricts of `district`, A-Z ({nsubs} in total). Empty for a district with none",
+        "  // (Dogtown, NCX Spaceport / Morro Rock) and for an unknown district.",
+        "  public static func SubdistrictsOf(district: String) -> array<String> {",
+        "    let out: array<String>;",
+    ]
+    for d in districts:
+        if not subs[d]:
+            continue
+        lines.append(f'    if UnicodeStringEqual(district, "{esc(d)}") {{')
+        for s in subs[d]:
+            lines.append(f'      ArrayPush(out, "{esc(s)}");')
+        lines.append("      return out;")
+        lines.append("    }")
+    lines += [
+        "    return out;",
         "  }",
         "",
         "  private static func Make(district: String, subdistrict: String) -> ref<NCZDistrictName> {",

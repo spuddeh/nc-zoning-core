@@ -12,7 +12,7 @@
 //              @if(ModuleExists("RedHttpClient")), so the mod builds without the plugin.
 //              That build has no network layer and serves only a locations_full.json the
 //              player supplies by hand; if it is absent, ReportNoData tells them so.
-// Mod Version: 0.2.0 (Pre-release)
+// Mod Version: 0.3.0 (Pre-release)
 // Credits: psiberx (Codeware), rayshader (RedHttpClient, RedData, RedFileSystem)
 // ======================================================================================
 
@@ -319,15 +319,10 @@ public class NCZNoDataMessage extends DelayCallback {
   public let m_reason: String;
 
   public func Call() -> Void {
-    let text: String;
-    if UnicodeStringEqual(this.m_reason, NCZ_REASON_CACHE_INVALID()) {
-      text = "NC Zoning: locations_full.json is unreadable. Re-download it - see the mod page.";
-    } else {
-      if NCZHttpAvailable() {
-        text = "NC Zoning: could not download the location registry, and no local copy exists. See the mod page.";
-      } else {
-        text = "NC Zoning: no location data. Install RedHttpClient, or download locations_full.json by hand - see the mod page.";
-      }
+    // Wording lives in NCZStatusMessage; do not inline the sentences here.
+    let text = NCZStatusMessage(this.m_reason);
+    if StrLen(text) == 0 {
+      return;
     }
 
     let msg: SimpleScreenMessage;

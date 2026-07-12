@@ -2,11 +2,17 @@
 // Mod Name: NCZoningCore
 // File: NCZoningDistricts.reds
 // Author: Spuddeh
-// Description: GENERATED - do not hand-edit. Static (Layer 1) map from the game's district
-//              TweakDBID (from District.GetDistrictID()) to the NC Zoning API district /
-//              subdistrict strings, for the editorial cases where the two vocabularies
-//              differ. Regenerate + verify with tools/districts/build-district-map.py.
-// Mod Version: 0.2.0 (Pre-release)
+// Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:
+//                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID
+//                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict
+//                   strings, for the editorial cases where the two vocabularies differ.
+//                2. AllDistricts() / SubdistrictsOf() - the API's district VOCABULARY,
+//                   enumerable. Static, so it needs no network and no registry data: a
+//                   consumer can render a district picker before the fetch lands, and an
+//                   area with ZERO locations still appears (deriving the list from the
+//                   locations would silently hide it).
+//              Regenerate + verify with tools/districts/build-district-map.py.
+// Mod Version: 0.3.0 (Pre-release)
 // ======================================================================================
 
 module NCZoning.Api
@@ -61,6 +67,76 @@ public class NCZDistrictMap {
     if gameDistrict == t"Districts.JapanTown" { return NCZDistrictMap.Make("Westbrook", "Japantown"); }
     if gameDistrict == t"Districts.NorthOaks" { return NCZDistrictMap.Make("Westbrook", "North Oak"); }
     return null;
+  }
+
+  // The 9 API districts, A-Z. Includes districts with no locations yet.
+  public static func AllDistricts() -> array<String> {
+    let out: array<String>;
+    ArrayPush(out, "Badlands");
+    ArrayPush(out, "City Center");
+    ArrayPush(out, "Dogtown");
+    ArrayPush(out, "Heywood");
+    ArrayPush(out, "NCX Spaceport / Morro Rock");
+    ArrayPush(out, "Pacifica");
+    ArrayPush(out, "Santo Domingo");
+    ArrayPush(out, "Watson");
+    ArrayPush(out, "Westbrook");
+    return out;
+  }
+
+  // The subdistricts of `district`, A-Z (27 in total). Empty for a district with none
+  // (Dogtown, NCX Spaceport / Morro Rock) and for an unknown district.
+  public static func SubdistrictsOf(district: String) -> array<String> {
+    let out: array<String>;
+    if UnicodeStringEqual(district, "Badlands") {
+      ArrayPush(out, "Biotechnica Flats");
+      ArrayPush(out, "Jackson Plains");
+      ArrayPush(out, "Laguna Bend");
+      ArrayPush(out, "North Sunrise Oil Field");
+      ArrayPush(out, "Rattlesnake Creek");
+      ArrayPush(out, "Red Peaks");
+      ArrayPush(out, "Rocky Ridge");
+      ArrayPush(out, "Sierra Sonora");
+      ArrayPush(out, "SoCal Border Crossing");
+      ArrayPush(out, "Vasquez Pass");
+      return out;
+    }
+    if UnicodeStringEqual(district, "City Center") {
+      ArrayPush(out, "Corpo Plaza");
+      ArrayPush(out, "Downtown");
+      return out;
+    }
+    if UnicodeStringEqual(district, "Heywood") {
+      ArrayPush(out, "The Glen");
+      ArrayPush(out, "Vista Del Rey");
+      ArrayPush(out, "Wellsprings");
+      return out;
+    }
+    if UnicodeStringEqual(district, "Pacifica") {
+      ArrayPush(out, "Coastview");
+      ArrayPush(out, "West Wind Estate");
+      return out;
+    }
+    if UnicodeStringEqual(district, "Santo Domingo") {
+      ArrayPush(out, "Arroyo");
+      ArrayPush(out, "Rancho Coronado");
+      return out;
+    }
+    if UnicodeStringEqual(district, "Watson") {
+      ArrayPush(out, "Arasaka Waterfront");
+      ArrayPush(out, "Kabuki");
+      ArrayPush(out, "Little China");
+      ArrayPush(out, "Northside Industrial District");
+      return out;
+    }
+    if UnicodeStringEqual(district, "Westbrook") {
+      ArrayPush(out, "Charter Hill");
+      ArrayPush(out, "Japantown");
+      ArrayPush(out, "North Oak");
+      ArrayPush(out, "North Oaks Casino");
+      return out;
+    }
+    return out;
   }
 
   private static func Make(district: String, subdistrict: String) -> ref<NCZDistrictName> {

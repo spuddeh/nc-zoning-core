@@ -5,7 +5,7 @@
 // Description: NCZoning.Api - the public contract. This is the ONLY module consumers
 //              import. Every function is a thin, null-safe forwarder to the internal
 //              NCZoningService singleton.
-// Mod Version: 0.2.0 (Pre-release)
+// Mod Version: 0.3.0 (Pre-release)
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 
@@ -18,7 +18,11 @@ import NCZoning.Data.*
 // redscript has no dependency versioning, and ModuleExists() cannot check a version,
 // so this pair is the load-bearing contract. Version() is human-facing semver.
 // ApiVersion() increments ONLY on a breaking change - never bump it silently.
-public func Version() -> String { return "0.2.0"; }
+//
+// There is no @if(FunctionExists). A consumer that calls a function added in a later core
+// fails to COMPILE against an older one, which takes every redscript mod on that machine
+// down with it. A consumer must require the core version that introduced what it calls.
+public func Version() -> String { return "0.3.0"; }
 public func ApiVersion() -> Int32 { return 1; }
 
 // --- status --------------------------------------------------------------------
@@ -55,6 +59,16 @@ public func GetStatusReason() -> String {
     return s.GetStatusReason();
   }
   return "";
+}
+
+// The player-facing sentence for the current state; "" when live. The only copy of this wording -
+// the core's no-data banner and every consumer read it, so do not restate it in a consumer.
+//
+// Pair with IsReady():
+//   IsReady() + a message -> informational (data is usable but can never refresh)
+//   no IsReady() + a message -> fatal for the session; show it INSTEAD of a zero count.
+public func GetStatusMessage() -> String {
+  return NCZStatusMessage(GetStatusReason());
 }
 
 // --- location queries ----------------------------------------------------------
@@ -122,4 +136,22 @@ public func GetLocationsBySubdistrict(subdistrict: String) -> array<ref<NCZLocat
     out = s.GetLocationsBySubdistrict(subdistrict);
   }
   return out;
+}
+
+// --- district vocabulary -------------------------------------------------------
+// Every district/subdistrict name the registry can attribute a location to, A-Z.
+//
+// STATIC (generated from /v1/districts), so unlike the queries above these do not depend on the
+// fetch: they answer before the data lands and while it is missing. Build a district picker from
+// these, not from GetAllLocations() - an area with zero locations exists here but appears in no
+// location (NCX Spaceport / Morro Rock, Rattlesnake Creek, SoCal Border Crossing today).
+public func GetDistricts() -> array<String> {
+  return NCZDistrictMap.AllDistricts();
+}
+
+// Empty for a district with no subdistricts (Dogtown, NCX Spaceport / Morro Rock) or an unknown one.
+// A district total is NOT the sum of its subdistricts - Badlands has 3 locations attributed to the
+// district directly, inside no subdistrict. Use GetLocationsByDistrict for a district total.
+public func GetSubdistricts(district: String) -> array<String> {
+  return NCZDistrictMap.SubdistrictsOf(district);
 }

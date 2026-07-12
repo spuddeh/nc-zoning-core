@@ -56,7 +56,10 @@ public class MyNCZConsumer extends ScriptableSystem {
     // launch. Show an empty state that explains itself; do not wait for data that never arrives.
     NCZLog(s"[consumer] DataError (\(event.Reason())); ready=\(IsReady()) http=\(IsHttpAvailable())");
     if !IsReady() {
-      // e.g. this.ShowMyEmptyState(GetStatusReason());
+      // Render GetStatusMessage(), not a zero count. "0 locations here" is a real answer;
+      // "no data" is a failure, and a UI that shows the first for the second tells the player a
+      // district is empty when the registry never loaded.
+      // e.g. this.ShowMyEmptyState(GetStatusMessage());
     }
   }
 
@@ -82,6 +85,18 @@ public class MyNCZConsumer extends ScriptableSystem {
     // it to the API's spaced name - NCZoningCore deliberately does not ship district geometry.
     let watson = GetLocationsByDistrict("Watson");
     NCZLog(s"[consumer] Watson has \(ArraySize(watson)) registry locations");
+
+    // Building a district picker? Enumerate the vocabulary (0.3.0+), do not derive it from the
+    // locations: an area with zero locations appears in no location and would silently vanish.
+    // These are static, so they also work before the fetch lands and while it is missing.
+    let districts = GetDistricts();
+    let d = 0;
+    while d < ArraySize(districts) {
+      let subs = GetSubdistricts(districts[d]);
+      let inDistrict = GetLocationsByDistrict(districts[d]);   // NOT the sum of the subdistricts
+      NCZLog(s"[consumer] \(districts[d]): \(ArraySize(inDistrict)) locations, \(ArraySize(subs)) subdistricts");
+      d += 1;
+    }
   }
 }
 

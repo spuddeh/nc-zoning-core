@@ -57,9 +57,13 @@ all the data there will ever be. If they have not supplied it, there is no data 
 coming to fix that. Do not sit in a "waiting for data" state forever, and do not render an empty
 list as though the registry were genuinely empty.
 
-Two calls tell you where you are:
+Three calls tell you where you are:
 
 - `IsHttpAvailable() -> Bool` - false when the build has no network layer.
+- `GetStatusMessage() -> String` - `""` when live; otherwise the player-facing sentence for the
+  current state. **Show this instead of a zero count when `IsReady()` is false.** It is the single
+  owner of that wording, so a consumer that renders it cannot contradict the core's own message.
+  Do not write your own version of these sentences.
 - `GetStatusReason() -> String` - `""` when the data is live, otherwise one of:
 
 | Reason | `IsReady()` | Meaning |
@@ -74,6 +78,11 @@ The rule of thumb: a reason with `IsReady() == true` is informational, and one w
 `IsReady() == false` is fatal for the session. In the fatal case NCZoningCore already shows the
 user an on-screen message explaining how to fix it, so your mod does not need to duplicate the
 install instructions. It just needs to not pretend it has data.
+
+**A zero count and no-data must not render the same.** "0 locations in this district" is a real,
+resolved answer. "No location data" is a failure. If a UI shows the first when the truth is the
+second, it tells the player a district is empty when the registry simply never loaded. Check
+`IsReady()` before you render any count, and render `GetStatusMessage()` when it is false.
 
 The fatal case also fires `NCZoning-DataError` (redscript) and `NCZoningApi.OnDataError` (CET
 Lua), both carrying the same reason string.
@@ -98,6 +107,15 @@ consumer needs; `NCZoning.Data` provides the DTO and event payload types.
 - `Version() -> String` - human-facing semver.
 - `ApiVersion() -> Int32` - increments only on a breaking change. Gate on it:
   `if ApiVersion() < 1 { return; }`.
+
+**`ApiVersion()` does not protect you from an OLD core.** It is a runtime check, and the problem
+lands at compile time. redscript has no `@if(FunctionExists)`, so if you call a function that a
+later core added (`GetDistricts`, `GetSubdistricts`, `GetStatusMessage` - all 0.3.0) and the player
+has an older NCZoningCore installed, the redscript compile fails. A redscript compile failure is
+not local to your mod: it takes down **every** redscript mod on that machine.
+
+So `ModuleExists` guards the core being *absent*, and nothing guards it being *stale*. If you call
+anything added after 0.2.0, state a minimum NCZoningCore version in your requirements and mod page.
 
 ### Events
 
@@ -138,7 +156,31 @@ directly.
 | `GetLocationsNear(pos: Vector4, radius: Float)` | `array<ref<NCZLocation>>` |
 
 Status functions live in the same module: `IsReady()`, `IsStale()`, `GetDataVersion()`,
-`IsHttpAvailable()`, `GetStatusReason()`.
+`IsHttpAvailable()`, `GetStatusReason()`, `GetStatusMessage()`.
+
+### District vocabulary (0.3.0+, redscript only)
+
+| Function | Returns |
+| --- | --- |
+| `GetDistricts()` | `array<String>` - all 9 districts, A-Z |
+| `GetSubdistricts(district: String)` | `array<String>` - that district's subdistricts, A-Z (empty for Dogtown and NCX Spaceport / Morro Rock, which have none) |
+
+Building a district picker? Use these, **not** the districts you find on the locations. They are
+static (generated from `/v1/districts`), so they need no network and no registry data: they answer
+correctly before the fetch lands and while it is missing entirely.
+
+Deriving the list from `GetAllLocations()` looks equivalent and is not. An area with zero locations
+appears in no location, so it silently vanishes - today that is NCX Spaceport / Morro Rock,
+Rattlesnake Creek and SoCal Border Crossing. Those are precisely the areas a modder browsing for
+somewhere to build would want to see.
+
+A district's total is **not** the sum of its subdistricts: some locations are attributed to a
+district directly, inside no subdistrict (Badlands has 3). Use `GetLocationsByDistrict` for a
+district total.
+
+These are redscript-only. Adding them to the CET facade would require importing `NCZoning.Api` into
+a no-module file, which would push the API's global functions into the true global namespace where
+other mods could collide with them. A CET consumer can reach `NCZDistrictMap` through RTTI.
 
 A full worked example is in [`examples/RedscriptConsumer.reds`](../examples/RedscriptConsumer.reds).
 

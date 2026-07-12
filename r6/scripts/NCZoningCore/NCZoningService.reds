@@ -5,7 +5,7 @@
 // Description: NCZoningService - the internal ScriptableService that owns the
 //              RedFileSystem storage and the in-memory registry store. NCZoning.Api
 //              forwards to this singleton; consumers never import NCZoning.Core.
-// Mod Version: 0.2.0 (Pre-release)
+// Mod Version: 0.3.0 (Pre-release)
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 
@@ -29,6 +29,26 @@ public func NCZ_REASON_CACHE_MISSING() -> String { return "cache_missing"; }    
 public func NCZ_REASON_CACHE_INVALID() -> String { return "cache_invalid"; }         // present but empty / unparseable
 public func NCZ_REASON_STORAGE_UNAVAIL() -> String { return "storage_unavailable"; } // RedFileSystem returned a null storage
 public func NCZ_REASON_FETCH_FAILED() -> String { return "fetch_failed"; }           // retries exhausted; cache may still serve
+
+// The player-facing sentence for a status reason; "" when live. Surfaced to consumers as
+// NCZoning.Api.GetStatusMessage(). The only copy of this wording: the core's no-data banner and
+// every consumer read it, so do not restate these sentences anywhere else.
+public func NCZStatusMessage(reason: String) -> String {
+  if StrLen(reason) == 0 {
+    return "";                                       // live
+  }
+  // Usable data that can never refresh. Informational, not an error - IsReady() is true.
+  if UnicodeStringEqual(reason, NCZ_REASON_OFFLINE_SNAPSHOT()) {
+    return "NC Zoning: using a local snapshot. It cannot refresh without RedHttpClient.";
+  }
+  if UnicodeStringEqual(reason, NCZ_REASON_CACHE_INVALID()) {
+    return "NC Zoning: locations_full.json is unreadable. Re-download it - see the mod page.";
+  }
+  if NCZHttpAvailable() {
+    return "NC Zoning: could not download the location registry, and no local copy exists. See the mod page.";
+  }
+  return "NC Zoning: no location data. Install RedHttpClient, or download locations_full.json by hand - see the mod page.";
+}
 
 public class NCZoningService extends ScriptableService {
   private let m_storage: ref<FileSystemStorage>;
