@@ -36,15 +36,43 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [*]Codeware
 [*]RedData
 [*]RedFileSystem
+[/list]
+[b]Optional:[/b]
+[list]
 [*]RedHttpClient
 [/list]
 [i]Cyber Engine Tweaks is [b]not[/b] required by NCZoningCore itself. It is only needed if the consumer mod using NCZoningCore is a CET Lua mod.[/i]
+[line]
+[color=#ffff00][size=5][b]RedHttpClient is optional[/b][/size][/color]
+RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason NCZoningCore touches the network at all. If you would rather not install a general-purpose HTTP plugin, that is a fair call, and you do not have to. It is a [b]soft dependency[/b]: NCZoningCore installs and runs without it.
+
+[b]With RedHttpClient.[/b] The registry downloads itself once per session and keeps itself current. Nothing for you to do.
+
+[b]Without RedHttpClient.[/b] NCZoningCore never opens a socket. It reads the registry from a file you download yourself, and treats it as permanently out of date, because it has no way to check. You re-download whenever you want fresher data.
+
+If you skip RedHttpClient and do not supply the file, the mod has no data. It will tell you so on screen a few seconds into your session, rather than pretending the map is empty.
+
+[color=#ffff00][size=5][b]Getting the data by hand[/b][/size][/color]
+Open a terminal in your Cyberpunk 2077 folder and run:
+[code]curl.exe -L "https://api.nczoning.net/v1/locations?full=1" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"[/code]
+That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations_full.json[/font]. The folder is not negotiable: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
+
+The output path is relative, so check it landed where you meant. Downloading a perfectly good file into the wrong folder looks like a complete success and does nothing:
+[code]dir r6\storages\NCZoningCore[/code]
+You should see [font=Courier New]locations_full.json[/font], around 210 KB.
+
+[b]Vortex, or a manual install:[/b] nothing special to do. The command above is all you need.
+
+[b]Mod Organizer 2:[/b] the game directory is virtualised, so instead either run the command from your [font=Courier New]overwrite\[/font] folder, or create [font=Courier New]r6\storages\NCZoningCore\locations_full.json[/font] inside a mod folder and let MO2 deploy it (which keeps it out of overwrite and lets you uninstall it cleanly).
+
+The overwrite route is the same place the mod writes to anyway: with RedHttpClient installed, the game's write passes through the virtual filesystem and MO2 drops it in [font=Courier New]overwrite\r6\storages\NCZoningCore\[/font]. So if you add RedHttpClient later, it refreshes the file you already put there instead of creating a second copy elsewhere.
 [line]
 [color=#ffff00][size=5][b]Installation[/b][/size][/color]
 [list=1]
 [*]Install the requirements above.
 [*]Download NCZoningCore and extract the [font=Courier New]r6[/font] folder into your Cyberpunk 2077 root directory.
 [i]Final path should look like:[/i] [font=Courier New]Cyberpunk 2077\r6\scripts\NCZoningCore\[/font]
+[*][i]Only if you skipped RedHttpClient:[/i] run the [font=Courier New]curl[/font] command above to download the registry.
 [/list]
 Works with mod managers, or install manually.
 [line]

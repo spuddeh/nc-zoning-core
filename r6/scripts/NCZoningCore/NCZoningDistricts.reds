@@ -6,7 +6,7 @@
 //              TweakDBID (from District.GetDistrictID()) to the NC Zoning API district /
 //              subdistrict strings, for the editorial cases where the two vocabularies
 //              differ. Regenerate + verify with tools/districts/build-district-map.py.
-// Mod Version: 0.1.0 (Pre-release)
+// Mod Version: 0.2.0 (Pre-release)
 // ======================================================================================
 
 module NCZoning.Api

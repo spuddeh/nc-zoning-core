@@ -48,8 +48,16 @@ public class MyNCZConsumer extends ScriptableSystem {
     this.UseTheData();
   }
   private cb func OnDataError(event: ref<NCZoningDataEvent>) -> Void {
-    // A fetch failed after retries. IsReady() may still be true if the offline cache served.
-    NCZLog(s"[consumer] DataError (\(event.Reason())); ready=\(IsReady())");
+    // The registry could not be obtained. Two very different situations:
+    //   IsReady() == true  -> informational; the cache is still serving usable data.
+    //   IsReady() == false -> FATAL for this session. No data exists and none is coming.
+    // The fatal case is normal, not exotic: RedHttpClient is optional for NCZoningCore, so a
+    // user who declined it and never downloaded locations_full.json by hand lands here every
+    // launch. Show an empty state that explains itself; do not wait for data that never arrives.
+    NCZLog(s"[consumer] DataError (\(event.Reason())); ready=\(IsReady()) http=\(IsHttpAvailable())");
+    if !IsReady() {
+      // e.g. this.ShowMyEmptyState(GetStatusReason());
+    }
   }
 
   private func UseTheData() -> Void {
@@ -59,7 +67,8 @@ public class MyNCZConsumer extends ScriptableSystem {
       return;
     }
     // NOTE the rvalue-array bug: never ArraySize()/index a method's array return inline -
-    // bind it to a local first (see the NCZoningCore wiki).
+    // bind it to a local first, as below. Applying an array intrinsic straight to a method's
+    // return value reads garbage in redscript. This is a redscript-wide trap, not an NCZ one.
     let near = GetLocationsNear(player.GetWorldPosition(), 50.0);
     let i = 0;
     while i < ArraySize(near) {

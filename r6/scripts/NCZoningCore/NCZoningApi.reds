@@ -8,7 +8,7 @@
 //              signal as an Observe-able instance method (Observe('NCZoningApi','OnDataReady')).
 //              A ScriptableService so it has a singleton for the instance hook. Read-only
 //              forwarders to the internal service; redscript consumers use `import NCZoning.Api.*`.
-// Mod Version: 0.1.0 (Pre-release)
+// Mod Version: 0.2.0 (Pre-release)
 // Credits: psiberx (Codeware)
 // ======================================================================================
 
@@ -21,7 +21,7 @@ public class NCZoningApi extends ScriptableService {
   }
 
   // --- version handshake (static; Lua: NCZoningApi.Version()) -------------------
-  public static func Version() -> String { return "0.1.0"; }
+  public static func Version() -> String { return "0.2.0"; }
   public static func ApiVersion() -> Int32 { return 1; }
 
   // --- status ------------------------------------------------------------------
@@ -42,6 +42,15 @@ public class NCZoningApi extends ScriptableService {
     let s = NCZoningService.Get();
     if IsDefined(s) { return s.GetLocationCount(); }
     return 0;
+  }
+  // False when the build has no RedHttpClient, so the registry can never refresh itself.
+  public static func IsHttpAvailable() -> Bool { return NCZHttpAvailable(); }
+  // "" when live; otherwise offline_snapshot / cache_missing / cache_invalid /
+  // storage_unavailable / fetch_failed. Pair with IsReady(): + true is informational, + false is fatal.
+  public static func GetStatusReason() -> String {
+    let s = NCZoningService.Get();
+    if IsDefined(s) { return s.GetStatusReason(); }
+    return "";
   }
 
   // --- location queries --------------------------------------------------------
@@ -93,11 +102,23 @@ public class NCZoningApi extends ScriptableService {
   //   Observe('NCZoningApi', 'OnDataReady', function(self, count, datasetVersion, isRefresh) ... end)
   public func OnDataReady(count: Int32, datasetVersion: String, isRefresh: Bool) -> Void {}
 
-  // Null-safe entry the fetcher calls (game thread) -> fans out to the Observe-able instance hook.
+  // Same shape for the failure path, when the registry could not be obtained at all:
+  //   Observe('NCZoningApi', 'OnDataError', function(self, reason) ... end)
+  // `reason` matches GetStatusReason().
+  public func OnDataError(reason: String) -> Void {}
+
+  // Null-safe entries the fetcher calls (game thread) -> fan out to the Observe-able hooks.
   public static func NotifyDataReady(count: Int32, datasetVersion: String, isRefresh: Bool) -> Void {
     let self = NCZoningApi.Get();
     if IsDefined(self) {
       self.OnDataReady(count, datasetVersion, isRefresh);
+    }
+  }
+
+  public static func NotifyDataError(reason: String) -> Void {
+    let self = NCZoningApi.Get();
+    if IsDefined(self) {
+      self.OnDataError(reason);
     }
   }
 }

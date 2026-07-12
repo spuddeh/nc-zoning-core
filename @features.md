@@ -27,8 +27,21 @@
 - CET Lua bridge: a bare-named NCZoningApi facade with read-only static reads and an
   Observe-able OnDataReady hook, so CET Lua mods consume the registry directly. Worked
   examples in examples/ (redscript soft-dep consumer + CET Lua consumer). (Verified in-game.)
+- RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
+  case it has no networking component at all and reads the registry from a hand-supplied
+  locations_full.json. Achieved by gating every RedHttpClient reference, the import included,
+  behind @if(ModuleExists("RedHttpClient")). (Verified by compiling both ways with scc, and
+  in-game: 295 locations served from a manual snapshot with the plugin uninstalled, consumed
+  normally by the NC Zoning District Guide.)
+- Status reasons (offline_snapshot, fetch_failed, cache_missing, cache_invalid,
+  storage_unavailable) surfaced through GetStatusReason() and IsHttpAvailable() on both the
+  redscript API and the CET Lua facade, so a consumer can distinguish "usable but frozen data"
+  from "no data is coming this session" instead of rendering an empty registry.
+- On-screen error when the mod has no data and no way to get any: a SimpleScreenMessage on the
+  UI_Notifications blackboard telling the user how to fix it. The framework's only UI.
+- NCZoningApi.OnDataError Observe hook for CET Lua, mirroring OnDataReady.
 
 ## Planned
 
-- Consumer documentation (threading invariant, soft-dep, events vs Observe) and release pipeline.
+- Release pipeline.
 - v1.0 Nexus release against the /v1 contract.

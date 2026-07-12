@@ -10,6 +10,9 @@
 --   * "Data ready" is delivered by OBSERVING an instance method (custom CallbackSystem
 --     events are not delivered to Lua):  Observe('NCZoningApi', 'OnDataReady', fn).
 --   * As a fallback you can just poll  NCZoningApi.IsReady().
+--   * RedHttpClient is OPTIONAL for NCZoningCore. A user can therefore be in a session where
+--     the registry is empty and will STAY empty - no fetch is coming to fix it. Handle it:
+--     Observe('NCZoningApi', 'OnDataError', fn), or check NCZoningApi.GetStatusReason().
 -- ======================================================================================
 
 -- Soft dependency: everything is guarded so your mod still runs without NCZoningCore.
@@ -53,6 +56,15 @@ registerForEvent("onInit", function()
     useTheData(isRefresh and "refresh" or "ready")
   end)
 
+  -- The failure path. `reason` matches NCZoningApi.GetStatusReason(). This fires when the
+  -- registry could not be obtained AT ALL, which is a normal state for a user who declined
+  -- RedHttpClient and never downloaded locations_full.json by hand. Show your own empty state;
+  -- do not sit waiting for data that is not coming.
+  Observe("NCZoningApi", "OnDataError", function(_, reason)
+    print(("[consumer] OnDataError: %s - no registry this session"):format(tostring(reason)))
+    -- e.g. showMyEmptyState(reason)
+  end)
+
   -- Also handle the case where the store was already ready before we subscribed
   -- (e.g. the offline cache loaded first).
   if NCZoningApi.IsReady() then
@@ -60,11 +72,18 @@ registerForEvent("onInit", function()
   end
 end)
 
--- Fallback pattern if you prefer polling over Observe: uncomment this and delete the Observe.
+-- Fallback pattern if you prefer polling over Observe. NOTE the exit condition: with no
+-- RedHttpClient and no locations_full.json, IsReady() NEVER becomes true, so a naive poll
+-- spins for the whole session. Stop on a fatal reason.
+-- local FATAL = { cache_missing = true, cache_invalid = true, storage_unavailable = true }
 -- local done = false
 -- registerForEvent("onUpdate", function()
---   if not done and hasNCZ() and NCZoningApi.IsReady() then
+--   if done or not hasNCZ() then return end
+--   if NCZoningApi.IsReady() then
 --     done = true
 --     useTheData("poll")
+--   elseif FATAL[NCZoningApi.GetStatusReason()] then
+--     done = true                     -- no data is coming this session
+--     -- e.g. showMyEmptyState(NCZoningApi.GetStatusReason())
 --   end
 -- end)

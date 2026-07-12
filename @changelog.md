@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.2.0 (pre-release)
+
+- RedHttpClient is now a SOFT dependency. NCZoningCore compiles and runs without it. Every
+  reference to it, the import included, is behind @if(ModuleExists("RedHttpClient")), which
+  redscript evaluates before name resolution, so the absent module is not an UNRESOLVED_IMPORT.
+  Verified by compiling the mod with scc against the real dependency scripts both with and
+  without RedHttpClient installed (and confirming that an ungated import does fail).
+  This answers a user concern about installing a general-purpose HTTP plugin: with RedHttpClient
+  removed, the mod has no networking component at all, rather than merely declining to use one.
+- Without RedHttpClient the registry is read from a locations_full.json the user downloads by
+  hand into r6\storages\NCZoningCore\, and is served as permanently stale data. Deliberately NOT
+  shipping a bundled snapshot: this mod updates rarely, so a bundled copy would go stale and
+  hand users bad data with no signal. README and the Nexus description carry the curl command.
+- Added a status-reason system, so "no data" is legible instead of silent. NCZoningService now
+  records why it has no live data: offline_snapshot, fetch_failed, cache_missing, cache_invalid,
+  or storage_unavailable ("" means live). Exposed as GetStatusReason() and IsHttpAvailable() on
+  both the redscript API and the CET Lua facade. Read alongside IsReady(): a reason with
+  IsReady() == true is informational, with IsReady() == false it is fatal for the session.
+- Added an on-screen error when the mod has no registry data and no way to obtain any (no
+  locations_full.json and either no RedHttpClient or a failed download). This is the framework's
+  only UI, and exists because otherwise every consumer mod would silently look broken for a reason
+  the user could not discover. It uses the UI_Notifications WarningMessage slot with
+  SimpleMessageType.Neutral (the real warning popup, which honours the duration), not the
+  OnscreenMessage slot (the cinematic-subtitle channel, which fades on its own animation). Timing
+  is driven by a QuestTrackerGameController.OnInitialize hook, the established "loading finished"
+  marker, plus a 3s settle: the blackboard slot only displays if the warning controller is already
+  listening, so this cannot be a plain timer.
+- Added the NCZoningApi.OnDataError Observe hook for CET Lua consumers, mirroring OnDataReady and
+  carrying the same reason string. The redscript NCZoning-DataError event now also fires when
+  there was never any data to begin with, not only when a fetch failed.
+- Consumer guide: documented the no-network path, the reason codes, and the trap it creates for
+  consumers (a naive IsReady() poll never terminates for a user with no data and no RedHttpClient).
+
 ## 0.1.0 (pre-release)
 
 - Initial scaffold of the NCZoningCore framework mod (flat pure-redscript layout,

@@ -15,7 +15,8 @@ Every code fact below is drawn from the shipped source in this repository. Exter
 NCZoningCore itself needs, at runtime:
 
 - RED4ext 1.29.0+, redscript 0.5.31+, and Cyberpunk 2077 2.31
-- Codeware, RedData 0.9+, RedFileSystem 0.15+, RedHttpClient 0.7.1+
+- Codeware, RedData 0.9+, RedFileSystem 0.15+
+- RedHttpClient 0.7.1+, **optional** (see [When there is no network](#when-there-is-no-network))
 
 These are RED4ext plugins usable from redscript; per each plugin's own install requirements,
 the mandatory base is RED4ext, and RedData underpins the JSON features (see
@@ -40,6 +41,42 @@ Status you can query at any time:
 - `IsStale()` - the store was served from cache and has not yet been confirmed against the
   server this session (cleared once a network response confirms it).
 - `GetDataVersion()` - the dataset content hash (changes when the registry changes).
+- `IsHttpAvailable()` - whether this install can fetch at all (see below).
+- `GetStatusReason()` - why the data is not live, if it is not.
+
+## When there is no network
+
+RedHttpClient is a **soft dependency**. Every reference to it in the source, the `import`
+included, sits behind `@if(ModuleExists("RedHttpClient"))`, and redscript evaluates those
+conditions before name resolution. With the plugin absent, that code is not compiled, so
+NCZoningCore still builds and runs. It simply has no network layer.
+
+This matters to you because it produces a session state that never resolves. A user without
+RedHttpClient supplies `r6\storages\NCZoningCore\locations_full.json` by hand, and that file is
+all the data there will ever be. If they have not supplied it, there is no data and no fetch
+coming to fix that. Do not sit in a "waiting for data" state forever, and do not render an empty
+list as though the registry were genuinely empty.
+
+Two calls tell you where you are:
+
+- `IsHttpAvailable() -> Bool` - false when the build has no network layer.
+- `GetStatusReason() -> String` - `""` when the data is live, otherwise one of:
+
+| Reason | `IsReady()` | Meaning |
+| --- | --- | --- |
+| `offline_snapshot` | true | No RedHttpClient. Serving a hand-supplied file. Usable, permanently stale. |
+| `fetch_failed` | either | Retries exhausted. If `IsReady()`, the cache is still serving. |
+| `cache_missing` | false | No `locations_full.json`. No data at all. |
+| `cache_invalid` | false | The file is present but empty or unparseable. |
+| `storage_unavailable` | false | RedFileSystem returned a null storage. |
+
+The rule of thumb: a reason with `IsReady() == true` is informational, and one with
+`IsReady() == false` is fatal for the session. In the fatal case NCZoningCore already shows the
+user an on-screen message explaining how to fix it, so your mod does not need to duplicate the
+install instructions. It just needs to not pretend it has data.
+
+The fatal case also fires `NCZoning-DataError` (redscript) and `NCZoningApi.OnDataError` (CET
+Lua), both carrying the same reason string.
 
 ## Consuming from redscript
 
@@ -81,8 +118,9 @@ private cb func OnReady(event: ref<NCZoningDataEvent>) -> Void {
 - `NCZoning-DataReady` - the store first became usable this session (from cache or the first
   successful fetch).
 - `NCZoning-DataRefreshed` - a later network fetch replaced the store with newer data.
-- `NCZoning-DataError` - a fetch failed after retries. `event.Reason()` holds a code;
-  `IsReady()` may still be true if the offline cache is serving.
+- `NCZoning-DataError` - the registry could not be obtained. `event.Reason()` holds one of the
+  codes in [When there is no network](#when-there-is-no-network); `IsReady()` may still be true
+  if the offline cache is serving.
 
 If your system attaches after the event already fired, check `IsReady()` and use the data
 directly.
@@ -98,6 +136,9 @@ directly.
 | `GetLocationsByCategory(category: String)` | `array<ref<NCZLocation>>` |
 | `GetLocationsByTag(tag: String)` | `array<ref<NCZLocation>>` |
 | `GetLocationsNear(pos: Vector4, radius: Float)` | `array<ref<NCZLocation>>` |
+
+Status functions live in the same module: `IsReady()`, `IsStale()`, `GetDataVersion()`,
+`IsHttpAvailable()`, `GetStatusReason()`.
 
 A full worked example is in [`examples/RedscriptConsumer.reds`](../examples/RedscriptConsumer.reds).
 
@@ -134,8 +175,9 @@ if NCZoningApi ~= nil and NCZoningApi.ApiVersion() >= 1 and NCZoningApi.IsReady(
 end
 ```
 
-The Lua facade exposes the same reads as the redscript API, plus `GetLocationCount()`. It is
-read-only by design, so a Lua consumer cannot reach the framework's internal mutating methods.
+The Lua facade exposes the same reads as the redscript API, plus `GetLocationCount()`,
+`IsHttpAvailable()`, and `GetStatusReason()`. It is read-only by design, so a Lua consumer
+cannot reach the framework's internal mutating methods.
 
 ### Knowing when data is ready
 
@@ -157,6 +199,32 @@ Note: the CallbackSystem events in the redscript section are the redscript consu
 CET Lua, use the `Observe` hook above (or `IsReady()` polling). In this framework's own in-game
 testing, custom CallbackSystem events dispatched from redscript were not delivered to CET Lua
 listeners, which is why the `OnDataReady` hook is provided as the Lua path.
+
+### Knowing when data is never coming
+
+`OnDataError` is the matching hook for the failure path. It receives the same reason string as
+`GetStatusReason()`:
+
+```lua
+Observe("NCZoningApi", "OnDataError", function(_, reason)
+  -- reason: cache_missing, cache_invalid, storage_unavailable, fetch_failed
+  showMyOwnEmptyState(reason)
+end)
+```
+
+If you poll `IsReady()` instead of observing, give the poll an exit. A user with no
+RedHttpClient and no `locations_full.json` will never flip `IsReady()` to true, so a naive
+`onUpdate` poll spins for the whole session. Stop when `GetStatusReason()` returns a fatal
+reason:
+
+```lua
+if not NCZoningApi.IsReady() then
+  local reason = NCZoningApi.GetStatusReason()
+  if reason == "cache_missing" or reason == "cache_invalid" or reason == "storage_unavailable" then
+    stopPolling()   -- no data is coming this session
+  end
+end
+```
 
 A full worked example is in [`examples/cet_lua_consumer.lua`](../examples/cet_lua_consumer.lua).
 
@@ -214,8 +282,11 @@ through reflection and hooking, rather than the framework reaching out.
 - Consumers do not deal with threads. NCZoningCore parses network responses off the game thread
   and marshals the result back onto the game thread before updating the store or firing any
   signal, so every callback, event, and read you see runs on the game thread.
-- Non-goals in v1: NCZoningCore does not write anything, report telemetry or player position,
-  show any UI of its own, poll on a loop, or authenticate. It is a read-only data provider.
+- Non-goals in v1: NCZoningCore does not report telemetry or player position, poll on a loop, or
+  authenticate. It is a read-only data provider with no UI, with one deliberate exception: when
+  it has no registry data at all and no way to get any, it pushes a single on-screen message
+  telling the user how to fix it. That is the one case where staying silent would leave every
+  consumer mod looking broken for a reason the user could not otherwise discover.
 
 ## Availability caveat
 

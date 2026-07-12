@@ -5,7 +5,7 @@
 // Description: NCZoningService - the internal ScriptableService that owns the
 //              RedFileSystem storage and the in-memory registry store. NCZoning.Api
 //              forwards to this singleton; consumers never import NCZoning.Core.
-// Mod Version: 0.1.0 (Pre-release)
+// Mod Version: 0.2.0 (Pre-release)
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 
@@ -23,6 +23,14 @@ public func NCZoningLog(value: script_ref<String>) -> Void {
   FTLog(s"[NCZoningCore] \(value)");
 }
 
+// Values for GetStatusReason(); "" means live data. Public contract, like the event names:
+// consumers compare against these, so additive only, never rename.
+public func NCZ_REASON_OFFLINE_SNAPSHOT() -> String { return "offline_snapshot"; }   // no RedHttpClient; hand-supplied file, usable but stale forever
+public func NCZ_REASON_CACHE_MISSING() -> String { return "cache_missing"; }         // no locations_full.json
+public func NCZ_REASON_CACHE_INVALID() -> String { return "cache_invalid"; }         // present but empty / unparseable
+public func NCZ_REASON_STORAGE_UNAVAIL() -> String { return "storage_unavailable"; } // RedFileSystem returned a null storage
+public func NCZ_REASON_FETCH_FAILED() -> String { return "fetch_failed"; }           // retries exhausted; cache may still serve
+
 public class NCZoningService extends ScriptableService {
   private let m_storage: ref<FileSystemStorage>;
   private let m_locations: array<ref<NCZLocation>>;
@@ -30,6 +38,7 @@ public class NCZoningService extends ScriptableService {
   private let m_stale: Bool;
   private let m_datasetVersion: String;
   private let m_etag: String;                 // last ETag (verbatim, incl. quotes + -full)
+  private let m_statusReason: String;         // "" once live data is in hand; see NCZ_REASON_* above
 
   // --- lifecycle ---------------------------------------------------------------
 
@@ -58,6 +67,8 @@ public class NCZoningService extends ScriptableService {
   public func GetDataVersion() -> String { return this.m_datasetVersion; }
   public func GetEtag() -> String { return this.m_etag; }
   public func SetStale(stale: Bool) -> Void { this.m_stale = stale; }
+  public func GetStatusReason() -> String { return this.m_statusReason; }
+  public func SetStatusReason(reason: String) -> Void { this.m_statusReason = reason; }
   // Inline-safe count (field-internal ArraySize). Callers can use this instead of
   // ArraySize(GetAllLocations()) which would hit the rvalue-array bug.
   public func GetLocationCount() -> Int32 { return ArraySize(this.m_locations); }
@@ -68,26 +79,34 @@ public class NCZoningService extends ScriptableService {
   // ready but STALE (cache is unverified until the network confirms via 200/304). Returns
   // true if a usable cache was loaded. Runs on the game thread (called from Session/Ready).
   public func LoadCache() -> Bool {
+    // Each early return records WHY, so the failure the player sees can distinguish "never
+    // downloaded" from "downloaded but broken".
     if !IsDefined(this.m_storage) {
+      this.m_statusReason = NCZ_REASON_STORAGE_UNAVAIL();
       return false;
     }
     if !Equals(this.m_storage.Exists("locations_full.json"), FileSystemStatus.True) {
+      this.m_statusReason = NCZ_REASON_CACHE_MISSING();
       return false;
     }
     let locFile = this.m_storage.GetFile("locations_full.json");
     if !IsDefined(locFile) {
+      this.m_statusReason = NCZ_REASON_CACHE_MISSING();
       return false;
     }
     let body = locFile.ReadAsText();
     if StrLen(body) == 0 {
+      this.m_statusReason = NCZ_REASON_CACHE_INVALID();
       return false;
     }
     let obj = ParseJson(body) as JsonObject;
     if !IsDefined(obj) {
+      this.m_statusReason = NCZ_REASON_CACHE_INVALID();
       return false;
     }
     let dataArr = obj.GetKey("data") as JsonArray;
     if !IsDefined(dataArr) {
+      this.m_statusReason = NCZ_REASON_CACHE_INVALID();
       return false;
     }
     let locs: array<ref<NCZLocation>>;
@@ -144,6 +163,7 @@ public class NCZoningService extends ScriptableService {
     this.m_datasetVersion = datasetVersion;
     this.m_stale = stale;
     this.m_ready = true;
+    this.m_statusReason = "";   // caller re-stamps an informational reason if one still applies
   }
 
   // --- location queries (pure; operate on the in-memory store) -----------------
