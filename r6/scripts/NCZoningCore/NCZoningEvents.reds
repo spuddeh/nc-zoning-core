@@ -46,7 +46,7 @@ public class NCZoningDataEvent extends CallbackSystemEvent {
     cs.RegisterEvent(n"NCZoning-DataError", n"NCZoning.Data.NCZoningDataEvent");
   }
 
-  // Dispatch a NCZoningDataEvent under one of the frozen names (DispatchEventAs lets us fire
+  // Dispatch a NCZoningDataEvent under one of the frozen names (DispatchEventAs fires
   // under an arbitrary name rather than the class FQN). Must run on the game thread.
   public static func Dispatch(eventName: CName, datasetVersion: String, count: Int32, reason: String) -> Void {
     GameInstance.GetCallbackSystem()

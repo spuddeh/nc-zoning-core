@@ -32,7 +32,7 @@ public class MyNCZConsumer extends ScriptableSystem {
     cs.RegisterCallback(n"NCZoning-DataError", this, n"OnDataError").SetLifetime(CallbackLifetime.Forever);
 
     // If the store is already ready (e.g. this system attached after the offline cache
-    // loaded), use it right away - the event may have fired before we subscribed.
+    // loaded), use it right away - the event may have fired before this subscribed.
     if IsReady() {
       this.UseTheData();
     }

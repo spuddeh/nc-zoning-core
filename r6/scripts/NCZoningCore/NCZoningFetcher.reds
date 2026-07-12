@@ -61,7 +61,7 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
     this.m_done = true;
     this.m_retries = 0;
-    // Offline-first: load the file now (store becomes ready + stale), then revalidate if we can.
+    // Offline-first: load the file now (store becomes ready + stale), then revalidate if possible.
     let svc = NCZoningService.Get();
     if IsDefined(svc) && svc.LoadCache() {
       let count = svc.GetLocationCount();

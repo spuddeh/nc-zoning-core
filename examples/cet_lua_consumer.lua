@@ -65,7 +65,7 @@ registerForEvent("onInit", function()
     -- e.g. showMyEmptyState(reason)
   end)
 
-  -- Also handle the case where the store was already ready before we subscribed
+  -- Also handle the case where the store was already ready before this subscribed
   -- (e.g. the offline cache loaded first).
   if NCZoningApi.IsReady() then
     useTheData("already-ready")
