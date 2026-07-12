@@ -158,12 +158,14 @@ directly.
 Status functions live in the same module: `IsReady()`, `IsStale()`, `GetDataVersion()`,
 `IsHttpAvailable()`, `GetStatusReason()`, `GetStatusMessage()`.
 
-### District vocabulary (0.3.0+, redscript only)
+### District vocabulary (0.3.0+)
 
 | Function | Returns |
 | --- | --- |
 | `GetDistricts()` | `array<String>` - all 9 districts, A-Z |
 | `GetSubdistricts(district: String)` | `array<String>` - that district's subdistricts, A-Z (empty for Dogtown and NCX Spaceport / Morro Rock, which have none) |
+
+Both are on the CET facade too (`NCZoningApi.GetDistricts()`).
 
 Building a district picker? Use these, **not** the districts you find on the locations. They are
 static (generated from `/v1/districts`), so they need no network and no registry data: they answer
@@ -177,10 +179,6 @@ somewhere to build would want to see.
 A district's total is **not** the sum of its subdistricts: some locations are attributed to a
 district directly, inside no subdistrict (Badlands has 3). Use `GetLocationsByDistrict` for a
 district total.
-
-These are redscript-only. Adding them to the CET facade would require importing `NCZoning.Api` into
-a no-module file, which would push the API's global functions into the true global namespace where
-other mods could collide with them. A CET consumer can reach `NCZDistrictMap` through RTTI.
 
 A full worked example is in [`examples/RedscriptConsumer.reds`](../examples/RedscriptConsumer.reds).
 
