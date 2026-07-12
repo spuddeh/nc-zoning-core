@@ -73,7 +73,7 @@ public class NCZLocation {
   // Inline-safe count/index accessors. Prefer these when reading sizes or single elements:
   // applying ArraySize()/ArrayContains()/[] DIRECTLY to a method that returns an array reads
   // garbage in redscript (an rvalue-temporary bug). These return Int32/String, so they are
-  // always safe inline. See wiki learning redscript-arraysize-on-returned-array.
+  // always safe inline.
   public func TagCount() -> Int32 { return ArraySize(this.tags); }
   public func TagAt(idx: Int32) -> String {
     if idx >= 0 && idx < ArraySize(this.tags) {
@@ -91,9 +91,6 @@ public class NCZLocation {
 
   // Build an NCZLocation from one /v1 location element, fully manually (new object +
   // explicit GetKey* reads). Chosen for explicit control and no reflection dependency.
-  // NOTE: an earlier belief that FromJson fails to bind array<String> was a measurement
-  // artifact of the rvalue-ArraySize bug (wiki learning redscript-arraysize-on-returned-array)
-  // and was never actually confirmed; the manual factory is kept for robustness regardless.
   public static func FromJsonObject(item: ref<JsonObject>) -> ref<NCZLocation> {
     let loc = new NCZLocation();
     if !IsDefined(item) {

@@ -11,9 +11,8 @@
 
 module NCZoning.Data
 
-// One payload class, dispatched under the three frozen PUBLIC string names (verified: the
-// CallbackSystem delivers these custom names as typed events - see the wiki learning
-// codeware-custom-event-names):
+// One payload class, dispatched under three frozen PUBLIC string names. Codeware's
+// CallbackSystem delivers these custom names as typed events:
 //   NCZoning-DataReady      - store is populated and queryable (from cache or network)
 //   NCZoning-DataRefreshed  - a network fetch replaced the store with newer data
 //   NCZoning-DataError      - a fetch failed after retries; Reason() holds a code

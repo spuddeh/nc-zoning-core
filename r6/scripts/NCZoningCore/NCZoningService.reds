@@ -17,8 +17,7 @@ import RedData.Json.*
 
 // Dev-only log wrapper. Codeware (a required dependency) provides FTLog globally, so no
 // Logs.reds signature file is needed and there is no risk of a duplicate native-func
-// clash. STRIP this wrapper and every call site before a Nexus release build (see the
-// no-shipped-logging rule).
+// clash. This wrapper and every call site are stripped before a release build.
 public func NCZoningLog(value: script_ref<String>) -> Void {
   FTLog(s"[NCZoningCore] \(value)");
 }
@@ -136,7 +135,7 @@ public class NCZoningService extends ScriptableService {
   }
 
   // Persist a fresh (200) payload + its ETag. Called on the game thread (via the bounce).
-  // Sync write of ~216 KB happens during the load screen; switch to AsyncFile if it hitches.
+  // This is a synchronous write of ~216 KB, and it lands during the load screen.
   public func WriteCache(body: String, etag: String, datasetVersion: String) -> Void {
     if !IsDefined(this.m_storage) {
       return;
@@ -157,7 +156,7 @@ public class NCZoningService extends ScriptableService {
 
   // Swap the live store. Called by NCZoningFetcher ON THE GAME THREAD (via the DelaySystem
   // bounce) once a fetch or cache load produces new data - never from the HTTP worker
-  // thread, so the read side (Api/queries) stays race-free. See Invariant #1.
+  // thread, so the read side (Api/queries) stays race-free.
   public func SetStore(locations: array<ref<NCZLocation>>, datasetVersion: String, stale: Bool) -> Void {
     this.m_locations = locations;
     this.m_datasetVersion = datasetVersion;
@@ -200,7 +199,7 @@ public class NCZoningService extends ScriptableService {
     let i = 0;
     while i < ArraySize(this.m_locations) {
       // Bind Tags() to a local FIRST: ArrayContains on an inline array-return reads garbage
-      // in redscript (rvalue-array bug). See wiki learning redscript-arraysize-on-returned-array.
+      // in redscript (rvalue-array bug).
       let tags = this.m_locations[i].Tags();
       if ArrayContains(tags, tag) {
         ArrayPush(out, this.m_locations[i]);

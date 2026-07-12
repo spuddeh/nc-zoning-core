@@ -1,8 +1,10 @@
 # District CET console commands
 
 Diagnostics for the NCZoningCore district map, run from the **Cyber Engine Tweaks**
-console (open the CET overlay, Console tab). Handy for verifying the map in-game or
-while building a Layer-2 resolver in a consumer mod.
+console (open the CET overlay, Console tab). Useful for checking the map in-game, and for
+building your own resolver that walks from the player's current district up to its parent.
+NCZoningCore ships the static district-name map only; it does not resolve where the player
+physically is, so a consumer that needs that must read it from the game itself.
 
 ## Two paste rules (or the console rejects it)
 
@@ -60,21 +62,18 @@ for _,p in ipairs({"Districts.Kabuki","Districts.NCSpaceport","Districts.MorroRo
 
 ## 3. District display names (resolve LocKeys)
 
-Prints the game's own name for a district's `localizedName` LocKey (from the TweakDB
-dump). Used to confirm the API names match the game's labels.
+Prints the game's own display name for a district's `localizedName` LocKey. Use it to check
+that the names this API returns line up with the labels the game shows the player.
 
 ```lua
 for _,k in ipairs({"LocKey#87524","LocKey#87525","LocKey#86297"}) do print(k,"=>",Game.GetLocalizedText(k)) end
 ```
 
-Spaceport trio: `#87524 => Morro Rock`, `#87525 => Night City International and
-Translunar`, `#86297 => NCX Spaceport`.
+## 4. Full parent stack of the current district
 
-## 4. Full parent stack of the current district (Layer-2 dev)
-
-`DistrictManager.stack` is the resolved current->parent chain. Useful when building the
-Layer-2 walk. NOTE: verify the field read / 1-indexing live before relying on it — this
-one has not been exercised as thoroughly as 1-3.
+`DistrictManager.stack` is the resolved current->parent chain, and it is what you want when
+walking from a subdistrict up to its parent. **Unverified: confirm the field read and the
+1-indexing in-game before relying on it.**
 
 ```lua
 local ps=Game.GetScriptableSystemsContainer():Get(CName.new("PreventionSystem")) local st=ps.districtManager.stack for i=1,#st do local id=st[i]:GetDistrictID() local r=NCZoning_Api_NCZDistrictMap.Lookup(id) print(i,TDBID.ToStringDEBUG(id),"=>",r and (r.district.."/"..r.subdistrict) or "nil") end
@@ -82,9 +81,9 @@ local ps=Game.GetScriptableSystemsContainer():Get(CName.new("PreventionSystem"))
 
 ## 5. Self-discovery probe (when an accessor is unknown)
 
-Defensive probe that tries getter and field forms and prints what works, without
-aborting on the first error. This is how the accessors above were found — keep it for
-the next unknown native surface. (`try` returns nil on error and moves on.)
+Defensive probe that tries both getter and field forms and prints whichever works, without
+aborting on the first error (`try` returns nil on error and moves on). Useful against any
+native surface whose accessors you do not yet know.
 
 ```lua
 local function try(l,f) local ok,r=pcall(f) print(l,"=>",ok and tostring(r) or ("ERR "..tostring(r))) return ok and r or nil end local ps=Game.GetScriptableSystemsContainer():Get(CName.new("PreventionSystem")) local dm=try("dm.field",function() return ps.districtManager end) or try("dm.getter",function() return ps:GetDistrictManager() end) local d=dm and try("cur",function() return dm:GetCurrentDistrict() end) if d then local id=try("id",function() return d:GetDistrictID() end) if id then try("PATH",function() return TDBID.ToStringDEBUG(id) end) end end

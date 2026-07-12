@@ -92,8 +92,8 @@ public class NCZoningFetcher extends ScriptableSystem {
     NCZoningLog(s"fetch started (conditional=\(ArraySize(headers) > 0))");
   }
 
-  // HTTP callback - runs on a RED4ext JobQueue WORKER thread (Invariant #1). Parse only
-  // here (pure data, no game state); hand the result to the game thread via DelaySystem.
+  // HTTP callback - runs on a RED4ext JobQueue WORKER thread. Parse only here (pure data,
+  // no game state); hand the result to the game thread via DelaySystem.
   @if(ModuleExists("RedHttpClient"))
   private cb func OnHttpResponse(response: ref<HttpResponse>) -> Void {
     if !IsDefined(response) {
@@ -145,7 +145,8 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
     NCZoningLog(s"parsed \(ArraySize(locs)) locations on the worker thread; bouncing to game thread");
 
-    // Bounce to the game thread before swapping the store / writing cache (Invariant #1).
+    // Bounce to the game thread before swapping the store / writing cache: both must happen
+    // on the game thread, never on the HTTP worker.
     let apply = new NCZApplyResult();
     apply.m_fetcher = this;
     apply.m_notModified = false;
