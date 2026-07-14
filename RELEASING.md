@@ -30,13 +30,27 @@ upload cannot come from CI. Do this once:
    ```
    (The zip must contain `r6\scripts\NCZoningCore\*.reds`. The user extracts it into their
    Cyberpunk 2077 root.)
-3. **Read the file id and record it.** On the mod page open the **Files** tab > **API Info**
-   (or the Manage Files edit menu) and copy the id (Nexus labels it **"Group ID"** on the page,
-   but it is what the upload action's `file_id` input wants). Put it in `release-manifest.json`
-   as `file_id`, and set `nexus_mod_id` to the mod page number. File ids are not secret.
+3. **Read the file id and set it as a repository VARIABLE.** On the mod page open the **Files**
+   tab > **API Info** (or the Manage Files edit menu) and copy the id — Nexus labels it
+   **"Group ID"** there, but it is what the upload action's `file_id` input wants. Set it as the
+   repository variable **`NEXUS_FILE_ID_NCZONINGCORE`** (Settings > Secrets and variables >
+   Actions > **Variables**), and set `nexus_mod_id` in `release-manifest.json` to the mod page
+   number.
+
+   > **It does not go in the repo.** Before this first upload the id does not exist, so committing
+   > a placeholder commits a lie — which is exactly what `REPLACE_WITH_FILE_ID` was.
+   >
+   > **Do NOT take the id from the public v1 API.** That endpoint has a field also called
+   > `file_id`, it is a **different id space**, and the wrong value looks entirely plausible — it
+   > fails only at release time.
+   >
+   > **A variable, not a secret:** it is an identifier, not a credential. It authorizes nothing
+   > without `NEXUSMODS_API_KEY`, and anyone with that key could enumerate the ids anyway. As a
+   > secret it would render `***` in the logs, making a wrong id — the one mistake that is easy to
+   > make here — much harder to diagnose.
 4. **Add the API key secret.** Create a Nexus personal API key at
    <https://www.nexusmods.com/settings/api-keys> and add it as the repository secret
-   **`NEXUSMODS_API_KEY`** (Settings > Secrets and variables > Actions).
+   **`NEXUSMODS_API_KEY`** (Settings > Secrets and variables > Actions > **Secrets**).
 
 After that, every future release publishes automatically.
 
