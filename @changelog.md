@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.0 (pre-release)
+
+- Added the district vocabulary API: GetDistricts() and GetSubdistricts(district) enumerate the
+  registry's district and subdistrict names from the static Layer-1 NCZDistrictMap, so a consumer can
+  build a complete area picker (areas with zero locations included) without deriving it from the
+  location list. Exposed on both the redscript NCZoning.Api surface and the CET NCZoningApi facade.
+- Added GetStatusMessage(): a human-readable one-line status string, complementing the
+  machine-readable GetStatusReason().
+- Added recently_updated to NCZLocation (RecentlyUpdated() accessor). The /v1 API now ships a
+  server-computed per-location recency boolean - the polyfill for the missing in-game clock, so a
+  consumer can flag mods updated within the API's recency window with no date math. Read via RedData
+  GetKeyBool in FromJsonObject; additive and non-breaking (an older Core build ignores the new key and
+  the field defaults to false), so ApiVersion() is unchanged (stays 1). The envelope's
+  recently_updated_days window is deliberately not consumed - Core reads the bool, it does not compute
+  recency.
+
 ## 0.2.0 (pre-release)
 
 - RedHttpClient is now a SOFT dependency. NCZoningCore compiles and runs without it. Every

@@ -38,6 +38,7 @@ public class NCZLocation {
   let thumbnail_url: String;
   let picture_url: String;
   let updated_at: String;         // nullable -> "" when absent
+  let recently_updated: Bool;     // server-computed; true when updated within the API's recency window
 
   // --- camelCase accessors (the public surface consumers read) -----------------
   public func Id() -> String { return this.id; }
@@ -56,6 +57,10 @@ public class NCZLocation {
   public func Credits() -> String { return this.credits; }
   public func ThumbnailUrl() -> String { return this.thumbnail_url; }
   public func PictureUrl() -> String { return this.picture_url; }
+  // Server-computed recency: true when the mod was updated within the API's recency window. The
+  // window itself (recently_updated_days) rides the response envelope, not the record; consumers
+  // read this bool rather than compute recency, since redscript has no wall clock.
+  public func RecentlyUpdated() -> Bool { return this.recently_updated; }
 
   // Raw CET coordinates as a Vector4 (W = 1). Returns the zero vector if the array
   // is malformed (fewer than 3 entries) rather than indexing out of bounds.
@@ -109,6 +114,7 @@ public class NCZLocation {
     loc.thumbnail_url = item.GetKeyString("thumbnail_url");
     loc.picture_url = item.GetKeyString("picture_url");
     loc.updated_at = item.GetKeyString("updated_at");
+    loc.recently_updated = item.GetKeyBool("recently_updated");
 
     let coords = item.GetKey("coordinates") as JsonArray;
     if IsDefined(coords) {

@@ -3,6 +3,14 @@
 Public, user-facing changelog. Plain language, only what matters to the people installing this mod
 and to the mod authors building on it. The full technical detail lives in `@changelog.md`.
 
+### [Unreleased - v0.3.0]
+
+- New: Mods built on NCZoningCore can now list every district and subdistrict by name (including areas
+  with no locations yet), so they can offer a complete area picker. Available from both redscript and
+  CET Lua, plus a human-readable status message for showing the registry's state.
+- New: A per-location "recently updated" flag is now available to consumer mods, so they can highlight
+  mods updated in the last few days - something in-game code could not work out on its own before.
+
 ### [Unreleased - v0.2.0]
 
 - New: RedHttpClient is now **optional**. NCZoningCore installs and runs without it. If you would

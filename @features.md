@@ -40,6 +40,11 @@
 - On-screen error when the mod has no data and no way to get any: a SimpleScreenMessage on the
   UI_Notifications blackboard telling the user how to fix it. The framework's only UI.
 - NCZoningApi.OnDataError Observe hook for CET Lua, mirroring OnDataReady.
+- District vocabulary enumeration: GetDistricts() and GetSubdistricts(district) list the registry's
+  area names (empty areas included) from the static Layer-1 map, on both the redscript and CET surfaces,
+  plus GetStatusMessage() for a human-readable status line.
+- Per-location recency: RecentlyUpdated() exposes the /v1 API's server-computed recently_updated
+  boolean, so consumers can flag recently-updated mods despite the absence of an in-game clock.
 
 ## Planned
 
