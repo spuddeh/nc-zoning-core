@@ -38,7 +38,15 @@ and CET Lua mods can react.
 - Codeware
 - RedData 0.9 or newer
 - RedFileSystem 0.15 or newer
+- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.1.0 or newer
 - Cyberpunk 2077 2.31
+
+RedLogger is required rather than optional, and that is a deliberate cost. It is
+what NCZoningCore logs through, and because it is a framework the usual failure
+report is "the registry never loaded" — which is answerable only from a log. Its
+lines land in `r6\logs\mods\NCZoningCore__<date_time>.log`, one file per session
+with the five most recent kept, so a bug report is one small file scoped to this
+mod alone rather than a shared log or a special debug build.
 
 Optional:
 

@@ -2,6 +2,24 @@
 
 ## 0.3.0 (pre-release)
 
+- RedLogger is now a HARD dependency, and the NCZoningLog wrapper's call sites SHIP. The
+  wrapper body changed from FTLog to RedLog.Append("NCZoningCore", ...); its 19 call sites
+  were untouched, which is the whole reason a wrapper existed. Logs land in
+  r6\logs\mods\NCZoningCore__<date_time>.log - one file per session, five kept, oldest pruned.
+  Taken deliberately despite forcing the dependency onto every consumer of the framework: the
+  usual failure report against a background framework is "the registry never loaded", which is
+  answerable only from a log, and a consumer can now be asked for one small file scoped to
+  this mod rather than a shared log or a special debug build.
+  Why this may ship where Log/LogChannel may not: those need a per-mod Logs.reds carrying a
+  `native func` declaration, and redscript compiles every installed mod into ONE unit, so two
+  mods each shipping one is a duplicate declaration that breaks every redscript mod on the
+  player's machine. RedLogger's signature ships once, inside the plugin, so the collision is
+  structurally impossible however many mods call it. Logs.reds is still never shipped.
+  RedLog.Append has no level parameter, so log levels must be encoded in the line text.
+  examples/RedscriptConsumer.reds and docs/consumer-guide.md updated to teach the same shape;
+  the example's guard on NCZoning.Api is sufficient rather than lucky, because Core cannot
+  compile without RedLogger, so a resolvable NCZoning.Api implies RedLogger is installed.
+
 - Added the district vocabulary API: GetDistricts() and GetSubdistricts(district) enumerate the
   registry's district and subdistrict names from the static Layer-1 NCZDistrictMap, so a consumer can
   build a complete area picker (areas with zero locations included) without deriving it from the

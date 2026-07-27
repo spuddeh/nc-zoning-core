@@ -36,7 +36,9 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [*]Codeware
 [*]RedData
 [*]RedFileSystem
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/31920]RedLogger[/url]
 [/list]
+[i]RedLogger is what NCZoningCore writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font] instead of shouting into a log shared with every other mod, and it keeps the five most recent sessions. If something goes wrong, that one small file is the whole answer — which matters more here than in most mods, because NCZoningCore runs in the background and the thing that goes wrong is usually "the registry never loaded".[/i]
 [b]Optional:[/b]
 [list]
 [*]RedHttpClient

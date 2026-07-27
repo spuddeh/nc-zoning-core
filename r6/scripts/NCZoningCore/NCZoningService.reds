@@ -14,12 +14,23 @@ module NCZoning.Core
 import NCZoning.Data.*
 import RedFileSystem.*
 import RedData.Json.*
+import RedLogger.*
 
-// Dev-only log wrapper. Codeware (a required dependency) provides FTLog globally, so no
-// Logs.reds signature file is needed and there is no risk of a duplicate native-func
-// clash. This wrapper and every call site are stripped before a release build.
+// The log wrapper, and it SHIPS. RedLogger is a hard dependency (a bare import of an absent
+// module does not compile), which is a deliberate choice for a framework: a consumer reporting
+// "the registry never loaded" can be asked for one small file scoped to this mod alone, at
+// r6/logs/mods/NCZoningCore__<date_time>.log.
+//
+// Why this is safe where Log/LogChannel are not: redscript compiles every installed mod into
+// ONE unit, so the `native func` declaration a Logs.reds carries is global, and two mods each
+// shipping one is a duplicate declaration that breaks every redscript mod on the machine.
+// RedLogger's signature ships exactly once, inside the plugin, so the collision is
+// structurally impossible however many mods call it. Logs.reds is still never shipped.
+//
+// RedLog.Append has no level parameter; encode any level in the line text.
+// [[CP2077-Mods/wiki/decisions/redlogger-is-the-shipping-logging-path]]
 public func NCZoningLog(value: script_ref<String>) -> Void {
-  FTLog(s"[NCZoningCore] \(value)");
+  RedLog.Append("NCZoningCore", s"\(value)");
 }
 
 // Values for GetStatusReason(); "" means live data. Public contract, like the event names:

@@ -27,6 +27,12 @@
 - CET Lua bridge: a bare-named NCZoningApi facade with read-only static reads and an
   Observe-able OnDataReady hook, so CET Lua mods consume the registry directly. Worked
   examples in examples/ (redscript soft-dep consumer + CET Lua consumer). (Verified in-game.)
+- RedLogger as a HARD dependency, with the log calls shipping rather than stripped: one file per
+  session at r6\logs\mods\NCZoningCore__<date_time>.log, five kept. Contrast the line above - this
+  is the one dependency deliberately NOT made soft, because a framework's usual bug report is "the
+  registry never loaded" and only a log answers it. Safe to ship where Log/LogChannel are not,
+  because RedLogger's native signature lives inside the plugin and is declared exactly once no
+  matter how many mods call it. (Compiles clean; not yet exercised in-game.)
 - RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
   case it has no networking component at all and reads the registry from a hand-supplied
   locations_full.json. Achieved by gating every RedHttpClient reference, the import included,

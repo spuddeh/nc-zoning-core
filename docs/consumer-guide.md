@@ -16,7 +16,22 @@ NCZoningCore itself needs, at runtime:
 
 - RED4ext 1.29.0+, redscript 0.5.31+, and Cyberpunk 2077 2.31
 - Codeware, RedData 0.9+, RedFileSystem 0.15+
+- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.1.0+
 - RedHttpClient 0.7.1+, **optional** (see [When there is no network](#when-there-is-no-network))
+
+**RedLogger is a hard dependency, and it becomes one of yours too.** NCZoningCore imports it
+unguarded, so anything depending on NCZoningCore inherits it — list it in your own
+requirements. It is what the framework logs through, writing to
+`r6\logs\mods\NCZoningCore__<date_time>.log`, one file per session with five kept. That
+matters for a background framework: the usual bug report against it is "the registry never
+loaded", and that is answerable only from a log.
+
+You are not obliged to log through it yourself, but you may: unlike `Log`/`LogChannel`, a
+RedLogger call site is safe to ship. Those need a per-mod `Logs.reds` carrying a `native func`
+declaration, and redscript compiles every installed mod into one unit — so two mods each
+shipping one is a duplicate declaration that breaks *every* redscript mod on the player's
+machine. RedLogger's signature ships once, inside the plugin, so no number of callers can
+collide. `examples/RedscriptConsumer.reds` shows the wrapper shape.
 
 These are RED4ext plugins usable from redscript; per each plugin's own install requirements,
 the mandatory base is RED4ext, and RedData underpins the JSON features (see

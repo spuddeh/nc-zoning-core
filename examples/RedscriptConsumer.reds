@@ -100,8 +100,18 @@ public class MyNCZConsumer extends ScriptableSystem {
   }
 }
 
-// Dev-only log wrapper for this example (uses Codeware's FTLog). Strip for release.
+// Log wrapper for this example. Unlike an FTLog/LogChannel wrapper, this one MAY SHIP: the
+// native signature lives inside the RedLogger plugin, so it is declared exactly once no matter
+// how many mods call it, and the lines land in r6/logs/mods/MyConsumer__<date_time>.log rather
+// than a file shared with every other mod.
+//
+// Guarded on NCZoning.Api like everything else here, and that is sufficient rather than lucky:
+// NCZoningCore imports RedLogger unguarded, so it cannot compile without it. If NCZoning.Api
+// resolves, RedLogger is installed.
+@if(ModuleExists("NCZoning.Api"))
+import RedLogger.*
+
 @if(ModuleExists("NCZoning.Api"))
 public func NCZLog(value: script_ref<String>) -> Void {
-  FTLog(s"\(value)");
+  RedLog.Append("MyConsumer", s"\(value)");
 }

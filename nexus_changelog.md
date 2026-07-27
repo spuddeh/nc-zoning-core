@@ -5,6 +5,11 @@ and to the mod authors building on it. The full technical detail lives in `@chan
 
 ### [Unreleased - v0.3.0]
 
+- New: RedLogger is now a **required** dependency. NCZoningCore writes to its own log file at
+  `r6\logs\mods\NCZoningCore__<date_time>.log`, keeping the five most recent sessions, instead of
+  sharing one log with every other mod. This mod runs in the background with no menu, so when
+  something goes wrong the log is the only place the answer lives — and now it is one small file that
+  is easy to attach to a bug report. Mods built on NCZoningCore inherit this requirement.
 - New: Mods built on NCZoningCore can now list every district and subdistrict by name (including areas
   with no locations yet), so they can offer a complete area picker. Available from both redscript and
   CET Lua, plus a human-readable status message for showing the registry's state.
