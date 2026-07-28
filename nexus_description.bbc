@@ -69,19 +69,27 @@ You should see [font=Courier New]locations.json[/font], around 260 KB (it grows 
 
 The overwrite route is the same place the mod writes to anyway: with RedHttpClient installed, the game's write passes through the virtual filesystem and MO2 drops it in [font=Courier New]overwrite\r6\storages\NCZoningCore\[/font]. So if you add RedHttpClient later, it refreshes the file you already put there instead of creating a second copy elsewhere.
 
-[b]MO2 users: make it a one-click button.[/b] Rather than opening a terminal each time, add curl as an executable in MO2 ([font=Courier New]Tools > Executables[/font], or the gear icon) and run it from the dropdown whenever you want fresh data:
-[list]
-[*][b]Binary:[/b] [font=Courier New]C:\Windows\System32\curl.exe[/font]
-[*][b]Arguments:[/b] [font=Courier New]-L "https://api.nczoning.net/v1/locations" --create-dirs -o "C:\PATH\TO\YOUR\MO2\INSTANCE\overwrite\r6\storages\NCZoningCore\locations.json"[/font]
-[/list]
+[b]MO2 users: make it a one-click button.[/b] Rather than opening a terminal each time, save the following as [font=Courier New]refresh-nczoning-data.bat[/font] in your MO2 [b]instance[/b] folder - the one containing [font=Courier New]mods\[/font], [font=Courier New]profiles\[/font] and [font=Courier New]overwrite\[/font] - then add it in MO2 under [font=Courier New]Tools > Executables[/font] with [b]no arguments at all[/b], and run it from the dropdown whenever you want fresh data.
 
-[b]Use a FULL path in [font=Courier New]-o[/font], not a relative one.[/b] This is the part that catches people. A relative path like [font=Courier New]r6\storages\...[/font] is resolved against whatever folder curl happens to start in - which is not necessarily your game folder - so curl either writes somewhere you will never find or fails outright because it cannot create folders there. MO2 closes the console window instantly, so you see nothing at all: no file, no error, no clue.
+[code]@echo off
+set "DEST=%~dp0overwrite\r6\storages\NCZoningCore\locations.json"
+set "LOG=%~dp0refresh-nczoning-data.log"
+echo [%DATE% %TIME%] fetching NC Zoning registry> "%LOG%"
+curl.exe -L --fail --create-dirs -o "%DEST%" "https://api.nczoning.net/v1/locations" >> "%LOG%" 2>&1
+if errorlevel 1 (
+  echo   FAILED - see %LOG%
+  pause
+  exit /b 1
+)
+for %%A in ("%DEST%") do set SIZE=%%~zA
+echo   OK - wrote %SIZE% bytes to:
+echo   %DEST%
+if %SIZE% LSS 10000 echo   WARNING: too small - that is probably an error page, not the data.
+pause[/code]
 
-A full path removes the guesswork completely, and it also means MO2's virtual filesystem is not involved - you are writing straight to the folder the game reads through.
+[b]Why a batch file rather than pointing MO2 straight at curl.[/b] It is tempting to set the Binary to [font=Courier New]curl.exe[/font] and put the whole command in the Arguments box, and it very often does nothing at all - no file, no error, no clue, because the console window closes instantly. The usual cause is the output path: if it is relative it resolves against whatever folder curl happened to start in, and if it contains a space the quoting can be split into separate arguments. The batch file fixes the quoting where a mod manager cannot touch it, and [font=Courier New]%~dp0[/font] means the paths follow your instance around with nothing machine-specific to edit.
 
-[i]Keep [font=Courier New]--create-dirs[/font].[/i] On a fresh install [font=Courier New]r6\storages\NCZoningCore\[/font] does not exist yet - the mod creates it the first time it runs - and without that flag curl fails instead of creating it.
-
-[b]If nothing appears, make the error visible.[/b] Set the Binary to [font=Courier New]C:\Windows\System32\cmd.exe[/font] and put [font=Courier New]/k curl.exe [/font] in front of the same arguments. The window then stays open and shows you exactly what curl said.
+It also [b]leaves evidence[/b]. Every run writes [font=Courier New]refresh-nczoning-data.log[/font] beside it and holds the window open, so a failure tells you what happened instead of looking like nothing happened.
 
 [i]This is a convenience, not a substitute for RedHttpClient.[/i] The mod still treats the file as a permanent snapshot and will say so, because it has no clock and cannot tell a file fetched a minute ago from one fetched in March. Re-run the button when you want newer data.
 [line]
