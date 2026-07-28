@@ -22,7 +22,7 @@ and to the mod authors building on it. The full technical detail lives in `@chan
   rather not install a general-purpose HTTP plugin, you no longer have to: with RedHttpClient absent
   the mod has no networking component at all, rather than one it simply chooses not to use.
 - New: Without RedHttpClient, you supply the location registry yourself by downloading a single
-  `locations_full.json` into `r6\storages\NCZoningCore\`. The README and the mod description carry
+  `locations.json` into `r6\storages\NCZoningCore\`. The README and the mod description carry
   the command. That data is then served as a permanent offline snapshot.
 - New: The mod now tells you on screen when it has no location data and no way to fetch any, instead
   of failing silently. Without it, every mod built on NCZoningCore would just look broken for a

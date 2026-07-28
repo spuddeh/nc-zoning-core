@@ -58,7 +58,7 @@ registerForEvent("onInit", function()
 
   -- The failure path. `reason` matches NCZoningApi.GetStatusReason(). This fires when the
   -- registry could not be obtained AT ALL, which is a normal state for a user who declined
-  -- RedHttpClient and never downloaded locations_full.json by hand. Show your own empty state;
+  -- RedHttpClient and never downloaded locations.json by hand. Show your own empty state;
   -- do not sit waiting for data that is not coming.
   Observe("NCZoningApi", "OnDataError", function(_, reason)
     print(("[consumer] OnDataError: %s - no registry this session"):format(tostring(reason)))
@@ -73,7 +73,7 @@ registerForEvent("onInit", function()
 end)
 
 -- Fallback pattern if you prefer polling over Observe. NOTE the exit condition: with no
--- RedHttpClient and no locations_full.json, IsReady() NEVER becomes true, so a naive poll
+-- RedHttpClient and no locations.json, IsReady() NEVER becomes true, so a naive poll
 -- spins for the whole session. Stop on a fatal reason.
 -- local FATAL = { cache_missing = true, cache_invalid = true, storage_unavailable = true }
 -- local done = false

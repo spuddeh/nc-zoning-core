@@ -10,7 +10,7 @@
 //
 //              RedHttpClient is a SOFT dependency: every reference to it is gated behind
 //              @if(ModuleExists("RedHttpClient")), so the mod builds without the plugin.
-//              That build has no network layer and serves only a locations_full.json the
+//              That build has no network layer and serves only a locations.json the
 //              player supplies by hand; if it is absent, ReportNoData tells them so.
 // Mod Version: 0.3.0 (Pre-release)
 // Credits: psiberx (Codeware), rayshader (RedHttpClient, RedData, RedFileSystem)
@@ -178,7 +178,7 @@ public class NCZoningFetcher extends ScriptableSystem {
       return;
     }
     // LoadCache already recorded why (cache_missing / cache_invalid / storage_unavailable).
-    NCZoningLog(s"RedHttpClient not installed and no usable locations_full.json (\(svc.GetStatusReason()))");
+    NCZoningLog(s"RedHttpClient not installed and no usable locations.json (\(svc.GetStatusReason()))");
     this.ReportNoData(svc.GetStatusReason());
   }
 

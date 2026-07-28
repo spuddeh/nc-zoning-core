@@ -67,7 +67,7 @@ conditions before name resolution. With the plugin absent, that code is not comp
 NCZoningCore still builds and runs. It simply has no network layer.
 
 This matters to you because it produces a session state that never resolves. A user without
-RedHttpClient supplies `r6\storages\NCZoningCore\locations_full.json` by hand, and that file is
+RedHttpClient supplies `r6\storages\NCZoningCore\locations.json` by hand, and that file is
 all the data there will ever be. If they have not supplied it, there is no data and no fetch
 coming to fix that. Do not sit in a "waiting for data" state forever, and do not render an empty
 list as though the registry were genuinely empty.
@@ -85,7 +85,7 @@ Three calls tell you where you are:
 | --- | --- | --- |
 | `offline_snapshot` | true | No RedHttpClient. Serving a hand-supplied file. Usable, permanently stale. |
 | `fetch_failed` | either | Retries exhausted. If `IsReady()`, the cache is still serving. |
-| `cache_missing` | false | No `locations_full.json`. No data at all. |
+| `cache_missing` | false | No `locations.json`. No data at all. |
 | `cache_invalid` | false | The file is present but empty or unparseable. |
 | `storage_unavailable` | false | RedFileSystem returned a null storage. |
 
@@ -268,7 +268,7 @@ end)
 ```
 
 If you poll `IsReady()` instead of observing, give the poll an exit. A user with no
-RedHttpClient and no `locations_full.json` will never flip `IsReady()` to true, so a naive
+RedHttpClient and no `locations.json` will never flip `IsReady()` to true, so a naive
 `onUpdate` poll spins for the whole session. Stop when `GetStatusReason()` returns a fatal
 reason:
 

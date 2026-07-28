@@ -33,10 +33,20 @@ public func NCZoningLog(value: script_ref<String>) -> Void {
   RedLog.Append("NCZoningCore", s"\(value)");
 }
 
+// The registry cache filename, in ONE place. It is part of the user-facing contract - players
+// download it by hand when they decline RedHttpClient - so it appears in the README, the Nexus
+// description and the curl command too. Changing it is a breaking change for anyone who has
+// hand-placed the old one.
+//
+// Renamed from `locations.json` before 1.0.0 shipped, while there was still no installed
+// base to break. The `_full` recorded the API's old slim/full split, which no longer exists.
+// AFTER 1.0.0 this needs a migration read, not a rename.
+public func NCZ_LocationsFile() -> String { return "locations.json"; }
+
 // Values for GetStatusReason(); "" means live data. Public contract, like the event names:
 // consumers compare against these, so additive only, never rename.
 public func NCZ_REASON_OFFLINE_SNAPSHOT() -> String { return "offline_snapshot"; }   // no RedHttpClient; hand-supplied file, usable but stale forever
-public func NCZ_REASON_CACHE_MISSING() -> String { return "cache_missing"; }         // no locations_full.json
+public func NCZ_REASON_CACHE_MISSING() -> String { return "cache_missing"; }         // no locations.json
 public func NCZ_REASON_CACHE_INVALID() -> String { return "cache_invalid"; }         // present but empty / unparseable
 public func NCZ_REASON_STORAGE_UNAVAIL() -> String { return "storage_unavailable"; } // RedFileSystem returned a null storage
 public func NCZ_REASON_FETCH_FAILED() -> String { return "fetch_failed"; }           // retries exhausted; cache may still serve
@@ -53,12 +63,12 @@ public func NCZStatusMessage(reason: String) -> String {
     return "NC Zoning: using a local snapshot. It cannot refresh without RedHttpClient.";
   }
   if UnicodeStringEqual(reason, NCZ_REASON_CACHE_INVALID()) {
-    return "NC Zoning: locations_full.json is unreadable. Re-download it - see the mod page.";
+    return "NC Zoning: locations.json is unreadable. Re-download it - see the mod page.";
   }
   if NCZHttpAvailable() {
     return "NC Zoning: could not download the location registry, and no local copy exists. See the mod page.";
   }
-  return "NC Zoning: no location data. Install RedHttpClient, or download locations_full.json by hand - see the mod page.";
+  return "NC Zoning: no location data. Install RedHttpClient, or download locations.json by hand - see the mod page.";
 }
 
 public class NCZoningService extends ScriptableService {
@@ -115,11 +125,11 @@ public class NCZoningService extends ScriptableService {
       this.m_statusReason = NCZ_REASON_STORAGE_UNAVAIL();
       return false;
     }
-    if !Equals(this.m_storage.Exists("locations_full.json"), FileSystemStatus.True) {
+    if !Equals(this.m_storage.Exists(NCZ_LocationsFile()), FileSystemStatus.True) {
       this.m_statusReason = NCZ_REASON_CACHE_MISSING();
       return false;
     }
-    let locFile = this.m_storage.GetFile("locations_full.json");
+    let locFile = this.m_storage.GetFile(NCZ_LocationsFile());
     if !IsDefined(locFile) {
       this.m_statusReason = NCZ_REASON_CACHE_MISSING();
       return false;
@@ -171,7 +181,7 @@ public class NCZoningService extends ScriptableService {
     if !IsDefined(this.m_storage) {
       return;
     }
-    let locFile = this.m_storage.GetFile("locations_full.json");
+    let locFile = this.m_storage.GetFile(NCZ_LocationsFile());
     if IsDefined(locFile) {
       locFile.WriteText(body);
     }

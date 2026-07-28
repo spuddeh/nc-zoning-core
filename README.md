@@ -108,10 +108,10 @@ Run this from your Cyberpunk 2077 root directory. `--create-dirs` makes the
 storage folder for you.
 
 ```powershell
-curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"
+curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"
 ```
 
-The finished path is `Cyberpunk 2077\r6\storages\NCZoningCore\locations_full.json`.
+The finished path is `Cyberpunk 2077\r6\storages\NCZoningCore\locations.json`.
 That folder is fixed: RedFileSystem sandboxes every mod to `r6\storages\<mod name>\`
 and NCZoningCore cannot read from anywhere else.
 
@@ -122,7 +122,7 @@ perfectly good file into the wrong folder and see no error at all:
 dir r6\storages\NCZoningCore
 ```
 
-You should see `locations_full.json`, around 210 KB.
+You should see `locations.json`, around 210 KB.
 
 There is no second file to fetch. `meta.json` holds the ETag used for revalidation,
 which only matters when RedHttpClient is doing the fetching, so an offline install
@@ -135,7 +135,7 @@ game folder, so the command above is all you need.
 
 - run the command from `overwrite\`, so the file lands in
   `overwrite\r6\storages\NCZoningCore\`; or
-- create `r6\storages\NCZoningCore\locations_full.json` inside a mod folder and let
+- create `r6\storages\NCZoningCore\locations.json` inside a mod folder and let
   MO2 deploy it, which keeps it out of overwrite and lets you uninstall it cleanly.
 
 The first is the same place the mod would have written to anyway: when RedHttpClient

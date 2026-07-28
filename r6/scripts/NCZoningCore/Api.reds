@@ -77,7 +77,7 @@ public func GetDataVersion() -> String {
 }
 
 // False when the build has no RedHttpClient, so the registry can never refresh: it serves only a
-// locations_full.json the player supplied by hand, or nothing.
+// locations.json the player supplied by hand, or nothing.
 public func IsHttpAvailable() -> Bool { return NCZHttpAvailable(); }
 
 // "" when live; otherwise offline_snapshot / cache_missing / cache_invalid / storage_unavailable /

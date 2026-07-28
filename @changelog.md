@@ -2,6 +2,31 @@
 
 ## 0.3.0 (pre-release)
 
+- The registry cache file is renamed locations_full.json -> locations.json, and the fetch URL drops
+  the retired ?full=1. Both encoded the API's old slim/full fork, which has been collapsed into one
+  representation: the slim shape was built for a consumer that never existed (it dropped description,
+  which the District Guide needs, and thumbnails, which the website needs) and both real consumers
+  always asked for full.
+  - ?full=1 survives as a NO-OP ALIAS, not a redirect. Worth being precise about: nothing was broken
+    and nothing would have broken - RedHttpClient never had to follow a 301, the parameter was simply
+    ignored. It is dropped because it describes a distinction the API no longer has.
+  - THE RENAME IS A BREAKING CHANGE AND THE WINDOW FOR IT CLOSES AT 1.0.0. Players hand-place this
+    file when they decline RedHttpClient, so the name is part of the user-facing contract. Doing it
+    now costs nothing because the mod has never been published; after 1.0.0 it would need a migration
+    read of the old name rather than a rename.
+  - The filename is now a single NCZ_LocationsFile() rather than three string literals, so the next
+    change is one edit and cannot go half-done.
+  - Existing dev instances still hold the old file in overwrite\. With RedHttpClient installed it
+    simply re-fetches; without it, the old file must be renamed by hand or the mod reports
+    cache_missing.
+- Documented a one-click refresh for MO2 users: curl registered as an MO2 executable and run from the
+  dropdown. MO2 runs it inside the same virtual filesystem as the game, so the file lands in
+  overwrite\ exactly as if the mod had written it - the same location already documented, automated
+  rather than added to. --create-dirs is required: on a fresh install the storage folder does not
+  exist until the mod first runs. It is a convenience, NOT a substitute for RedHttpClient - the mod
+  still reports a permanent snapshot, because it has no clock and cannot tell a file fetched a minute
+  ago from one fetched in March.
+
 - Installed-mod detection. NCZLocation now parses the API's `archives` array (v1.5.0+, the
   .archive/.xl filenames a location mod installs; 285 of 297 live records carry one), and a new
   NCZInstalledRegistry answers which registry locations are actually present on this machine.

@@ -52,7 +52,7 @@ public class MyNCZConsumer extends ScriptableSystem {
     //   IsReady() == true  -> informational; the cache is still serving usable data.
     //   IsReady() == false -> FATAL for this session. No data exists and none is coming.
     // The fatal case is normal, not exotic: RedHttpClient is optional for NCZoningCore, so a
-    // user who declined it and never downloaded locations_full.json by hand lands here every
+    // user who declined it and never downloaded locations.json by hand lands here every
     // launch. Show an empty state that explains itself; do not wait for data that never arrives.
     NCZLog(s"[consumer] DataError (\(event.Reason())); ready=\(IsReady()) http=\(IsHttpAvailable())");
     if !IsReady() {

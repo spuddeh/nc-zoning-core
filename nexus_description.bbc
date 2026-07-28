@@ -56,16 +56,16 @@ If you skip RedHttpClient and do not supply the file, the mod has no data. It wi
 
 [color=#ffff00][size=5][b]Getting the data by hand[/b][/size][/color]
 Open a terminal in your Cyberpunk 2077 folder and run:
-[code]curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"[/code]
-That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations_full.json[/font]. The folder is not negotiable: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
+[code]curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"[/code]
+That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations.json[/font]. The folder is not negotiable: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
 
 The output path is relative, so check it landed where you meant. Downloading a perfectly good file into the wrong folder looks like a complete success and does nothing:
 [code]dir r6\storages\NCZoningCore[/code]
-You should see [font=Courier New]locations_full.json[/font], around 210 KB.
+You should see [font=Courier New]locations.json[/font], around 210 KB.
 
 [b]Vortex, or a manual install:[/b] nothing special to do. The command above is all you need.
 
-[b]Mod Organizer 2:[/b] the game directory is virtualised, so instead either run the command from your [font=Courier New]overwrite\[/font] folder, or create [font=Courier New]r6\storages\NCZoningCore\locations_full.json[/font] inside a mod folder and let MO2 deploy it (which keeps it out of overwrite and lets you uninstall it cleanly).
+[b]Mod Organizer 2:[/b] the game directory is virtualised, so instead either run the command from your [font=Courier New]overwrite\[/font] folder, or create [font=Courier New]r6\storages\NCZoningCore\locations.json[/font] inside a mod folder and let MO2 deploy it (which keeps it out of overwrite and lets you uninstall it cleanly).
 
 The overwrite route is the same place the mod writes to anyway: with RedHttpClient installed, the game's write passes through the virtual filesystem and MO2 drops it in [font=Courier New]overwrite\r6\storages\NCZoningCore\[/font]. So if you add RedHttpClient later, it refreshes the file you already put there instead of creating a second copy elsewhere.
 
@@ -73,7 +73,7 @@ The overwrite route is the same place the mod writes to anyway: with RedHttpClie
 [list]
 [*][b]Binary:[/b] [font=Courier New]C:\Windows\System32\curl.exe[/font]
 [*][b]Start in:[/b] your Cyberpunk 2077 folder
-[*][b]Arguments:[/b] [font=Courier New]-L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"[/font]
+[*][b]Arguments:[/b] [font=Courier New]-L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"[/font]
 [/list]
 MO2 runs it inside the same virtual filesystem the game uses, so the file lands in [font=Courier New]overwrite\[/font] exactly as if the mod had written it itself.
 

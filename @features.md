@@ -41,7 +41,7 @@
   5 AMM + 1 WIP, which are undetectable by construction rather than unfetched.)
 - RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
   case it has no networking component at all and reads the registry from a hand-supplied
-  locations_full.json. Achieved by gating every RedHttpClient reference, the import included,
+  locations.json. Achieved by gating every RedHttpClient reference, the import included,
   behind @if(ModuleExists("RedHttpClient")). (Verified by compiling both ways with scc, and
   in-game: 295 locations served from a manual snapshot with the plugin uninstalled, consumed
   normally by the NC Zoning District Guide.)
