@@ -32,7 +32,13 @@
   is the one dependency deliberately NOT made soft, because a framework's usual bug report is "the
   registry never loaded" and only a log answers it. Safe to ship where Log/LogChannel are not,
   because RedLogger's native signature lives inside the plugin and is declared exactly once no
-  matter how many mods call it. (Compiles clean; not yet exercised in-game.)
+  matter how many mods call it. (Verified in-game 2026-07-28: real file at
+  r6\logs\mods\NCZoningCore__<date_time>.log, per-line timestamps, five sessions retained, sharing
+  the sink with NCZoningDistrictGuide and RCF without collision.)
+- Installed-mod detection, via a bundled CET Lua component: parses the API's archives field and
+  answers Installed / NotInstalled / Unknown per location. (Verified in-game 2026-07-28: "install
+  scan complete: 10 installed of 291 tested" - 291 of 297, the six skipped being the API's own
+  5 AMM + 1 WIP, which are undetectable by construction rather than unfetched.)
 - RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
   case it has no networking component at all and reads the registry from a hand-supplied
   locations_full.json. Achieved by gating every RedHttpClient reference, the import included,
