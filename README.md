@@ -122,7 +122,7 @@ perfectly good file into the wrong folder and see no error at all:
 dir r6\storages\NCZoningCore
 ```
 
-You should see `locations.json`, around 210 KB.
+You should see `locations.json`, around 260 KB (it grows with the registry; anything under ~10 KB means you saved an error page, not the data).
 
 There is no second file to fetch. `meta.json` holds the ETag used for revalidation,
 which only matters when RedHttpClient is doing the fetching, so an offline install

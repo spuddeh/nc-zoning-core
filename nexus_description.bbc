@@ -61,7 +61,7 @@ That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations
 
 The output path is relative, so check it landed where you meant. Downloading a perfectly good file into the wrong folder looks like a complete success and does nothing:
 [code]dir r6\storages\NCZoningCore[/code]
-You should see [font=Courier New]locations.json[/font], around 210 KB.
+You should see [font=Courier New]locations.json[/font], around 260 KB (it grows with the registry; anything under ~10 KB means you saved an error page, not the data).
 
 [b]Vortex, or a manual install:[/b] nothing special to do. The command above is all you need.
 
@@ -72,12 +72,16 @@ The overwrite route is the same place the mod writes to anyway: with RedHttpClie
 [b]MO2 users: make it a one-click button.[/b] Rather than opening a terminal each time, add curl as an executable in MO2 ([font=Courier New]Tools > Executables[/font], or the gear icon) and run it from the dropdown whenever you want fresh data:
 [list]
 [*][b]Binary:[/b] [font=Courier New]C:\Windows\System32\curl.exe[/font]
-[*][b]Start in:[/b] your Cyberpunk 2077 folder
-[*][b]Arguments:[/b] [font=Courier New]-L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"[/font]
+[*][b]Arguments:[/b] [font=Courier New]-L "https://api.nczoning.net/v1/locations" --create-dirs -o "C:\PATH\TO\YOUR\MO2\INSTANCE\overwrite\r6\storages\NCZoningCore\locations.json"[/font]
 [/list]
-MO2 runs it inside the same virtual filesystem the game uses, so the file lands in [font=Courier New]overwrite\[/font] exactly as if the mod had written it itself.
 
-[i]Keep [font=Courier New]--create-dirs[/font].[/i] On a fresh install [font=Courier New]r6\storages\NCZoningCore\[/font] does not exist yet - the mod creates it the first time it runs - and without that flag curl fails rather than creating the folder.
+[b]Use a FULL path in [font=Courier New]-o[/font], not a relative one.[/b] This is the part that catches people. A relative path like [font=Courier New]r6\storages\...[/font] is resolved against whatever folder curl happens to start in - which is not necessarily your game folder - so curl either writes somewhere you will never find or fails outright because it cannot create folders there. MO2 closes the console window instantly, so you see nothing at all: no file, no error, no clue.
+
+A full path removes the guesswork completely, and it also means MO2's virtual filesystem is not involved - you are writing straight to the folder the game reads through.
+
+[i]Keep [font=Courier New]--create-dirs[/font].[/i] On a fresh install [font=Courier New]r6\storages\NCZoningCore\[/font] does not exist yet - the mod creates it the first time it runs - and without that flag curl fails instead of creating it.
+
+[b]If nothing appears, make the error visible.[/b] Set the Binary to [font=Courier New]C:\Windows\System32\cmd.exe[/font] and put [font=Courier New]/k curl.exe [/font] in front of the same arguments. The window then stays open and shows you exactly what curl said.
 
 [i]This is a convenience, not a substitute for RedHttpClient.[/i] The mod still treats the file as a permanent snapshot and will say so, because it has no clock and cannot tell a file fetched a minute ago from one fetched in March. Re-run the button when you want newer data.
 [line]
