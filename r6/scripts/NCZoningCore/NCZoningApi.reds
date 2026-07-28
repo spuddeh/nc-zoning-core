@@ -119,6 +119,57 @@ public class NCZoningApi extends ScriptableService {
     return out;
   }
 
+  // --- installed-mod detection: the CET Lua component writes THROUGH here -------
+  //
+  // Direction of travel is the opposite of everything else on this class. Elsewhere Lua
+  // READS the registry; here it WRITES the scan result back, because ModArchiveExists is a
+  // CET Lua global with no redscript equivalent - nothing reachable from redscript can see
+  // archive/pc/mod/ at all.
+  //
+  // STATIC, and called from Lua with a DOT, matching the one interop idiom this codebase has
+  // actually verified (see examples/cet_lua_consumer.lua):
+  //   NCZoningApi.BeginInstallScan()
+  //   NCZoningApi.ReportInstalled(id)   -- once per installed location
+  //   NCZoningApi.EndInstallScan(tested)
+  //
+  // Statics rather than instance methods deliberately: the read hooks below must be instance
+  // methods because Observe only hooks those, but nothing here needs observing, and a static
+  // avoids a service-handle lookup that has never been exercised from Lua in this project.
+  //
+  // Ids go one at a time on purpose. Marshalling an array<String> across the CET boundary is
+  // the fragile part of this path; a few hundred single-String calls are not.
+  public static func BeginInstallScan() -> Void {
+    let r = NCZInstalledRegistry.Get();
+    if IsDefined(r) { r.BeginScan(); }
+  }
+
+  public static func ReportInstalled(locationId: String) -> Void {
+    let r = NCZInstalledRegistry.Get();
+    if IsDefined(r) { r.ReportInstalled(locationId); }
+  }
+
+  public static func EndInstallScan(tested: Int32) -> Void {
+    let r = NCZInstalledRegistry.Get();
+    if IsDefined(r) { r.EndScan(tested); }
+  }
+
+  // Read side, for Lua consumers that want the same answer redscript gets. Returns the enum
+  // as Int32 (0 Unknown / 1 Installed / 2 NotInstalled) - Lua has no enum type, and a raw
+  // integer is unambiguous where a coerced name would not be.
+  public static func GetInstallStateInt(id: String) -> Int32 {
+    let r = NCZInstalledRegistry.Get();
+    let s = NCZoningService.Get();
+    if !IsDefined(r) || !IsDefined(s) {
+      return EnumInt(NCZInstallState.Unknown);
+    }
+    return EnumInt(r.StateOf(s.GetLocationById(id)));
+  }
+
+  public static func IsInstallDetectionAvailable() -> Bool {
+    let r = NCZInstalledRegistry.Get();
+    return IsDefined(r) && r.IsAvailable();
+  }
+
   // --- CET Lua data-ready hook (INSTANCE method, so it can be Observed) ---------
   // No-op that exists to be Observed from CET Lua (custom CallbackSystem events dispatched
   // via DispatchEventAs are NOT delivered to Lua, and Observe only hooks instance methods):

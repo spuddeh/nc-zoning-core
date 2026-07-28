@@ -2,6 +2,36 @@
 
 ## 0.3.0 (pre-release)
 
+- Installed-mod detection. NCZLocation now parses the API's `archives` array (v1.5.0+, the
+  .archive/.xl filenames a location mod installs; 285 of 297 live records carry one), and a new
+  NCZInstalledRegistry answers which registry locations are actually present on this machine.
+  Public surface: IsInstallDetectionAvailable(), GetInstallState(loc), GetInstalledCount(), plus
+  NCZoningApi.GetInstallStateInt(id) for CET Lua consumers.
+  - THREE STATES, and Unknown is a real answer rather than a rounding error. It means either
+    detection did not run, or the location cannot be detected at all. An empty archives array is
+    NOT "not installed": it is an AMM mod, whose files live in CET's own sandboxed folder where
+    no mod can see them, or a record the API has not filled yet - and those are indistinguishable
+    from in-game. Collapsing Unknown into NotInstalled would tell players to download mods they
+    already own. NCZInstallState.Unknown is the zero value so an unpopulated registry says so.
+  - This is why the mod now ships Lua at all, and it is the ONLY Lua it ships. Detection means
+    reading archive/pc/mod/, and nothing reachable from redscript can: RedFileSystem confines
+    every mod to r6/storages/<name>/, and the string "Archive" does not occur anywhere in the
+    RTTI dump. CET's ModArchiveExists is the only route (measured true/false 2026-07-28). The
+    bundled CET component scans on data-ready and pushes ids back through
+    BeginInstallScan/ReportInstalled/EndInstallScan.
+  - CET REMAINS OPTIONAL TO THE FRAMEWORK. Without it the component never runs, the registry
+    stays empty, IsInstallDetectionAvailable() is false and everything reads Unknown. Redscript
+    consumers never touch Lua.
+  - Results are in-memory and per-session, deliberately never persisted: install state is
+    precisely what changes between sessions, so a cached answer goes stale in the one direction
+    that matters - claiming a mod is present after it was removed.
+  - The write path uses STATIC methods called with a dot, matching the one CET interop idiom this
+    codebase has actually verified, and pushes ids ONE AT A TIME - marshalling an array<String>
+    across the CET boundary is the fragile part, a few hundred String calls are not.
+  - NCZInstallState lives in NCZoning.Data, not NCZoning.Core: consumers must be able to name it
+    and they never import Core, and redscript requires a return type to be imported even when it
+    is never written out.
+
 - RedLogger is now a HARD dependency, and the NCZoningLog wrapper's call sites SHIP. The
   wrapper body changed from FTLog to RedLog.Append("NCZoningCore", ...); its 19 call sites
   were untouched, which is the whole reason a wrapper existed. Logs land in

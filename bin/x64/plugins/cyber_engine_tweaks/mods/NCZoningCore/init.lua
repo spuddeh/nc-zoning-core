@@ -1,0 +1,105 @@
+-- ======================================================================================
+-- Mod Name: NCZoningCore
+-- File: bin/x64/plugins/cyber_engine_tweaks/mods/NCZoningCore/init.lua
+-- Author: Spuddeh
+-- Description: Installed-mod detection. The ONLY Lua NCZoningCore ships, and it exists for
+--              exactly one reason: ModArchiveExists is a CET Lua global with no redscript
+--              equivalent.
+--
+--              WHY THIS FILE HAS TO EXIST. Detection means asking whether a location mod's
+--              .archive / .xl files are present in archive/pc/mod/, and NOTHING REACHABLE
+--              FROM REDSCRIPT CAN LOOK THERE. RedFileSystem confines every mod to
+--              r6/storages/<name>/, and the engine exposes no archive surface to script at
+--              all - the string "Archive" does not occur anywhere in the RTTI dump. CET's
+--              ModArchiveExists(name) is the only route, measured working 2026-07-28.
+--
+--              CET REMAINS OPTIONAL. Without CET this file never runs, the redscript
+--              registry stays empty, IsInstallDetectionAvailable() answers false and every
+--              location reads Unknown. NCZoningCore itself takes no CET dependency, and
+--              redscript consumers never touch Lua.
+--
+--              RESULTS ARE NOT PERSISTED, here or on the redscript side. Install state is
+--              precisely the thing that changes between sessions, so a cached answer would
+--              go stale in the one direction that matters - telling a player a mod is
+--              present after they removed it.
+-- Mod Version: 0.3.0 (Pre-release)
+-- Credits: Spuddeh
+-- ======================================================================================
+
+local scanned = false
+
+-- Guarded exactly like the consumer example: this file is inert rather than broken if
+-- NCZoningCore's redscript half is absent or too old.
+local function hasNCZ()
+  return NCZoningApi ~= nil and NCZoningApi.ApiVersion and NCZoningApi.ApiVersion() >= 1
+end
+
+local function scan(reason)
+  if scanned or not hasNCZ() or not NCZoningApi.IsReady() then return end
+  if NCZoningApi.BeginInstallScan == nil then
+    -- Core is older than 0.3.0. Say so once rather than erroring on every call.
+    print("[NCZoningCore] install detection needs NCZoningCore 0.3.0+ - skipping")
+    scanned = true
+    return
+  end
+  scanned = true
+
+  local locations = NCZoningApi.GetAllLocations()   -- array<ref<NCZLocation>> -> 1-indexed table
+  NCZoningApi.BeginInstallScan()
+
+  local tested, found = 0, 0
+  for _, loc in ipairs(locations) do
+    local n = loc:ArchiveCount()
+    if n > 0 then
+      tested = tested + 1
+      -- ANY match counts. A mod's MAIN file is the canonical fingerprint and its optionals
+      -- are extra; a player who installed the main archive but no optionals is still a player
+      -- who has the mod.
+      for i = 0, n - 1 do
+        if ModArchiveExists(loc:ArchiveAt(i)) then
+          NCZoningApi.ReportInstalled(loc:Id())
+          found = found + 1
+          break
+        end
+      end
+    end
+    -- n == 0 is deliberately NOT tested and NOT reported. An empty archives list means
+    -- "cannot say" - an AMM mod, whose files live in CET's own sandboxed folder and can never
+    -- be seen by any mod, or a record the API has not filled yet. Reporting those as
+    -- not-installed would tell players to download mods they already have.
+  end
+
+  NCZoningApi.EndInstallScan(tested)
+  print(("[NCZoningCore] install scan (%s): %d installed of %d detectable, %d total")
+    :format(reason, found, tested, #locations))
+end
+
+registerForEvent("onInit", function()
+  if NCZoningApi == nil then
+    -- Not an error. This Lua ships WITH the framework, so a missing NCZoningApi means the
+    -- redscript half failed to compile - which the redscript log will already be shouting about.
+    return
+  end
+
+  -- The registry is fetched asynchronously, so the scan waits for data rather than racing it.
+  -- isRefresh is ignored on purpose: a later network refresh re-sends the same records with the
+  -- same archive names, and a running game cannot change what is in archive/pc/mod/.
+  Observe("NCZoningApi", "OnDataReady", function(_, _, _, isRefresh)
+    scan(isRefresh and "refresh" or "ready")
+  end)
+
+  -- No data, ever, this session (no RedHttpClient and no hand-supplied snapshot). Nothing to
+  -- scan against, so stop rather than leaving detection permanently "pending".
+  Observe("NCZoningApi", "OnDataError", function(_, reason)
+    if not NCZoningApi.IsReady() then
+      scanned = true
+      print(("[NCZoningCore] no registry this session (%s) - install detection skipped")
+        :format(tostring(reason)))
+    end
+  end)
+
+  -- The store can already be ready before this subscribes, when the offline cache loads first.
+  if NCZoningApi.IsReady() then
+    scan("already-ready")
+  end
+end)

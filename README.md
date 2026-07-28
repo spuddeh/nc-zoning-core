@@ -51,6 +51,25 @@ mod alone rather than a shared log or a special debug build.
 Optional:
 
 - RedHttpClient 0.7.1 or newer
+- **Cyber Engine Tweaks** — only for installed-mod detection (see below)
+
+## Installed-mod detection needs CET, and only for that
+
+The registry publishes the `.archive` / `.xl` filenames each location mod installs, so
+NCZoningCore can tell a consumer which mods are actually present. Doing that means
+reading `archive/pc/mod/`, and **nothing reachable from redscript can look there**:
+RedFileSystem confines every mod to `r6/storages/<name>/`, and the engine exposes no
+archive surface to script at all. CET's Lua `ModArchiveExists` is the only route.
+
+So NCZoningCore ships one small CET Lua component that does the scan and hands the
+result back to redscript. **Consumers stay pure redscript and never touch Lua.**
+
+Without CET the component never runs and every location reports `Unknown` — which is
+distinct from "not installed" and must be rendered as such. Check
+`IsInstallDetectionAvailable()` before offering the player any installed/missing filter.
+
+`Unknown` is also permanent for **AMM location mods**: their files live in CET's own
+sandboxed folder, which no mod can read, so they can never be detected.
 
 Note: RED4ext family plugins usually need a rebuild after each game patch, so
 this mod can be temporarily unavailable right after an update until its

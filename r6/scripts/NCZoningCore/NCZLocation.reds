@@ -18,6 +18,23 @@ import RedData.Json.*
 // envelope's dataset_version is read from the ETag response header (or GetKeyString on the
 // cached envelope).
 
+// Whether a location's mod is present in archive/pc/mod/ on this machine.
+//
+// PART OF THE PUBLIC CONTRACT, and it lives here rather than beside the registry that fills
+// it because consumers must be able to name it and they never import NCZoning.Core - and
+// redscript requires a return type to be imported even when it is never written out.
+//
+// THREE STATES, AND UNKNOWN IS A REAL ANSWER. Unknown means detection did not run (it needs
+// CET; nothing reachable from redscript can read archive/pc/mod/) or the location cannot be
+// detected at all - an AMM mod ships only a .json into CET's own sandboxed folder, which no
+// mod can see. Rendering Unknown as "not installed" tells players to download mods they
+// already own. Unknown is the zero value so an unpopulated registry answers it by default.
+public enum NCZInstallState {
+  Unknown = 0,
+  Installed = 1,
+  NotInstalled = 2,
+}
+
 // A single registry entry. Slim (/v1/locations) plus the full (?full=1) extras.
 public class NCZLocation {
   // --- slim fields -------------------------------------------------------------
@@ -39,6 +56,12 @@ public class NCZLocation {
   let picture_url: String;
   let updated_at: String;         // nullable -> "" when absent
   let recently_updated: Bool;     // server-computed; true when updated within the API's recency window
+  // The .archive / .xl filenames this mod installs into archive/pc/mod/, for installed-mod
+  // detection (API v1.5.0+). EMPTY MEANS "CANNOT SAY", NEVER "NOT INSTALLED" - it is either an
+  // AMM mod, which is permanently undetectable because CET sandboxes its folder, or a record
+  // the API has not fetched yet. Those two are indistinguishable from here, so both are
+  // Unknown. See NCZ_InstallState.
+  let archives: array<String>;
 
   // --- camelCase accessors (the public surface consumers read) -----------------
   public func Id() -> String { return this.id; }
@@ -93,6 +116,14 @@ public class NCZLocation {
     }
     return "";
   }
+  public func ArchiveCount() -> Int32 { return ArraySize(this.archives); }
+  public func ArchiveAt(idx: Int32) -> String {
+    if idx >= 0 && idx < ArraySize(this.archives) {
+      return this.archives[idx];
+    }
+    return "";
+  }
+  public func Archives() -> array<String> { return this.archives; }
 
   // Build an NCZLocation from one /v1 location element, fully manually (new object +
   // explicit GetKey* reads). Chosen for explicit control and no reflection dependency.
@@ -127,6 +158,9 @@ public class NCZLocation {
     }
     loc.tags = NCZLocation.ReadStrArr(item, "tags");
     loc.authors = NCZLocation.ReadStrArr(item, "authors");
+    // Additive since API v1.5.0. An older Core build ignored this key and an older API omits
+    // it; both cases land as an empty array, which already means "cannot say".
+    loc.archives = NCZLocation.ReadStrArr(item, "archives");
     return loc;
   }
 

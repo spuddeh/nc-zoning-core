@@ -25,6 +25,37 @@ import NCZoning.Data.*
 public func Version() -> String { return "0.3.0"; }
 public func ApiVersion() -> Int32 { return 1; }
 
+// --- installed-mod detection (0.3.0+) --------------------------------------------
+//
+// AVAILABILITY IS A GATE, DATA IS A BRANCH - and here they are two different calls.
+// Check IsInstallDetectionAvailable() BEFORE offering the player any installed/missing
+// filter. Detection needs CET (nothing reachable from redscript can read archive/pc/mod/),
+// so on a machine without it every record answers Unknown, and a UI that treats Unknown as
+// "not installed" would show an empty list and blame the registry.
+//
+// A consumer requiring these must require NCZoningCore 0.3.0+: calling a function that does
+// not exist is a COMPILE error that takes down every redscript mod on the machine.
+public func IsInstallDetectionAvailable() -> Bool {
+  let r = NCZInstalledRegistry.Get();
+  return IsDefined(r) && r.IsAvailable();
+}
+
+// Unknown is a real answer, not a failure. It means either detection never ran (no CET) or
+// the location is undetectable in principle - AMM location mods ship only a .json into CET's
+// own sandboxed folder, so no mod can ever see them. Do not render Unknown as "not installed".
+public func GetInstallState(loc: ref<NCZLocation>) -> NCZInstallState {
+  let r = NCZInstalledRegistry.Get();
+  if !IsDefined(r) {
+    return NCZInstallState.Unknown;
+  }
+  return r.StateOf(loc);
+}
+
+public func GetInstalledCount() -> Int32 {
+  let r = NCZInstalledRegistry.Get();
+  return IsDefined(r) ? r.InstalledCount() : 0;
+}
+
 // --- status --------------------------------------------------------------------
 
 public func IsReady() -> Bool {
