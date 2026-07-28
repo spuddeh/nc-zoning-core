@@ -35,7 +35,8 @@ public enum NCZInstallState {
   NotInstalled = 2,
 }
 
-// A single registry entry. Slim (/v1/locations) plus the full (?full=1) extras.
+// A single registry entry. ONE representation - the API's slim/full fork was collapsed, so every
+// field below arrives on every record from /v1/locations. There is no longer a subset to ask for.
 public class NCZLocation {
   // --- slim fields -------------------------------------------------------------
   let id: String;                 // UUID (manual) or "nexus-<id>" (auto); stable
@@ -49,7 +50,7 @@ public class NCZLocation {
   let source: String;             // manual | auto
   let district: String;           // never null (Badlands is the default region)
   let subdistrict: String;        // "" when the JSON value is null / key absent
-  // --- full (?full=1) fields ---------------------------------------------------
+  // --- richer fields (once behind ?full=1; now always present) -------------------
   let description: String;
   let credits: String;            // optional; "" when absent
   let thumbnail_url: String;

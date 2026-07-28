@@ -4,7 +4,7 @@
 // Author: Spuddeh
 // Description: NCZoningFetcher - the network lifecycle. A ScriptableSystem (so it has
 //              GetGameInstance() for the DelaySystem bounce, which a ScriptableService
-//              lacks). On Session/Ready it fetches /v1/locations?full=1 once per game
+//              lacks). On Session/Ready it fetches /v1/locations once per game
 //              launch, parses on the HTTP worker thread, then bounces to the game thread
 //              via DelaySystem before swapping NCZoningService's live store. Retries x3.
 //
@@ -78,7 +78,13 @@ public class NCZoningFetcher extends ScriptableSystem {
   // Runs on the game thread (Session/Ready, or a retry bounce). Public so NCZRetry can call it.
   @if(ModuleExists("RedHttpClient"))
   public func DoFetch() -> Void {
-    let url = "https://api.nczoning.net/v1/locations?full=1";
+    // No ?full=1. The API collapsed its slim/full fork into ONE representation - the slim shape
+    // was built for a consumer that never existed, and both real consumers always asked for full.
+    // The parameter survives as a NO-OP ALIAS rather than a redirect, so sending it still worked
+    // and would have gone on working silently; it is dropped because it now describes a
+    // distinction the API does not have.
+    // [[NC-Zoning-Board/wiki/decisions/api-per-location-records]]
+    let url = "https://api.nczoning.net/v1/locations";
     let headers: array<HttpHeader>;
     let svc = NCZoningService.Get();
     if IsDefined(svc) {

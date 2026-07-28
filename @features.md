@@ -9,7 +9,7 @@
 - NCZLocation data model matching the frozen /v1 API contract, including the
   full-entry fields (description, credits, image URLs) and the per-location
   district / subdistrict classification.
-- Once-per-launch fetch of /v1/locations?full=1 over HTTPS (NCZoningFetcher):
+- Once-per-launch fetch of /v1/locations over HTTPS (NCZoningFetcher):
   parse on the HTTP worker thread, DelaySystem bounce to the game thread, then
   swap the live store. Retries three times with backoff. (Verified in-game.)
 - Offline-first RedFileSystem cache: writes the payload + ETag on a 200, loads and

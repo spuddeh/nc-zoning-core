@@ -108,7 +108,7 @@ Run this from your Cyberpunk 2077 root directory. `--create-dirs` makes the
 storage folder for you.
 
 ```powershell
-curl.exe -L "https://api.nczoning.net/v1/locations?full=1" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"
+curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations_full.json"
 ```
 
 The finished path is `Cyberpunk 2077\r6\storages\NCZoningCore\locations_full.json`.
