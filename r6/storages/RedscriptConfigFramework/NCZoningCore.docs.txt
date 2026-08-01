@@ -1,0 +1,40 @@
+[color=#00f0ff][size=5][b]NC ZONING BOARD — INSTRUMENT NC-ZB-01[/b][/size][/color]
+[color=#8892b0][i]NIGHT CORP // URBAN PLANNING DIVISION[/i][/color]
+[line]
+[color=#00f0ff][size=5][b]0. WHAT THIS IS[/b][/size][/color]
+NCZoningCore is a framework - a modder's resource. It fetches the NC Zoning registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API: each surveyed location's name, authors, world coordinates, category, tags and district.
+
+[color=#ffb300][b]It has no settings and does nothing on its own.[/b][/color] It is here because another mod asked for it. That is why this page has no options beside it.
+[line]
+[color=#00f0ff][size=5][b]1. WHAT IT DOES[/b][/size][/color]
+[*]Downloads the registry once per game session over HTTPS.
+[*]Caches it on disk, so it works offline after the first online launch, and revalidates without re-downloading when nothing has changed.
+[*]Serves the data to redscript and CET Lua mods through a small, stable API.
+
+It makes no changes to your game: no writes, no telemetry, no position tracking, and exactly one piece of UI - the alert that tells you the registry failed to load.
+[line]
+[color=#00f0ff][size=5][b]2. WHERE THE DATA COMES FROM[/b][/size][/color]
+The NC Zoning registry, maintained by the community at nczoning.net. NCZoningCore does not decide what is on the map; it reports what the Board has on file. A location mod missing from a consumer mod's list is missing from the registry, and the map is open for submissions.
+[line]
+[color=#00f0ff][size=5][b]3. THE NETWORK IS OPTIONAL[/b][/size][/color]
+RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason this mod touches the network at all. It is a soft dependency.
+
+[b]With RedHttpClient.[/b] The registry downloads itself once per session and stays current. Nothing for you to do.
+
+[b]Without it.[/b] No socket is ever opened. The registry is read from a file you place yourself, and treated as permanently out of date, because there is no way to check. Re-download whenever you want fresher data.
+
+The file goes in r6\storages\NCZoningCore\locations.json - that folder and no other, because RedFileSystem confines every mod to its own. The full command is on this mod's Nexus page.
+[line]
+[color=#00f0ff][size=5][b]4. IF SOMETHING LOOKS WRONG[/b][/size][/color]
+[*][b]An on-screen alert says there is no data.[/b] That is this mod reporting honestly rather than letting a consumer show you an empty map. Either RedHttpClient is absent and no file was placed, or the download failed.
+[*][b]A mod says it needs a newer NCZoningCore.[/b] The API is versioned, and a consumer built against a later version will stay dormant rather than misbehave.
+[*][b]Anything else.[/b] The log is at r6\logs\mods\NCZoningCore__<date_time>.log, one file per session, five kept. Almost every question here is answered by that one file, and you can read it in this hub under LOGS.
+[line]
+[color=#00f0ff][size=5][b]5. FOR MOD AUTHORS[/b][/size][/color]
+Redscript consumers import NCZoning.Api.* - or guard with @if(ModuleExists("NCZoning.Api")) for a soft dependency - and subscribe to NCZoning-DataReady, -DataRefreshed and -DataError. CET Lua consumers call the NCZoningApi facade and observe NCZoningApi.OnDataReady.
+
+The full consumer guide and worked examples for both are in the GitHub repository linked from the Nexus page.
+[line]
+[color=#8892b0][i]Filed with the NC Zoning Board. Survey NC-ZB-01.[/i][/color]
+[color=#8892b0][i]The Board records what is built. It does not build it.[/i][/color]
+[color=#8892b0][i]nczoning.net[/i][/color]
