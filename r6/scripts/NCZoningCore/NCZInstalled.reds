@@ -84,11 +84,19 @@ public class NCZInstalledRegistry extends ScriptableService {
   // `scanned` is how many records the component actually tested, for the log only. A scan
   // that ends having tested zero records still counts as available - it means the registry
   // was empty, not that detection failed.
+  // The moment detection becomes answerable, and therefore the moment consumers are told.
+  //
+  // Announcing it is what lets a consumer react instead of re-checking on a timer: "has the scan
+  // finished" has no other signal, so without this event the only way to find out is to keep asking.
+  //
+  // Reached from CET Lua via NCZoningApi.EndInstallScan, which runs on the game thread - the
+  // condition NCZoningDataEvent.Dispatch requires.
   public func EndScan(scanned: Int32) -> Void {
     this.m_scanning = false;
     this.m_available = true;
     this.m_scanned = scanned;
     NCZoningLog(s"install scan complete: \(ArraySize(this.m_installed)) installed of \(scanned) tested");
+    NCZoningDataEvent.Dispatch(n"NCZoning-InstallScanComplete", "", ArraySize(this.m_installed), "");
   }
 
   // --- read by consumers ---------------------------------------------------------------

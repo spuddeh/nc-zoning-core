@@ -11,11 +11,16 @@
 
 module NCZoning.Data
 
-// One payload class, dispatched under three frozen PUBLIC string names. Codeware's
+// One payload class, dispatched under four frozen PUBLIC string names. Codeware's
 // CallbackSystem delivers these custom names as typed events:
-//   NCZoning-DataReady      - store is populated and queryable (from cache or network)
-//   NCZoning-DataRefreshed  - a network fetch replaced the store with newer data
-//   NCZoning-DataError      - a fetch failed after retries; Reason() holds a code
+//   NCZoning-DataReady            - store is populated and queryable (from cache or network)
+//   NCZoning-DataRefreshed        - a network fetch replaced the store with newer data
+//   NCZoning-DataError            - a fetch failed after retries; Reason() holds a code
+//   NCZoning-InstallScanComplete  - install detection has finished; Count() is how many are
+//                                   installed. FIRES ONLY WITH CET, because the scan that
+//                                   feeds it is CET's - absence of this event is the normal
+//                                   resting state without it, never an error, and a consumer
+//                                   that blocks on it will wait forever on a CET-less setup.
 // Consumers subscribe by the literal name, e.g. (reds)
 //   GameInstance.GetCallbackSystem().RegisterCallback(n"NCZoning-DataReady", this, n"OnReady");
 // or (CET Lua)
@@ -37,13 +42,16 @@ public class NCZoningDataEvent extends CallbackSystemEvent {
     return e;
   }
 
-  // Declare the three frozen public event names once (call at startup). Binding each to the
+  // Declare the four frozen public event names once (call at startup). Binding each to the
   // NCZoningDataEvent type lets the callback system deliver a typed event to subscribers.
+  //
+  // ADDITIVE ONLY. A name here is a public contract: add to this list, never rename or remove.
   public static func RegisterNames() -> Void {
     let cs = GameInstance.GetCallbackSystem();
     cs.RegisterEvent(n"NCZoning-DataReady", n"NCZoning.Data.NCZoningDataEvent");
     cs.RegisterEvent(n"NCZoning-DataRefreshed", n"NCZoning.Data.NCZoningDataEvent");
     cs.RegisterEvent(n"NCZoning-DataError", n"NCZoning.Data.NCZoningDataEvent");
+    cs.RegisterEvent(n"NCZoning-InstallScanComplete", n"NCZoning.Data.NCZoningDataEvent");
   }
 
   // Dispatch a NCZoningDataEvent under one of the frozen names (DispatchEventAs fires
