@@ -30,12 +30,12 @@
   examples in examples/ (redscript soft-dep consumer + CET Lua consumer). (Verified in-game.)
 - RedLogger as a hard dependency, with the log calls shipping rather than stripped: one file
   per session at r6\logs\mods\NCZoningCore__<date_time>.log, five kept. Consumers of
-  NCZoningCore inherit the requirement. (Verified in-game 2026-07-28: file written, per-line
-  timestamps, five sessions retained, no collision with NCZoningDistrictGuide or RCF.)
+  NCZoningCore inherit the requirement. (Verified in-game: file written, per-line timestamps, five
+  sessions retained, no collision with NCZoningDistrictGuide or RCF.)
 - Installed-mod detection, via a bundled CET Lua component: parses the API's archives field and
-  answers Installed / NotInstalled / Unknown per location. (Verified in-game 2026-07-28:
-  10 installed of 291 tested, from 297 records. The 6 untested are the API's 5 AMM entries and
-  1 WIP, which carry no archive names and cannot be detected.)
+  answers Installed / NotInstalled / Unknown per location. (Verified in-game: 10 installed of 291
+  tested, from 297 records. The 6 untested are the API's 5 AMM entries and 1 WIP, which carry no
+  archive names and cannot be detected.)
 - RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
   case it has no networking component at all and reads the registry from a hand-supplied
   locations.json. Every RedHttpClient reference, the import included, is gated behind
