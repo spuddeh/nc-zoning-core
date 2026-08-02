@@ -60,9 +60,9 @@ public class NCZoningApi extends ScriptableService {
   }
 
   // --- district vocabulary (static; Lua: NCZoningApi.GetDistricts()) -------------
-  // Every district/subdistrict name the registry can attribute a location to, A-Z. Static
-  // (generated from /v1/districts), so unlike the queries below these do not depend on the fetch:
-  // they answer before the data lands and while it is missing.
+  // Every district/subdistrict name the registry can attribute a location to, A-Z. Generated
+  // from /v1/districts, so unlike the queries below these do not depend on the fetch: they
+  // answer before the data lands and while it is missing.
   //
   // Build a district picker from these, not from GetAllLocations() - an area with zero locations
   // exists here but appears in no location.
@@ -121,23 +121,18 @@ public class NCZoningApi extends ScriptableService {
 
   // --- installed-mod detection: the CET Lua component writes THROUGH here -------
   //
-  // Direction of travel is the opposite of everything else on this class. Elsewhere Lua
-  // READS the registry; here it WRITES the scan result back, because ModArchiveExists is a
-  // CET Lua global with no redscript equivalent - nothing reachable from redscript can see
-  // archive/pc/mod/ at all.
+  // Traffic runs the other way here. Elsewhere Lua READS the registry; these three let it
+  // WRITE the scan result back, because ModArchiveExists is a CET Lua global with no redscript
+  // equivalent - nothing reachable from redscript can see archive/pc/mod/.
   //
-  // STATIC, and called from Lua with a DOT, matching the one interop idiom this codebase has
-  // actually verified (see examples/cet_lua_consumer.lua):
+  // Static, and called from Lua with a DOT (see examples/cet_lua_consumer.lua):
   //   NCZoningApi.BeginInstallScan()
   //   NCZoningApi.ReportInstalled(id)   -- once per installed location
   //   NCZoningApi.EndInstallScan(tested)
   //
-  // Statics rather than instance methods deliberately: the read hooks below must be instance
-  // methods because Observe only hooks those, but nothing here needs observing, and a static
-  // avoids a service-handle lookup that has never been exercised from Lua in this project.
-  //
-  // Ids go one at a time on purpose. Marshalling an array<String> across the CET boundary is
-  // the fragile part of this path; a few hundred single-String calls are not.
+  // Static rather than instance: nothing here needs observing, and a static avoids a
+  // service-handle lookup from Lua. Ids go one at a time because passing an array<String>
+  // across the CET boundary is the fragile part of this route.
   public static func BeginInstallScan() -> Void {
     let r = NCZInstalledRegistry.Get();
     if IsDefined(r) { r.BeginScan(); }
@@ -153,9 +148,8 @@ public class NCZoningApi extends ScriptableService {
     if IsDefined(r) { r.EndScan(tested); }
   }
 
-  // Read side, for Lua consumers that want the same answer redscript gets. Returns the enum
-  // as Int32 (0 Unknown / 1 Installed / 2 NotInstalled) - Lua has no enum type, and a raw
-  // integer is unambiguous where a coerced name would not be.
+  // Read side, for Lua consumers. Returns the enum as Int32 (0 Unknown / 1 Installed /
+  // 2 NotInstalled), since Lua has no enum type.
   public static func GetInstallStateInt(id: String) -> Int32 {
     let r = NCZInstalledRegistry.Get();
     let s = NCZoningService.Get();

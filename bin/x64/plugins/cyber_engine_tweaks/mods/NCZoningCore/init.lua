@@ -2,26 +2,22 @@
 -- Mod Name: NCZoningCore
 -- File: bin/x64/plugins/cyber_engine_tweaks/mods/NCZoningCore/init.lua
 -- Author: Spuddeh
--- Description: Installed-mod detection. The ONLY Lua NCZoningCore ships, and it exists for
---              exactly one reason: ModArchiveExists is a CET Lua global with no redscript
---              equivalent.
+-- Description: Installed-mod detection, and the ONLY Lua NCZoningCore ships.
 --
---              WHY THIS FILE HAS TO EXIST. Detection means asking whether a location mod's
---              .archive / .xl files are present in archive/pc/mod/, and NOTHING REACHABLE
---              FROM REDSCRIPT CAN LOOK THERE. RedFileSystem confines every mod to
---              r6/storages/<name>/, and the engine exposes no archive surface to script at
---              all - the string "Archive" does not occur anywhere in the RTTI dump. CET's
---              ModArchiveExists(name) is the only route, measured working 2026-07-28.
+--              Detection asks whether a location mod's .archive / .xl files are present in
+--              archive/pc/mod/, and nothing reachable from redscript can look there:
+--              RedFileSystem confines every mod to r6/storages/<name>/, and the engine
+--              exposes no archive surface to script - the string "Archive" does not occur
+--              anywhere in the RTTI dump. CET's ModArchiveExists(name) is the only route.
 --
---              CET REMAINS OPTIONAL. Without CET this file never runs, the redscript
---              registry stays empty, IsInstallDetectionAvailable() answers false and every
---              location reads Unknown. NCZoningCore itself takes no CET dependency, and
---              redscript consumers never touch Lua.
+--              CET STAYS OPTIONAL. Without it this file never runs, the redscript registry
+--              stays empty, IsInstallDetectionAvailable() answers false and every location
+--              reads Unknown. NCZoningCore takes no CET dependency, and redscript consumers
+--              never touch Lua.
 --
 --              RESULTS ARE NOT PERSISTED, here or on the redscript side. Install state is
---              precisely the thing that changes between sessions, so a cached answer would
---              go stale in the one direction that matters - telling a player a mod is
---              present after they removed it.
+--              what changes between sessions, so a cached answer would claim a mod is
+--              present after the player removed it.
 -- Mod Version: 0.3.0 (Pre-release)
 -- Credits: Spuddeh
 -- ======================================================================================
@@ -52,9 +48,8 @@ local function scan(reason)
     local n = loc:ArchiveCount()
     if n > 0 then
       tested = tested + 1
-      -- ANY match counts. A mod's MAIN file is the canonical fingerprint and its optionals
-      -- are extra; a player who installed the main archive but no optionals is still a player
-      -- who has the mod.
+      -- ANY match counts. A player who installed the main archive but none of the mod's
+      -- optional archives still has the mod.
       for i = 0, n - 1 do
         if ModArchiveExists(loc:ArchiveAt(i)) then
           NCZoningApi.ReportInstalled(loc:Id())

@@ -7,26 +7,28 @@ and to the mod authors building on it. The full technical detail lives in `@chan
 
 - New: RedLogger is now a **required** dependency. NCZoningCore writes to its own log file at
   `r6\logs\mods\NCZoningCore__<date_time>.log`, keeping the five most recent sessions, instead of
-  sharing one log with every other mod. This mod runs in the background with no menu, so when
-  something goes wrong the log is the only place the answer lives — and now it is one small file that
-  is easy to attach to a bug report. Mods built on NCZoningCore inherit this requirement.
+  sharing one log with every other mod. Mods built on NCZoningCore inherit this requirement.
+- New: Installed-mod detection. NCZoningCore can now tell a consumer mod which location mods you
+  already have installed, so a mod list can mark what is present and what is missing. This part
+  needs Cyber Engine Tweaks; without it, everything reads as "unknown". AMM location mods always
+  read as "unknown", because no mod can see inside CET's own mods folder.
 - New: Mods built on NCZoningCore can now list every district and subdistrict by name (including areas
   with no locations yet), so they can offer a complete area picker. Available from both redscript and
   CET Lua, plus a human-readable status message for showing the registry's state.
 - New: A per-location "recently updated" flag is now available to consumer mods, so they can highlight
-  mods updated in the last few days - something in-game code could not work out on its own before.
+  mods updated in the last few days.
+- Changed: the offline registry file is now named `locations.json`. If you supplied
+  `locations_full.json` by hand, rename it.
 
 ### [Unreleased - v0.2.0]
 
-- New: RedHttpClient is now **optional**. NCZoningCore installs and runs without it. If you would
-  rather not install a general-purpose HTTP plugin, you no longer have to: with RedHttpClient absent
-  the mod has no networking component at all, rather than one it simply chooses not to use.
+- New: RedHttpClient is now **optional**. NCZoningCore installs and runs without it, and with it
+  absent the mod has no networking component at all.
 - New: Without RedHttpClient, you supply the location registry yourself by downloading a single
   `locations.json` into `r6\storages\NCZoningCore\`. The README and the mod description carry
   the command. That data is then served as a permanent offline snapshot.
 - New: The mod now tells you on screen when it has no location data and no way to fetch any, instead
-  of failing silently. Without it, every mod built on NCZoningCore would just look broken for a
-  reason you could not discover.
+  of failing silently.
 - New: Mods built on NCZoningCore can now tell the difference between "the data is usable but cannot
   refresh" and "no data is coming this session", so they can show you something useful instead of an
   empty list. Added `GetStatusReason()` and `IsHttpAvailable()` to both the redscript API and the CET

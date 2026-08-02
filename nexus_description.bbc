@@ -27,8 +27,9 @@ Only if a mod you want tells you to. NCZoningCore is a shared dependency, like C
 [*]Downloads the registry once per game session over HTTPS.
 [*]Caches it on disk, so it works offline after the first online launch and revalidates efficiently (no re-download when nothing changed).
 [*]Serves the data to redscript and CET Lua mods through a small, stable API.
+[*]Tells a consumer mod which location mods you already have installed, so it can mark what is present and what is missing. This part needs Cyber Engine Tweaks; without it, every location reads as "unknown".
 [/list]
-It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tracking, no UI.
+It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tracking. Its only piece of UI is the alert that tells you the registry failed to load.
 [line]
 [color=#00f0ff][size=5][b]4. CONDITIONS OF ISSUE[/b][/size][/color]
 [b]Required:[/b]
@@ -40,16 +41,17 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [*]RedFileSystem
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/31920]RedLogger[/url]
 [/list]
-[i]RedLogger is what NCZoningCore writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font] instead of shouting into a log shared with every other mod, and it keeps the five most recent sessions. If something goes wrong, that one small file is the whole answer — which matters more here than in most mods, because NCZoningCore runs in the background and the thing that goes wrong is usually "the registry never loaded".[/i]
+[i]RedLogger is what NCZoningCore writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font], one per session, keeping the five most recent. That file is what to attach to a bug report.[/i]
 
 [b]Optional:[/b]
 [list]
 [*]RedHttpClient
+[*]Cyber Engine Tweaks
 [/list]
-[i]Cyber Engine Tweaks is [b]not[/b] required by NCZoningCore itself. It is only needed if the consumer mod using NCZoningCore is a CET Lua mod.[/i]
+[i]Cyber Engine Tweaks is [b]not[/b] required by NCZoningCore itself. It is needed for installed-mod detection, and by any consumer mod that is itself a CET Lua mod.[/i]
 [line]
 [color=#00f0ff][size=5][b]5. RedHttpClient IS OPTIONAL[/b][/size][/color]
-RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason NCZoningCore touches the network at all. If you would rather not install a general-purpose HTTP plugin, that is a fair call, and you do not have to. It is a [b]soft dependency[/b]: NCZoningCore installs and runs without it.
+RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason NCZoningCore touches the network at all. It is a [b]soft dependency[/b]: NCZoningCore installs and runs without it.
 
 [b]With RedHttpClient.[/b] The registry downloads itself once per session and keeps itself current. Nothing for you to do.
 
@@ -60,9 +62,9 @@ RedHttpClient is the plugin that lets the game make HTTPS requests, and it is th
 [color=#00f0ff][size=5][b]6. FILING THE SURVEY BY HAND[/b][/size][/color]
 Open a terminal in your Cyberpunk 2077 folder and run:
 [code]curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"[/code]
-That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations.json[/font]. The folder is not negotiable: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
+That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations.json[/font]. That folder is fixed: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
 
-The output path is relative, so check it landed where you meant. Downloading a perfectly good file into the wrong folder looks like a complete success and does nothing:
+The output path is relative, so check it landed where you meant. Downloading a good file into the wrong folder looks like a complete success and does nothing:
 [code]dir r6\storages\NCZoningCore[/code]
 You should see [font=Courier New]locations.json[/font], around 260 KB (it grows with the registry; [color=#ffb300]anything under ~10 KB means you saved an error page, not the data[/color]).
 
@@ -98,11 +100,9 @@ pause[/code]
 [*][b]Vortex or a manual install:[/b] put it in your Cyberpunk 2077 folder, and change the [font=Courier New]DEST[/font] line to [font=Courier New]set "DEST=%~dp0r6\storages\NCZoningCore\locations.json"[/font] - there is no [font=Courier New]overwrite\[/font] involved. Then just double-click it.
 [/list]
 
-[b]Why a batch file rather than pointing MO2 straight at curl.exe.[/b] Putting the whole command in a launcher's Arguments box looks like it should work and often does nothing at all - no file, no error, no clue, because the console window closes the instant it exits. Quoting an output path that contains a space is fragile through an argument box, and a relative path resolves against whatever folder curl happened to start in rather than your game folder. A batch file puts the quoting somewhere no launcher can touch.
+Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.exe[/font]. Put the whole command in a launcher's Arguments box and it often does nothing at all — no file, no error, no clue, because the console window closes the instant it exits. The batch file writes a log beside itself on every run and holds the window open, so a failure tells you what went wrong.
 
-It also [b]leaves evidence[/b], which matters more than the convenience: every run writes a log beside it and holds the window open, so a failure tells you what went wrong instead of looking like nothing happened.
-
-[i]This is a convenience, not a substitute for RedHttpClient.[/i] The mod still treats the file as a permanent snapshot and will say so, because it has no clock and cannot tell a file fetched a minute ago from one fetched in March. Re-run the button when you want newer data.
+[i]This is a convenience, not a substitute for RedHttpClient.[/i] The mod still treats the file as a permanent snapshot and will say so. Re-run the button when you want newer data.
 [line]
 [color=#00f0ff][size=5][b]7. INSTALLATION[/b][/size][/color]
 [list=1]

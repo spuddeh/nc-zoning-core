@@ -4,12 +4,13 @@
 [color=#00f0ff][size=5][b]0. WHAT THIS IS[/b][/size][/color]
 NCZoningCore is a framework - a modder's resource. It fetches the NC Zoning registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API: each surveyed location's name, authors, world coordinates, category, tags and district.
 
-[color=#ffb300][b]It has no settings and does nothing on its own.[/b][/color] It is here because another mod asked for it. That is why this page has no options beside it.
+[color=#ffb300][b]It has no settings and does nothing on its own.[/b][/color] It is here because another mod asked for it.
 [line]
 [color=#00f0ff][size=5][b]1. WHAT IT DOES[/b][/size][/color]
 [*]Downloads the registry once per game session over HTTPS.
 [*]Caches it on disk, so it works offline after the first online launch, and revalidates without re-downloading when nothing has changed.
 [*]Serves the data to redscript and CET Lua mods through a small, stable API.
+[*]Tells a consumer mod which location mods you already have installed. This part needs Cyber Engine Tweaks; without it, every location reads as "unknown".
 
 It makes no changes to your game: no writes, no telemetry, no position tracking, and exactly one piece of UI - the alert that tells you the registry failed to load.
 [line]
@@ -26,7 +27,7 @@ RedHttpClient is the plugin that lets the game make HTTPS requests, and it is th
 The file goes in r6\storages\NCZoningCore\locations.json - that folder and no other, because RedFileSystem confines every mod to its own. The full command is on this mod's Nexus page.
 [line]
 [color=#00f0ff][size=5][b]4. IF SOMETHING LOOKS WRONG[/b][/size][/color]
-[*][b]An on-screen alert says there is no data.[/b] That is this mod reporting honestly rather than letting a consumer show you an empty map. Either RedHttpClient is absent and no file was placed, or the download failed.
+[*][b]An on-screen alert says there is no data.[/b] Either RedHttpClient is absent and no file was placed, or the download failed. Section 3 has the fix.
 [*][b]A mod says it needs a newer NCZoningCore.[/b] The API is versioned, and a consumer built against a later version will stay dormant rather than misbehave.
 [*][b]Anything else.[/b] The log is at r6\logs\mods\NCZoningCore__<date_time>.log, one file per session, five kept. Almost every question here is answered by that one file, and you can read it in this hub under LOGS.
 [line]

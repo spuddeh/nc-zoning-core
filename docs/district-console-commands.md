@@ -16,7 +16,7 @@ The CET console flattens a multi-line paste onto **one line**, so:
 
 The annotated blocks below are for reading; paste the one-liner beneath each.
 
-## Key facts these rely on (verified in-game 2026-07-07)
+## Key facts these rely on
 
 - The reds lookup class is exposed to Lua as **`NCZoning_Api_NCZDistrictMap`**
   (module `NCZoning.Api` -> dots become underscores). Its `.Lookup(TweakDBID)` is a
@@ -79,11 +79,11 @@ walking from a subdistrict up to its parent. **Unverified: confirm the field rea
 local ps=Game.GetScriptableSystemsContainer():Get(CName.new("PreventionSystem")) local st=ps.districtManager.stack for i=1,#st do local id=st[i]:GetDistrictID() local r=NCZoning_Api_NCZDistrictMap.Lookup(id) print(i,TDBID.ToStringDEBUG(id),"=>",r and (r.district.."/"..r.subdistrict) or "nil") end
 ```
 
-## 5. Self-discovery probe (when an accessor is unknown)
+## 5. Accessor probe (when the accessor form is unknown)
 
-Defensive probe that tries both getter and field forms and prints whichever works, without
-aborting on the first error (`try` returns nil on error and moves on). Useful against any
-native surface whose accessors you do not yet know.
+Tries both the getter and the field form and prints whichever works, without aborting on the
+first error (`try` returns nil on error and moves on). Use it against any native surface whose
+accessors you do not yet know.
 
 ```lua
 local function try(l,f) local ok,r=pcall(f) print(l,"=>",ok and tostring(r) or ("ERR "..tostring(r))) return ok and r or nil end local ps=Game.GetScriptableSystemsContainer():Get(CName.new("PreventionSystem")) local dm=try("dm.field",function() return ps.districtManager end) or try("dm.getter",function() return ps:GetDistrictManager() end) local d=dm and try("cur",function() return dm:GetCurrentDistrict() end) if d then local id=try("id",function() return d:GetDistrictID() end) if id then try("PATH",function() return TDBID.ToStringDEBUG(id) end) end end

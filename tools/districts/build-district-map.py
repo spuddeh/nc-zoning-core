@@ -24,8 +24,8 @@ subdistrict row to reach them from.
 Usage:  python build-district-map.py            (fetches /v1/districts with curl)
         python build-district-map.py api.json    (use a local /v1/districts json instead)
 
-The map is game -> API only where they DIFFER editorially; the vast majority is a mechanical
-name match. The handful of editorial decisions below were confirmed by the mod author.
+The map holds game -> API entries only where the two vocabularies differ; the rest is a
+mechanical name match. The hand-mapped cases are listed below.
 """
 import json, os, re, subprocess, sys
 
@@ -46,7 +46,7 @@ def read_version():
         sys.exit(1)
     return m.group(1)
 
-# --- confirmed editorial decisions (game enum <-> API), see the wiki decision ------------
+# --- hand-mapped cases (game enum <-> API), see the wiki decision -------------------------
 # API entries whose game enum the mechanical matcher can't find, resolved by hand:
 OVERRIDE = {
     "ncx_morro_rock": "MorroRock",                 # API renamed "Morro Rock" -> "NCX Spaceport / Morro Rock"
@@ -60,14 +60,14 @@ EXTRA = [
     ("SouthBadlands", "Badlands", ""),
     ("MorroRock_NCX", "NCX Spaceport / Morro Rock", ""),
     # The game has THREE spaceport districts, split across two unrelated parents, that the API
-    # models as one district "NCX Spaceport / Morro Rock" (game display names confirmed live via
-    # their LocKeys, 2026-07-07):
+    # models as one district, "NCX Spaceport / Morro Rock". Game display names come from their
+    # LocKeys:
     #   Districts.MorroRock  (top-level)      = "Morro Rock"
     #     -> Districts.NCX   (child)          = "Night City International and Translunar" (airport)
     #   Districts.Badlands (top-level)
-    #     -> Districts.NCSpaceport (child)    = "NCX Spaceport"   <- where the player actually stands
-    # NCSpaceport's game parent is Badlands, so it MUST map directly here or a parent-walk would
-    # wrongly report "Badlands". Live round-trip confirmed: NCSpaceport -> "NCX Spaceport / Morro Rock".
+    #     -> Districts.NCSpaceport (child)    = "NCX Spaceport"   <- where the player stands
+    # NCSpaceport's game parent is Badlands, so it MUST map directly here or a parent walk
+    # reports "Badlands".
     ("Badlands_Spaceport", "NCX Spaceport / Morro Rock", ""),
 ]
 # game enums that must NOT map to any API district (documented so a future regen keeps them out):
@@ -243,7 +243,7 @@ def write_reds(entries, api):
         "// Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:",
         "//                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID",
         "//                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict",
-        "//                   strings, for the editorial cases where the two vocabularies differ.",
+        "//                   strings, for the cases where the two vocabularies differ.",
         "//                2. AllDistricts() / SubdistrictsOf() - the API's district VOCABULARY,",
         "//                   enumerable. Static, so it needs no network and no registry data: a",
         "//                   consumer can render a district picker before the fetch lands, and an",

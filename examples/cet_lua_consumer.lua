@@ -2,7 +2,7 @@
 -- EXAMPLE - CET Lua consumer of NCZoningCore. Teaching reference, not a shipped file.
 -- Drop this into a CET mod's init.lua (or require it) as a starting point.
 --
--- Verified interop facts this is built on:
+-- The interop facts this is built on:
 --   * NCZoningCore exposes a bare-named facade class `NCZoningApi`. Call its STATIC methods
 --     with a dot:  NCZoningApi.GetAllLocations()  (NOT the internal service).
 --   * Each location is a handle; call its methods with a colon:  loc:Name(), loc:Pos().

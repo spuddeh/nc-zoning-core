@@ -17,10 +17,9 @@ module NCZoning.Data
 //   NCZoning-DataRefreshed        - a network fetch replaced the store with newer data
 //   NCZoning-DataError            - a fetch failed after retries; Reason() holds a code
 //   NCZoning-InstallScanComplete  - install detection has finished; Count() is how many are
-//                                   installed. FIRES ONLY WITH CET, because the scan that
-//                                   feeds it is CET's - absence of this event is the normal
-//                                   resting state without it, never an error, and a consumer
-//                                   that blocks on it will wait forever on a CET-less setup.
+//                                   installed. FIRES ONLY WITH CET, since the scan that feeds
+//                                   it is CET's. Without CET it never fires, which is normal
+//                                   rather than an error, so a consumer must not block on it.
 // Consumers subscribe by the literal name, e.g. (reds)
 //   GameInstance.GetCallbackSystem().RegisterCallback(n"NCZoning-DataReady", this, n"OnReady");
 // or (CET Lua)

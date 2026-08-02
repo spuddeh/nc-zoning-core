@@ -51,9 +51,9 @@ public class MyNCZConsumer extends ScriptableSystem {
     // The registry could not be obtained. Two very different situations:
     //   IsReady() == true  -> informational; the cache is still serving usable data.
     //   IsReady() == false -> FATAL for this session. No data exists and none is coming.
-    // The fatal case is normal, not exotic: RedHttpClient is optional for NCZoningCore, so a
-    // user who declined it and never downloaded locations.json by hand lands here every
-    // launch. Show an empty state that explains itself; do not wait for data that never arrives.
+    // The fatal case is common: RedHttpClient is optional for NCZoningCore, so a user who
+    // declined it and never downloaded locations.json by hand lands here every launch. Show an
+    // empty state that explains itself; do not wait for data that never arrives.
     NCZLog(s"[consumer] DataError (\(event.Reason())); ready=\(IsReady()) http=\(IsHttpAvailable())");
     if !IsReady() {
       // Render GetStatusMessage(), not a zero count. "0 locations here" is a real answer;
@@ -105,9 +105,8 @@ public class MyNCZConsumer extends ScriptableSystem {
 // how many mods call it, and the lines land in r6/logs/mods/MyConsumer__<date_time>.log rather
 // than a file shared with every other mod.
 //
-// Guarded on NCZoning.Api like everything else here, and that is sufficient rather than lucky:
-// NCZoningCore imports RedLogger unguarded, so it cannot compile without it. If NCZoning.Api
-// resolves, RedLogger is installed.
+// The @if guard on NCZoning.Api covers RedLogger too: NCZoningCore imports RedLogger unguarded,
+// so it cannot compile without it. If NCZoning.Api resolves, RedLogger is installed.
 @if(ModuleExists("NCZoning.Api"))
 import RedLogger.*
 

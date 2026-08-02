@@ -78,11 +78,7 @@ public class NCZoningFetcher extends ScriptableSystem {
   // Runs on the game thread (Session/Ready, or a retry bounce). Public so NCZRetry can call it.
   @if(ModuleExists("RedHttpClient"))
   public func DoFetch() -> Void {
-    // No ?full=1. The API collapsed its slim/full fork into ONE representation - the slim shape
-    // was built for a consumer that never existed, and both real consumers always asked for full.
-    // The parameter survives as a NO-OP ALIAS rather than a redirect, so sending it still worked
-    // and would have gone on working silently; it is dropped because it now describes a
-    // distinction the API does not have.
+    // No ?full=1. The API serves one representation now, and the parameter is a no-op alias.
     // [[NC-Zoning-Board/wiki/decisions/api-per-location-records]]
     let url = "https://api.nczoning.net/v1/locations";
     let headers: array<HttpHeader>;
@@ -192,8 +188,8 @@ public class NCZoningFetcher extends ScriptableSystem {
       return;
     }
     if r.m_error {
-      // Retries exhausted. Degrade quietly if the cache is still serving; otherwise the player
-      // has no data and the only fix is a manual download, so say so.
+      // Retries exhausted. Stay quiet if the cache is still serving; otherwise the player has no
+      // data and the only fix is a manual download, so say so.
       svc.SetStatusReason(r.m_reason);
       if svc.IsReady() {
         NCZoningDataEvent.Dispatch(n"NCZoning-DataError", svc.GetDataVersion(), svc.GetLocationCount(), r.m_reason);
@@ -227,8 +223,8 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
   }
 
-  // No data and no way to get any. Signal consumers, then tell the player: the mod has no UI and
-  // no CET, so an on-screen message is the only channel that reaches someone not reading logs.
+  // No data and no way to get any. Signal consumers, then tell the player on screen - the only
+  // channel that reaches someone who is not reading logs.
   private func ReportNoData(reason: String) -> Void {
     NCZoningDataEvent.Dispatch(n"NCZoning-DataError", "", 0, reason);
     NCZoningApi.NotifyDataError(reason);
@@ -333,7 +329,7 @@ public class NCZNoDataMessage extends DelayCallback {
 
     let msg: SimpleScreenMessage;
     msg.isShown = true;
-    msg.duration = 8.0;                      // long enough to read three lines, short enough not to nag
+    msg.duration = 8.0;                      // long enough to read three lines
     msg.message = text;
     msg.type = SimpleMessageType.Negative;   // -> Default state = red error styling
     GameInstance.GetBlackboardSystem(this.m_gi)

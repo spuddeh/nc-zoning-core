@@ -5,7 +5,7 @@
 // Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:
 //                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID
 //                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict
-//                   strings, for the editorial cases where the two vocabularies differ.
+//                   strings, for the cases where the two vocabularies differ.
 //                2. AllDistricts() / SubdistrictsOf() - the API's district VOCABULARY,
 //                   enumerable. Static, so it needs no network and no registry data: a
 //                   consumer can render a district picker before the fetch lands, and an

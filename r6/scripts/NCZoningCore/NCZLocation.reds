@@ -20,25 +20,25 @@ import RedData.Json.*
 
 // Whether a location's mod is present in archive/pc/mod/ on this machine.
 //
-// PART OF THE PUBLIC CONTRACT, and it lives here rather than beside the registry that fills
-// it because consumers must be able to name it and they never import NCZoning.Core - and
-// redscript requires a return type to be imported even when it is never written out.
+// Part of the public contract, so it lives here rather than beside the registry that fills it:
+// consumers must be able to name it and they never import NCZoning.Core, and redscript requires
+// a return type to be imported even when it is never written out.
 //
-// THREE STATES, AND UNKNOWN IS A REAL ANSWER. Unknown means detection did not run (it needs
-// CET; nothing reachable from redscript can read archive/pc/mod/) or the location cannot be
-// detected at all - an AMM mod ships only a .json into CET's own sandboxed folder, which no
-// mod can see. Rendering Unknown as "not installed" tells players to download mods they
-// already own. Unknown is the zero value so an unpopulated registry answers it by default.
+// THREE STATES. Unknown means detection did not run (it needs CET; nothing reachable from
+// redscript can read archive/pc/mod/) or the location cannot be detected at all - an AMM mod
+// ships only a .json into CET's own sandboxed folder, which no mod can read. Do not render
+// Unknown as "not installed". Unknown is the zero value, so an unpopulated registry answers it
+// by default.
 public enum NCZInstallState {
   Unknown = 0,
   Installed = 1,
   NotInstalled = 2,
 }
 
-// A single registry entry. ONE representation - the API's slim/full fork was collapsed, so every
-// field below arrives on every record from /v1/locations. There is no longer a subset to ask for.
+// A single registry entry. The API has one representation, so every field below arrives on
+// every record from /v1/locations; there is no subset to ask for.
 public class NCZLocation {
-  // --- slim fields -------------------------------------------------------------
+  // --- core fields -------------------------------------------------------------
   let id: String;                 // UUID (manual) or "nexus-<id>" (auto); stable
   let name: String;
   let nexus_id: String;           // snake_case ON PURPOSE (case-sensitive bind); numeric / WIP / Dummy
@@ -50,7 +50,7 @@ public class NCZLocation {
   let source: String;             // manual | auto
   let district: String;           // never null (Badlands is the default region)
   let subdistrict: String;        // "" when the JSON value is null / key absent
-  // --- richer fields (once behind ?full=1; now always present) -------------------
+  // --- richer fields (once behind ?full=1; always present since that split was dropped) ---
   let description: String;
   let credits: String;            // optional; "" when absent
   let thumbnail_url: String;
@@ -59,9 +59,9 @@ public class NCZLocation {
   let recently_updated: Bool;     // server-computed; true when updated within the API's recency window
   // The .archive / .xl filenames this mod installs into archive/pc/mod/, for installed-mod
   // detection (API v1.5.0+). EMPTY MEANS "CANNOT SAY", NEVER "NOT INSTALLED" - it is either an
-  // AMM mod, which is permanently undetectable because CET sandboxes its folder, or a record
-  // the API has not fetched yet. Those two are indistinguishable from here, so both are
-  // Unknown. See NCZ_InstallState.
+  // AMM mod, permanently undetectable because CET sandboxes its folder, or a record the API has
+  // not fetched yet. Those two are indistinguishable from here, so both read Unknown. See
+  // NCZInstallState.
   let archives: array<String>;
 
   // --- camelCase accessors (the public surface consumers read) -----------------
@@ -126,8 +126,8 @@ public class NCZLocation {
   }
   public func Archives() -> array<String> { return this.archives; }
 
-  // Build an NCZLocation from one /v1 location element, fully manually (new object +
-  // explicit GetKey* reads). Chosen for explicit control and no reflection dependency.
+  // Build an NCZLocation from one /v1 location element, by hand: new object plus explicit
+  // GetKey* reads, no reflection.
   public static func FromJsonObject(item: ref<JsonObject>) -> ref<NCZLocation> {
     let loc = new NCZLocation();
     if !IsDefined(item) {
@@ -181,12 +181,9 @@ public class NCZLocation {
   }
 }
 
-// NOTE: There is deliberately no district-geometry DTO here. Each NCZLocation already
-// carries its server-computed district / subdistrict (the API mirrors the game's district
-// rules), and the game resolves the PLAYER's current district natively and far more richly
-// via DistrictManager.GetCurrentDistrict() + the gamedataDistrict enum. Fetching the API's
-// /v1/districts boundary polygons to re-run point-in-polygon in-game would be a worse
-// reimplementation of what the engine already does, so NCZoningCore does not consume it.
+// NOTE: there is no district-geometry DTO here, and there should not be one. Each NCZLocation
+// already carries its server-computed district / subdistrict, and the game resolves the
+// PLAYER's current district natively via DistrictManager.GetCurrentDistrict() and the
+// gamedataDistrict enum, so the API's /v1/districts boundary polygons are not consumed.
 // Consumers join "player's current district" (from the game) to a location's District() /
-// Subdistrict() string; a small game-vocabulary -> API-string normalization map lives with
-// the district-guide demo, not in the core data model.
+// Subdistrict() string, through the game-vocabulary -> API-string map in NCZoningDistricts.reds.

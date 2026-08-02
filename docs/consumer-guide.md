@@ -7,9 +7,6 @@ map of location mods at nczoning.net) once per game session, caches it offline-f
 exposes it in game as a read-only API. Your mod reads that registry: each entry's name,
 authors, world coordinates, category, tags, and district/subdistrict.
 
-Every code fact below is drawn from the shipped source in this repository. External behaviour
-(dependencies, the CET Lua bridge) is cited to its upstream source in [References](#references).
-
 ## Requirements
 
 NCZoningCore itself needs, at runtime:
@@ -21,34 +18,32 @@ NCZoningCore itself needs, at runtime:
 
 **RedLogger is a hard dependency, and it becomes one of yours too.** NCZoningCore imports it
 unguarded, so anything depending on NCZoningCore inherits it — list it in your own
-requirements. It is what the framework logs through, writing to
-`r6\logs\mods\NCZoningCore__<date_time>.log`, one file per session with five kept. That
-matters for a background framework: the usual bug report against it is "the registry never
-loaded", and that is answerable only from a log.
+requirements. NCZoningCore logs through it, writing to
+`r6\logs\mods\NCZoningCore__<date_time>.log`, one file per session with five kept.
 
-You are not obliged to log through it yourself, but you may: unlike `Log`/`LogChannel`, a
-RedLogger call site is safe to ship. Those need a per-mod `Logs.reds` carrying a `native func`
-declaration, and redscript compiles every installed mod into one unit — so two mods each
-shipping one is a duplicate declaration that breaks *every* redscript mod on the player's
-machine. RedLogger's signature ships once, inside the plugin, so no number of callers can
-collide. `examples/RedscriptConsumer.reds` shows the wrapper shape.
+You may log through it yourself as well. Unlike `Log` / `LogChannel`, a RedLogger call site is
+safe to ship: those need a per-mod `Logs.reds` carrying a `native func` declaration, and
+redscript compiles every installed mod into one unit, so two mods each shipping one is a
+duplicate declaration that breaks *every* redscript mod on the player's machine. RedLogger's
+signature ships once, inside the plugin, so callers cannot collide.
+`examples/RedscriptConsumer.reds` shows the wrapper shape.
 
-These are RED4ext plugins usable from redscript; per each plugin's own install requirements,
-the mandatory base is RED4ext, and RedData underpins the JSON features (see
+The Red\* dependencies are RED4ext plugins callable from redscript; each states RED4ext as its
+own requirement, and RedData is what provides the JSON handling (see
 [References](#references)). NCZoningCore's redscript calls no CET (Cyber Engine Tweaks) API, so
 **the framework does not require CET**. CET is required only by a consumer that is itself a CET
-Lua mod (see [Consuming from CET Lua](#consuming-from-cet-lua)).
+Lua mod (see [Consuming from CET Lua](#consuming-from-cet-lua)), and by installed-mod detection
+(see [Installed-mod detection](#installed-mod-detection)).
 
-NCZoningCore ships redscript only. There are no Lua files in the distribution; the files in
-`examples/` are documentation, not loaded by the framework.
+The files in `examples/` are documentation. They are not loaded by the framework.
 
 ## When is data available
 
 One fetch runs per game launch. On session start NCZoningCore loads its offline cache
 immediately (so the registry is usable within a second or two of entering the world, even with
-no network), then revalidates over the network. Your consumer should therefore wait for a
-"data ready" signal rather than assume the data is present at startup. Both consumer types have
-a signal and a simple readiness check, described below.
+no network), then revalidates over the network. Wait for a "data ready" signal rather than
+assuming the data is present at startup. Both consumer types have a signal and a readiness
+check, described below.
 
 Status you can query at any time:
 
@@ -64,21 +59,20 @@ Status you can query at any time:
 RedHttpClient is a **soft dependency**. Every reference to it in the source, the `import`
 included, sits behind `@if(ModuleExists("RedHttpClient"))`, and redscript evaluates those
 conditions before name resolution. With the plugin absent, that code is not compiled, so
-NCZoningCore still builds and runs. It simply has no network layer.
+NCZoningCore still builds and runs. It has no network layer.
 
-This matters to you because it produces a session state that never resolves. A user without
-RedHttpClient supplies `r6\storages\NCZoningCore\locations.json` by hand, and that file is
-all the data there will ever be. If they have not supplied it, there is no data and no fetch
-coming to fix that. Do not sit in a "waiting for data" state forever, and do not render an empty
-list as though the registry were genuinely empty.
+That produces a session state that never resolves. A user without RedHttpClient supplies
+`r6\storages\NCZoningCore\locations.json` by hand, and that file is all the data there will
+ever be. If they have not supplied it, there is no data and no fetch coming. Do not sit in a
+"waiting for data" state forever, and do not render an empty list as though the registry were
+empty.
 
 Three calls tell you where you are:
 
 - `IsHttpAvailable() -> Bool` - false when the build has no network layer.
 - `GetStatusMessage() -> String` - `""` when live; otherwise the player-facing sentence for the
-  current state. **Show this instead of a zero count when `IsReady()` is false.** It is the single
-  owner of that wording, so a consumer that renders it cannot contradict the core's own message.
-  Do not write your own version of these sentences.
+  current state. **Show this instead of a zero count when `IsReady()` is false.** It is the only
+  copy of that wording. Do not write your own version of these sentences.
 - `GetStatusReason() -> String` - `""` when the data is live, otherwise one of:
 
 | Reason | `IsReady()` | Meaning |
@@ -89,15 +83,13 @@ Three calls tell you where you are:
 | `cache_invalid` | false | The file is present but empty or unparseable. |
 | `storage_unavailable` | false | RedFileSystem returned a null storage. |
 
-The rule of thumb: a reason with `IsReady() == true` is informational, and one with
-`IsReady() == false` is fatal for the session. In the fatal case NCZoningCore already shows the
-user an on-screen message explaining how to fix it, so your mod does not need to duplicate the
-install instructions. It just needs to not pretend it has data.
+A reason with `IsReady() == true` is informational; one with `IsReady() == false` is fatal for
+the session. In the fatal case NCZoningCore already shows the user an on-screen message
+explaining how to fix it, so your mod does not need to repeat the install instructions.
 
-**A zero count and no-data must not render the same.** "0 locations in this district" is a real,
-resolved answer. "No location data" is a failure. If a UI shows the first when the truth is the
-second, it tells the player a district is empty when the registry simply never loaded. Check
-`IsReady()` before you render any count, and render `GetStatusMessage()` when it is false.
+**A zero count and no-data must not render the same.** "0 locations in this district" is a
+resolved answer; "no location data" is a failure. Check `IsReady()` before you render any
+count, and render `GetStatusMessage()` when it is false.
 
 The fatal case also fires `NCZoning-DataError` (redscript) and `NCZoningApi.OnDataError` (CET
 Lua), both carrying the same reason string.
@@ -123,18 +115,18 @@ consumer needs; `NCZoning.Data` provides the DTO and event payload types.
 - `ApiVersion() -> Int32` - increments only on a breaking change. Gate on it:
   `if ApiVersion() < 1 { return; }`.
 
-**`ApiVersion()` does not protect you from an OLD core.** It is a runtime check, and the problem
+**`ApiVersion()` does not protect you from an old core.** It is a runtime check, and the problem
 lands at compile time. redscript has no `@if(FunctionExists)`, so if you call a function that a
 later core added (`GetDistricts`, `GetSubdistricts`, `GetStatusMessage` - all 0.3.0) and the player
 has an older NCZoningCore installed, the redscript compile fails. A redscript compile failure is
 not local to your mod: it takes down **every** redscript mod on that machine.
 
-So `ModuleExists` guards the core being *absent*, and nothing guards it being *stale*. If you call
+`ModuleExists` guards the core being *absent*; nothing guards it being *stale*. If you call
 anything added after 0.2.0, state a minimum NCZoningCore version in your requirements and mod page.
 
 ### Events
 
-NCZoningCore dispatches three events through Codeware's CallbackSystem. Register with the frozen
+NCZoningCore dispatches these events through Codeware's CallbackSystem. Register with the frozen
 names; the callback receives a `ref<NCZoningDataEvent>` (from `NCZoning.Data`):
 
 ```swift
@@ -154,6 +146,8 @@ private cb func OnReady(event: ref<NCZoningDataEvent>) -> Void {
 - `NCZoning-DataError` - the registry could not be obtained. `event.Reason()` holds one of the
   codes in [When there is no network](#when-there-is-no-network); `IsReady()` may still be true
   if the offline cache is serving.
+- `NCZoning-InstallScanComplete` - installed-mod detection has finished; `event.Count()` is how
+  many locations are installed. Fires only when CET is present. Do not block on it.
 
 If your system attaches after the event already fired, check `IsReady()` and use the data
 directly.
@@ -187,9 +181,8 @@ static (generated from `/v1/districts`), so they need no network and no registry
 correctly before the fetch lands and while it is missing entirely.
 
 Deriving the list from `GetAllLocations()` looks equivalent and is not. An area with zero locations
-appears in no location, so it silently vanishes - today that is NCX Spaceport / Morro Rock,
-Rattlesnake Creek and SoCal Border Crossing. Those are precisely the areas a modder browsing for
-somewhere to build would want to see.
+appears in no location, so it silently vanishes — today that is NCX Spaceport / Morro Rock,
+Rattlesnake Creek and SoCal Border Crossing.
 
 A district's total is **not** the sum of its subdistricts: some locations are attributed to a
 district directly, inside no subdistrict (Badlands has 3). Use `GetLocationsByDistrict` for a
@@ -202,12 +195,36 @@ A full worked example is in [`examples/RedscriptConsumer.reds`](../examples/Reds
 > method's array return value reads garbage in redscript (an rvalue-temporary issue). This is a
 > redscript-wide gotcha, not specific to NCZoningCore.
 
+## Installed-mod detection
+
+`GetInstallState(loc)` answers whether a location's mod is present in `archive/pc/mod/` on this
+machine, as an `NCZInstallState`: `Unknown`, `Installed` or `NotInstalled`.
+
+| Function | Returns |
+| --- | --- |
+| `IsInstallDetectionAvailable()` | `Bool` - false until a scan has completed |
+| `GetInstallState(loc: ref<NCZLocation>)` | `NCZInstallState` |
+| `GetInstalledCount()` | `Int32` |
+
+CET Lua consumers use `NCZoningApi.GetInstallStateInt(id)`, which returns the enum as an
+`Int32` (0 Unknown / 1 Installed / 2 NotInstalled).
+
+Three rules for a consumer:
+
+1. **Check `IsInstallDetectionAvailable()` before offering an installed/missing filter.**
+   Detection needs CET, and on a machine without it every location answers `Unknown`.
+2. **Do not render `Unknown` as "not installed".** It means detection did not run, or the
+   location cannot be detected at all — an AMM location mod ships only a `.json` into CET's own
+   sandboxed folder, which no mod can read, so those are `Unknown` permanently.
+3. **A consumer calling these must require NCZoningCore 0.3.0+.** Calling a function that does
+   not exist is a compile error, and that takes down every redscript mod on the machine.
+
 ## Consuming from CET Lua
 
 CET Lua reaches NCZoningCore through a dedicated facade class, `NCZoningApi`. You do not import
-anything and NCZoningCore ships no Lua; `NCZoningApi` is simply a global in CET Lua because CET
-exposes every redscript class through the shared reflection system (see
-[How the CET Lua bridge works](#how-the-cet-lua-bridge-works) and [References](#references)).
+anything; `NCZoningApi` is a global in CET Lua because CET exposes every redscript class through
+the shared reflection system (see [How the CET Lua bridge works](#how-the-cet-lua-bridge-works)
+and [References](#references)).
 
 ### Reading the registry
 
@@ -231,8 +248,8 @@ end
 ```
 
 The Lua facade exposes the same reads as the redscript API, plus `GetLocationCount()`,
-`IsHttpAvailable()`, and `GetStatusReason()`. It is read-only by design, so a Lua consumer
-cannot reach the framework's internal mutating methods.
+`IsHttpAvailable()`, and `GetStatusReason()`. It is read-only, so a Lua consumer cannot reach
+the framework's internal mutating methods.
 
 ### Knowing when data is ready
 
@@ -250,10 +267,9 @@ end)
 Simpler alternative: poll `NCZoningApi.IsReady()` (for example in `onUpdate`) until it returns
 true, then read once. This is fine for a one-time load.
 
-Note: the CallbackSystem events in the redscript section are the redscript consumer path. For
-CET Lua, use the `Observe` hook above (or `IsReady()` polling). In this framework's own in-game
-testing, custom CallbackSystem events dispatched from redscript were not delivered to CET Lua
-listeners, which is why the `OnDataReady` hook is provided as the Lua path.
+Note: the CallbackSystem events in the redscript section are the redscript consumer path. Custom
+CallbackSystem events dispatched from redscript are not delivered to CET Lua listeners, so Lua
+uses the `Observe` hook above (or `IsReady()` polling).
 
 ### Knowing when data is never coming
 
@@ -302,9 +318,14 @@ accessor methods (redscript `loc.Name()`, Lua `loc:Name()`):
 | `Description()` | String | |
 | `Credits()` | String | may be empty |
 | `ThumbnailUrl()` / `PictureUrl()` | String | Nexus image URLs; may be empty |
+| `RecentlyUpdated()` | Bool | server-computed; true when the mod was updated inside the API's recency window |
 
-Arrays (`Tags()`, `Authors()`) are also exposed as count/index accessors that are safe to call
-inline: `TagCount()` / `TagAt(i)` and `AuthorCount()` / `AuthorAt(i)`.
+Arrays (`Tags()`, `Authors()`, `Archives()`) are also exposed as count/index accessors that are
+safe to call inline: `TagCount()` / `TagAt(i)`, `AuthorCount()` / `AuthorAt(i)`, and
+`ArchiveCount()` / `ArchiveAt(i)`.
+
+`Archives()` is the `.archive` / `.xl` filenames the mod installs. An empty list means "cannot
+say", never "not installed" — see [Installed-mod detection](#installed-mod-detection).
 
 ### Player's current district
 
@@ -315,40 +336,38 @@ game's `CityCenter` to the API's `City Center`), and filter with `GetLocationsBy
 
 ## How the CET Lua bridge works
 
-Useful background if you want to understand why the Lua patterns look the way they do.
+Background, if you want to know why the Lua patterns look the way they do.
 
-- NCZoningCore ships no Lua and calls no CET function. `NCZoningApi` is reachable from CET Lua
-  only because CET reads the game's shared reflection system and exposes every registered
-  redscript class to Lua automatically (see [References](#references)). A redscript class in a
-  module appears in Lua under its full name with dots replaced by underscores; `NCZoningApi` has
-  no module, so it keeps its bare name.
-- The data-ready signal is not a message the framework "sends" to CET. `OnDataReady` is an empty
-  redscript method; NCZoningCore simply calls it after each store update. CET's `Observe`
-  installs a hook on that method, so when NCZoningCore calls it, your Lua function runs with the
-  arguments. If CET is not installed, or nobody is observing, the call is a harmless no-op and
-  the framework is unaffected. This "observe an empty stub method" pattern is the same one used
-  by other redscript-plus-CET mods (see [References](#references)).
+- `NCZoningApi` is reachable from CET Lua because CET reads the game's shared reflection system
+  and exposes every registered redscript class to Lua automatically (see
+  [References](#references)). A redscript class in a module appears in Lua under its full name
+  with dots replaced by underscores; `NCZoningApi` has no module, so it keeps its bare name.
+- The data-ready signal is not a message the framework sends to CET. `OnDataReady` is an empty
+  redscript method that NCZoningCore calls after each store update. CET's `Observe` installs a
+  hook on that method, so your Lua function runs with the arguments. If CET is not installed, or
+  nobody is observing, the call is a no-op. This "observe an empty stub method" pattern is the
+  same one used by other redscript-plus-CET mods (see [References](#references)).
 
-So NCZoningCore stays a self-contained redscript data provider; a CET Lua consumer reaches in
-through reflection and hooking, rather than the framework reaching out.
+The one place the traffic runs the other way is installed-mod detection: NCZoningCore's own CET
+Lua component calls `ModArchiveExists` and pushes the result back into redscript. Consumers
+never do this themselves.
 
 ## Threading and non-goals
 
 - Consumers do not deal with threads. NCZoningCore parses network responses off the game thread
-  and marshals the result back onto the game thread before updating the store or firing any
+  and passes the result back onto the game thread before updating the store or firing any
   signal, so every callback, event, and read you see runs on the game thread.
 - Non-goals in v1: NCZoningCore does not report telemetry or player position, poll on a loop, or
-  authenticate. It is a read-only data provider with no UI, with one deliberate exception: when
-  it has no registry data at all and no way to get any, it pushes a single on-screen message
-  telling the user how to fix it. That is the one case where staying silent would leave every
-  consumer mod looking broken for a reason the user could not otherwise discover.
+  authenticate. It is a read-only data provider with no UI, with one exception: when it has no
+  registry data and no way to get any, it pushes a single on-screen message telling the user how
+  to fix it.
 
 ## Availability caveat
 
 NCZoningCore is pure redscript and survives game patches, but its RED4ext plugin dependencies
-(Codeware, the Red* plugins) need per-patch rebuilds by their authors. Right after a game update
+(Codeware, the Red\* plugins) need per-patch rebuilds by their authors. Right after a game update
 the framework can be temporarily unavailable until those catch up. A soft-dependency consumer
-degrades gracefully in that window.
+keeps working in that window.
 
 ## References
 
@@ -357,4 +376,4 @@ degrades gracefully in that window.
 - Codeware (CallbackSystem, ScriptableService): repo <https://github.com/psiberx/cp2077-codeware>, wiki <https://github.com/psiberx/cp2077-codeware/wiki>
 - RedHttpClient / RedData / RedFileSystem (each states its install requirement as RED4ext, and that it is usable from redscript and CET): <https://github.com/rayshader/cp2077-red-httpclient>, <https://github.com/rayshader/cp2077-red-data>, <https://github.com/rayshader/cp2077-red-filesystem>
 - Cyber Engine Tweaks, which exposes redscript types to Lua and provides `Observe`: docs at <https://wiki.redmodding.org/cyber-engine-tweaks>
-- Native Interactions Framework, a real mod that uses the observe-a-stub-method pattern: <https://github.com/justarandomguyintheinternet/nativeInteractions>
+- Native Interactions Framework, a mod that uses the observe-a-stub-method pattern: <https://github.com/justarandomguyintheinternet/nativeInteractions>

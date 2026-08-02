@@ -15,9 +15,9 @@ import NCZoning.Core.*
 import NCZoning.Data.*
 
 // --- version handshake ---------------------------------------------------------
-// redscript has no dependency versioning, and ModuleExists() cannot check a version,
-// so this pair is the load-bearing contract. Version() is human-facing semver.
-// ApiVersion() increments ONLY on a breaking change - never bump it silently.
+// redscript has no dependency versioning and ModuleExists() cannot check a version, so this
+// pair is the only version contract. Version() is human-facing semver. ApiVersion()
+// increments ONLY on a breaking change - never bump it silently.
 //
 // There is no @if(FunctionExists). A consumer that calls a function added in a later core
 // fails to COMPILE against an older one, which takes every redscript mod on that machine
@@ -27,22 +27,20 @@ public func ApiVersion() -> Int32 { return 1; }
 
 // --- installed-mod detection (0.3.0+) --------------------------------------------
 //
-// AVAILABILITY IS A GATE, DATA IS A BRANCH - and here they are two different calls.
 // Check IsInstallDetectionAvailable() BEFORE offering the player any installed/missing
 // filter. Detection needs CET (nothing reachable from redscript can read archive/pc/mod/),
-// so on a machine without it every record answers Unknown, and a UI that treats Unknown as
-// "not installed" would show an empty list and blame the registry.
+// so on a machine without it every record answers Unknown.
 //
-// A consumer requiring these must require NCZoningCore 0.3.0+: calling a function that does
+// A consumer calling these must require NCZoningCore 0.3.0+: calling a function that does
 // not exist is a COMPILE error that takes down every redscript mod on the machine.
 public func IsInstallDetectionAvailable() -> Bool {
   let r = NCZInstalledRegistry.Get();
   return IsDefined(r) && r.IsAvailable();
 }
 
-// Unknown is a real answer, not a failure. It means either detection never ran (no CET) or
-// the location is undetectable in principle - AMM location mods ship only a .json into CET's
-// own sandboxed folder, so no mod can ever see them. Do not render Unknown as "not installed".
+// Unknown means either detection never ran (no CET) or the location cannot be detected at all
+// - AMM location mods ship only a .json into CET's own sandboxed folder, which no mod can read.
+// Do not render Unknown as "not installed".
 public func GetInstallState(loc: ref<NCZLocation>) -> NCZInstallState {
   let r = NCZInstalledRegistry.Get();
   if !IsDefined(r) {
@@ -92,8 +90,8 @@ public func GetStatusReason() -> String {
   return "";
 }
 
-// The player-facing sentence for the current state; "" when live. The only copy of this wording -
-// the core's no-data banner and every consumer read it, so do not restate it in a consumer.
+// The player-facing sentence for the current state; "" when live. The only copy of this wording
+// - the core's no-data banner reads it too - so do not restate it in a consumer.
 //
 // Pair with IsReady():
 //   IsReady() + a message -> informational (data is usable but can never refresh)
