@@ -314,7 +314,6 @@ accessor methods (redscript `loc.Name()`, Lua `loc:Name()`):
 | `Category()` | String | `location-overhaul`, `new-location`, or `other` |
 | `District()` | String | never empty (Badlands is the default region) |
 | `Subdistrict()` | String | empty when the entry has none |
-| `Source()` | String | `manual` or `auto` |
 | `Description()` | String | |
 | `Credits()` | String | may be empty |
 | `ThumbnailUrl()` / `PictureUrl()` | String | Nexus image URLs; may be empty |

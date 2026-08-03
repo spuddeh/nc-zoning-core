@@ -5,6 +5,9 @@ and to the mod authors building on it. The full technical detail lives in `@chan
 
 ### [Unreleased - v0.3.0]
 
+- Removed: the `Source()` accessor on a location. The registry no longer records whether an entry was
+  added by hand or picked up from Nexus, so there was nothing for it to return. An entry that came
+  from Nexus still has an id beginning `nexus-`.
 - New: RedLogger is now a **required** dependency. NCZoningCore writes to its own log file at
   `r6\logs\mods\NCZoningCore__<date_time>.log`, keeping the five most recent sessions, instead of
   sharing one log with every other mod. Mods built on NCZoningCore inherit this requirement.

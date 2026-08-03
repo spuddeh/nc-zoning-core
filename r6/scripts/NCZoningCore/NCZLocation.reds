@@ -47,7 +47,6 @@ public class NCZLocation {
   let category: String;           // location-overhaul | new-location | other
   let tags: array<String>;        // built in FromJsonObject(); read via TagCount()/TagAt() or a local
   let authors: array<String>;     // built in FromJsonObject(); read via AuthorCount()/AuthorAt() or a local
-  let source: String;             // manual | auto
   let district: String;           // never null (Badlands is the default region)
   let subdistrict: String;        // "" when the JSON value is null / key absent
   // --- richer fields (once behind ?full=1; always present since that split was dropped) ---
@@ -74,7 +73,6 @@ public class NCZLocation {
   // rvalue-array note on TagCount(); for a size or single element prefer TagCount()/TagAt().
   public func Tags() -> array<String> { return this.tags; }
   public func Authors() -> array<String> { return this.authors; }
-  public func Source() -> String { return this.source; }
   public func District() -> String { return this.district; }
   public func Subdistrict() -> String { return this.subdistrict; }
   public func Description() -> String { return this.description; }
@@ -138,7 +136,6 @@ public class NCZLocation {
     loc.nexus_id = item.GetKeyString("nexus_id");
     loc.yaw = Cast<Float>(item.GetKeyDouble("yaw"));
     loc.category = item.GetKeyString("category");
-    loc.source = item.GetKeyString("source");
     loc.district = item.GetKeyString("district");
     loc.subdistrict = item.GetKeyString("subdistrict");
     loc.description = item.GetKeyString("description");

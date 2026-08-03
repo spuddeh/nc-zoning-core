@@ -2,6 +2,14 @@
 
 ## 0.3.0 (pre-release)
 
+- Removed NCZLocation.Source(), its backing field and its parse line, and the row that published it
+  in the consumer guide's accessor table. The API dropped `source` in 0.5.0 - it was derived, stamped
+  `manual` onto mods.json entries and `auto` onto Nexus ones at build time, and nothing auto-publishes
+  now. `GetKeyString` on an absent key yields "", so the accessor answered "" for every location while
+  the guide promised one of two values; a consumer branching on `Source() == "manual"` took the false
+  path everywhere, silently. Provenance still reads off the id: a `nexus-` prefix is what `auto` meant.
+  - ApiVersion() stays at 1. It gates a published contract, and this accessor never reached a release.
+
 - Renamed the registry cache file locations_full.json -> locations.json, and dropped ?full=1 from
   the fetch URL. The API collapsed its slim/full split into one representation, so ?full=1 is now
   a no-op alias and the name no longer describes anything.
