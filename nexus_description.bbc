@@ -1,15 +1,15 @@
 [center][color=#00f0ff][size=6][b]NC ZONING BOARD[/b][/size][/color]
 [color=#8892b0]NIGHT CORP // URBAN PLANNING DIVISION[/color]
 [color=#00f0ff][size=5][b]INSTRUMENT NC-ZB-01 - THE SURVEY REGISTER[/b][/size][/color]
-[i]NCZoningCore - the NC Zoning registry, in game, for other mods to build on.[/i][/center]
+[i]NC Zoning Board - Core: the registry, in game, for other mods to build on.[/i][/center]
 [line]
 [color=#00f0ff][size=5][b]0. NATURE OF THIS INSTRUMENT[/b][/size][/color]
-[b]NCZoningCore[/b] is a framework - a modder's resource. It fetches the [b]NC Zoning[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
+[b]NC Zoning Board - Core[/b] is a framework - a modder's resource. It fetches the [b]NC Zoning Board[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
 
 [color=#ffb300][b]It has no menu and does nothing on its own.[/b][/color] You only need it if another mod lists it as a requirement. Installing it by itself has no visible effect.
 [line]
 [color=#00f0ff][size=5][b]1. THE WIDER PROJECT[/b][/size][/color]
-NCZoningCore is the in-game half of [b]NC Zoning[/b], the interactive map of Cyberpunk 2077 location mods.
+The Core is the in-game half of [b]NC Zoning Board[/b], the interactive map of Cyberpunk 2077 location mods.
 [list]
 [*][b]Explore the map:[/b] [url=https://nczoning.net]nczoning.net[/url]
 [*][b]Join the community:[/b] [url=https://discord.gg/sc4yEx2fNf]Locations Hub Discord[/url]
@@ -20,7 +20,7 @@ NCZoningCore is the in-game half of [b]NC Zoning[/b], the interactive map of Cyb
 [youtube]LJVJ2lN4aQ0[/youtube][/center]
 [line]
 [color=#00f0ff][size=5][b]2. DO I NEED TO FILE THIS?[/b][/size][/color]
-Only if a mod you want tells you to. NCZoningCore is a shared dependency, like Codeware or RED4ext: it sits in the background and provides data to the mods that ask for it.
+Only if a mod you want tells you to. The Core is a shared dependency, like Codeware or RED4ext: it sits in the background and provides data to the mods that ask for it.
 
 [color=#00f0ff][size=5][b]3. WHAT IT DOES UNDER THE HOOD[/b][/size][/color]
 [list]
@@ -41,28 +41,28 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [*]RedFileSystem
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/31920]RedLogger[/url]
 [/list]
-[i]RedLogger is what NCZoningCore writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font], one per session, keeping the five most recent. That file is what to attach to a bug report.[/i]
+[i]RedLogger is what the Core writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font], one per session, keeping the five most recent. That file is what to attach to a bug report.[/i]
 
 [b]Optional:[/b]
 [list]
 [*]RedHttpClient
 [*]Cyber Engine Tweaks
 [/list]
-[i]Cyber Engine Tweaks is [b]not[/b] required by NCZoningCore itself. It is needed for installed-mod detection, and by any consumer mod that is itself a CET Lua mod.[/i]
+[i]Cyber Engine Tweaks is [b]not[/b] required by the Core itself. It is needed for installed-mod detection, and by any consumer mod that is itself a CET Lua mod.[/i]
 [line]
 [color=#00f0ff][size=5][b]5. RedHttpClient IS OPTIONAL[/b][/size][/color]
-RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason NCZoningCore touches the network at all. It is a [b]soft dependency[/b]: NCZoningCore installs and runs without it.
+RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason the Core touches the network at all. It is a [b]soft dependency[/b]: the Core installs and runs without it.
 
 [b]With RedHttpClient.[/b] The registry downloads itself once per session and keeps itself current. Nothing for you to do.
 
-[b]Without RedHttpClient.[/b] NCZoningCore never opens a socket. It reads the registry from a file you download yourself, and treats it as permanently out of date, because it has no way to check. You re-download whenever you want fresher data.
+[b]Without RedHttpClient.[/b] The Core never opens a socket. It reads the registry from a file you download yourself, and treats it as permanently out of date, because it has no way to check. You re-download whenever you want fresher data.
 
 [color=#ffb300]If you skip RedHttpClient and do not supply the file, the mod has no data.[/color] It will tell you so on screen a few seconds into your session, rather than pretending the map is empty.
 [line]
 [color=#00f0ff][size=5][b]6. FILING THE SURVEY BY HAND[/b][/size][/color]
 Open a terminal in your Cyberpunk 2077 folder and run:
 [code]curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storages\NCZoningCore\locations.json"[/code]
-That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations.json[/font]. That folder is fixed: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and NCZoningCore cannot read from anywhere else. There is only one file to fetch.
+That creates [font=Courier New]Cyberpunk 2077\r6\storages\NCZoningCore\locations.json[/font]. That folder is fixed: RedFileSystem confines every mod to [font=Courier New]r6\storages\<mod name>\[/font], and the Core cannot read from anywhere else. There is only one file to fetch.
 
 The output path is relative, so check it landed where you meant. Downloading a good file into the wrong folder looks like a complete success and does nothing:
 [code]dir r6\storages\NCZoningCore[/code]
@@ -107,7 +107,7 @@ Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.e
 [color=#00f0ff][size=5][b]7. INSTALLATION[/b][/size][/color]
 [list=1]
 [*]Install the requirements above.
-[*]Download NCZoningCore and extract the [font=Courier New]r6[/font] folder into your Cyberpunk 2077 root directory.
+[*]Download [b]NC Zoning Board - Core[/b] and extract the [font=Courier New]r6[/font] folder into your Cyberpunk 2077 root directory.
 [i]Final path should look like:[/i] [font=Courier New]Cyberpunk 2077\r6\scripts\NCZoningCore\[/font]
 [*][i]Only if you skipped RedHttpClient:[/i] run the [font=Courier New]curl[/font] command above to download the registry.
 [/list]
@@ -119,7 +119,7 @@ Build on NCZoningCore from redscript or CET Lua. The full consumer guide and wor
 In short: redscript consumers [font=Courier New]import NCZoning.Api.*[/font] (or guard with [font=Courier New]@if(ModuleExists("NCZoning.Api"))[/font] for a soft dependency) and subscribe to the [font=Courier New]NCZoning-DataReady[/font] / [font=Courier New]-DataRefreshed[/font] / [font=Courier New]-DataError[/font] events. CET Lua consumers call the [font=Courier New]NCZoningApi[/font] facade and observe [font=Courier New]NCZoningApi.OnDataReady[/font] for the data-ready signal.
 [line]
 [color=#00f0ff][size=5][b]9. A NOTE ON GAME UPDATES[/b][/size][/color]
-NCZoningCore is pure redscript and survives game patches on its own, but its plugin requirements (Codeware and the Red* plugins) usually need a rebuild by their authors after each Cyberpunk update. Right after a game update the framework can be temporarily unavailable until those catch up. Mods that depend on it with a soft dependency keep working in that window.
+The Core is pure redscript and survives game patches on its own, but its plugin requirements (Codeware and the Red* plugins) usually need a rebuild by their authors after each Cyberpunk update. Right after a game update the framework can be temporarily unavailable until those catch up. Mods that depend on it with a soft dependency keep working in that window.
 [line]
 [color=#00f0ff][size=5][b]10. ACKNOWLEDGEMENTS[/b][/size][/color]
 [list]

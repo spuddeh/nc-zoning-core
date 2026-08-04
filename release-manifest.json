@@ -6,7 +6,7 @@
   "$mod_page_note": "Two keys here drive the mod PAGE rather than the file. `update_mod_version` sets the page's headline version to the released file's version: true for a mod's own main artifact, false for any artifact that shares a page with another (an SLM preset would otherwise stamp '1.0.0kp' onto the page). `nexus_mod_id` is the number in the mod page URL; the workflow looks it up at release time to get the internal id the changelog endpoint needs, so a wrong number here costs the changelog and never posts it to the wrong page. The page DESCRIPTION is still manual -- no endpoint in the pipeline touches it.",
   "artifacts": {
     "nczoningcore": {
-      "displayName": "NCZoningCore",
+      "displayName": "NC Zoning Board - Core",
       "fileBaseName": "NCZoningCore",
       "contentDir": "r6",
       "installDir": "r6",

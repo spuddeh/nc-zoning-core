@@ -1,14 +1,15 @@
-# NCZoningCore
+# NC Zoning Board - Core
 
-A pure-redscript Cyberpunk 2077 framework mod. It fetches the NC Zoning
+A pure-redscript Cyberpunk 2077 framework mod (folder and module name
+`NCZoningCore`). It fetches the NC Zoning Board
 registry (an interactive map of location mods at nczoning.net) from
 `https://api.nczoning.net/v1/`, caches it offline-first, and exposes it in
 game as a public redscript API that other mods can build on. It has no UI of
 its own, makes no writes, and sends no telemetry.
 
-## The NC Zoning project
+## The NC Zoning Board project
 
-NCZoningCore is the in-game half of [NC Zoning](https://nczoning.net), the
+The Core is the in-game half of [NC Zoning Board](https://nczoning.net), the
 interactive map of Cyberpunk 2077 location mods.
 
 - Explore the map: <https://nczoning.net>

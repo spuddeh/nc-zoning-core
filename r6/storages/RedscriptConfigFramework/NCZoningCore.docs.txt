@@ -2,7 +2,7 @@
 [color=#8892b0][i]NIGHT CORP // URBAN PLANNING DIVISION[/i][/color]
 [line]
 [color=#00f0ff][size=5][b]0. WHAT THIS IS[/b][/size][/color]
-NCZoningCore is a framework - a modder's resource. It fetches the NC Zoning registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API: each surveyed location's name, authors, world coordinates, category, tags and district.
+NC Zoning Board - Core is a framework - a modder's resource. It fetches the NC Zoning Board registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API: each surveyed location's name, authors, world coordinates, category, tags and district.
 
 [color=#ffb300][b]It has no settings and does nothing on its own.[/b][/color] It is here because another mod asked for it.
 [line]
@@ -15,7 +15,7 @@ NCZoningCore is a framework - a modder's resource. It fetches the NC Zoning regi
 It makes no changes to your game: no writes, no telemetry, no position tracking, and exactly one piece of UI - the alert that tells you the registry failed to load.
 [line]
 [color=#00f0ff][size=5][b]2. WHERE THE DATA COMES FROM[/b][/size][/color]
-The NC Zoning registry, maintained by the community at nczoning.net. NCZoningCore does not decide what is on the map; it reports what the Board has on file. A location mod missing from a consumer mod's list is missing from the registry, and the map is open for submissions.
+The NC Zoning Board registry, maintained by the community at nczoning.net. The Core does not decide what is on the map; it reports what the Board has on file. A location mod missing from a consumer mod's list is missing from the registry, and the map is open for submissions.
 [line]
 [color=#00f0ff][size=5][b]3. THE NETWORK IS OPTIONAL[/b][/size][/color]
 RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason this mod touches the network at all. It is a soft dependency.
