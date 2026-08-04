@@ -2,6 +2,12 @@
 
 ## 0.3.0 (pre-release)
 
+- Localisation via Codeware's ModLocalizationPackage: the four status sentences
+  (GetStatusMessage / the no-data banner) now live as NCZ.* keys in translations/English.reds,
+  resolved for the game's language with English as the fallback. Adding a language is one
+  translated file plus one case in translations/Provider.reds. The cache filename is a {file}
+  placeholder substituted from NCZ_LocationsFile(), so a translation cannot pin the old name.
+
 - Removed NCZLocation.Source(), its backing field and its parse line, and the row that published it
   in the consumer guide's accessor table. The API dropped `source` in 0.5.0 - it was derived, stamped
   `manual` onto mods.json entries and `auto` onto Nexus ones at build time, and nothing auto-publishes

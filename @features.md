@@ -48,6 +48,9 @@
   from "no data is coming this session" instead of rendering an empty registry.
 - On-screen error when the mod has no data and no way to get any: a SimpleScreenMessage on the
   UI_Notifications blackboard telling the user how to fix it. The framework's only UI.
+- Localised status sentences: the four player-facing strings resolve through Codeware's
+  LocalizationSystem (translations/English.reds; English is the fallback for every language).
+  Consumers reading GetStatusMessage() inherit the translation for free.
 - NCZoningApi.OnDataError Observe hook for CET Lua, mirroring OnDataReady.
 - District vocabulary enumeration: GetDistricts() and GetSubdistricts(district) list the registry's
   area names (empty areas included) from the static Layer-1 map, on both the redscript and CET surfaces,

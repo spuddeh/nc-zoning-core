@@ -51,22 +51,23 @@ public func NCZ_REASON_FETCH_FAILED() -> String { return "fetch_failed"; }      
 
 // The player-facing sentence for a status reason; "" when live. Surfaced to consumers as
 // NCZoning.Api.GetStatusMessage(). The only copy of this wording - the core's no-data banner
-// reads it too - so do not restate these sentences anywhere else.
+// reads it too - so do not restate these sentences anywhere else. The sentences themselves
+// live in translations/English.reds; this resolves the key for the game's language.
 public func NCZStatusMessage(reason: String) -> String {
   if StrLen(reason) == 0 {
     return "";                                       // live
   }
   // Usable data that can never refresh. Informational, not an error - IsReady() is true.
   if UnicodeStringEqual(reason, NCZ_REASON_OFFLINE_SNAPSHOT()) {
-    return "NC Zoning: using a local snapshot. It cannot refresh without RedHttpClient.";
+    return NCZ_T("NCZ.statusSnapshot");
   }
   if UnicodeStringEqual(reason, NCZ_REASON_CACHE_INVALID()) {
-    return "NC Zoning: locations.json is unreadable. Re-download it - see the mod page.";
+    return NCZ_T1("NCZ.statusUnreadable", "{file}", NCZ_LocationsFile());
   }
   if NCZHttpAvailable() {
-    return "NC Zoning: could not download the location registry, and no local copy exists. See the mod page.";
+    return NCZ_T("NCZ.statusFetchFailed");
   }
-  return "NC Zoning: no location data. Install RedHttpClient, or download locations.json by hand - see the mod page.";
+  return NCZ_T1("NCZ.statusNoData", "{file}", NCZ_LocationsFile());
 }
 
 public class NCZoningService extends ScriptableService {

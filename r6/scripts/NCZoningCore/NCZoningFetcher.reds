@@ -56,6 +56,12 @@ public class NCZoningFetcher extends ScriptableSystem {
       return;
     }
     this.m_gi = this.GetGameInstance();   // capture on the game thread (safe to reuse off-thread)
+    // Before the m_done gate: the status sentences must resolve on every session, not just the
+    // one that fetched.
+    let loc = NCZLocCache.Get();
+    if IsDefined(loc) {
+      loc.Bind(this.m_gi);
+    }
     if this.m_done {
       return;                              // already fetched this launch
     }
