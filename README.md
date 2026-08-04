@@ -42,13 +42,13 @@ and CET Lua mods can react.
 
 RedLogger is required, not optional, and mods built on NCZoningCore inherit that
 requirement. NCZoningCore writes every line through it, to
-`r6\logs\mods\NCZoningCore__<date_time>.log` — one file per session, with the five
+`r6\logs\mods\NCZoningCore__<date_time>.log` - one file per session, with the five
 most recent kept.
 
 Optional:
 
 - RedHttpClient 0.7.1 or newer
-- **Cyber Engine Tweaks** — only for installed-mod detection (see below)
+- **Cyber Engine Tweaks** - only for installed-mod detection (see below)
 
 ## Installed-mod detection needs CET, and only for that
 
@@ -107,7 +107,7 @@ The finished path is `Cyberpunk 2077\r6\storages\NCZoningCore\locations.json`.
 That folder is fixed: RedFileSystem sandboxes every mod to `r6\storages\<mod name>\`
 and NCZoningCore cannot read from anywhere else.
 
-The path is relative, so check the file landed where you meant — downloading it into
+The path is relative, so check the file landed where you meant - downloading it into
 the wrong folder produces no error:
 
 ```powershell
@@ -137,7 +137,7 @@ write goes through the virtual filesystem and MO2 lands it in
 refreshes the file you put there rather than creating a second one.
 
 To confirm it worked, the on-screen error stops appearing. If you have CET, its
-console can confirm it directly (wrap the calls in `print` — the console does not
+console can confirm it directly (wrap the calls in `print` - the console does not
 echo return values on its own):
 
 ```lua

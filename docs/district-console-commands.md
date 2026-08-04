@@ -21,7 +21,7 @@ The annotated blocks below are for reading; paste the one-liner beneath each.
 - The reds lookup class is exposed to Lua as **`NCZoning_Api_NCZDistrictMap`**
   (module `NCZoning.Api` -> dots become underscores). Its `.Lookup(TweakDBID)` is a
   static (call with a dot); the result's `.district` / `.subdistrict` read directly.
-- Reach the `DistrictManager` through the **field** `ps.districtManager` — there is
+- Reach the `DistrictManager` through the **field** `ps.districtManager` - there is
   **no `GetDistrictManager()` getter** (calling it errors). `GetCurrentDistrict()`
   and `GetDistrictID()` are real methods.
 - `GetDistrictID()` returns the TweakDBID in **path form** (`Districts.Kabuki`),
@@ -53,7 +53,7 @@ Example output at the spaceport: `Districts.NCSpaceport => NCX Spaceport / Morro
 
 ## 2. Table smoke test (feed known district paths)
 
-Confirms the compiled reds table without moving — resolve a batch of TweakDBIDs.
+Confirms the compiled reds table without moving - resolve a batch of TweakDBIDs.
 Edit the list as needed.
 
 ```lua

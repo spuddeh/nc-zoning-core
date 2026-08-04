@@ -17,7 +17,7 @@ NCZoningCore itself needs, at runtime:
 - RedHttpClient 0.7.1+, **optional** (see [When there is no network](#when-there-is-no-network))
 
 **RedLogger is a hard dependency, and it becomes one of yours too.** NCZoningCore imports it
-unguarded, so anything depending on NCZoningCore inherits it — list it in your own
+unguarded, so anything depending on NCZoningCore inherits it - list it in your own
 requirements. NCZoningCore logs through it, writing to
 `r6\logs\mods\NCZoningCore__<date_time>.log`, one file per session with five kept.
 
@@ -181,7 +181,7 @@ static (generated from `/v1/districts`), so they need no network and no registry
 correctly before the fetch lands and while it is missing entirely.
 
 Deriving the list from `GetAllLocations()` looks equivalent and is not. An area with zero locations
-appears in no location, so it silently vanishes — today that is NCX Spaceport / Morro Rock,
+appears in no location, so it silently vanishes - today that is NCX Spaceport / Morro Rock,
 Rattlesnake Creek and SoCal Border Crossing.
 
 A district's total is **not** the sum of its subdistricts: some locations are attributed to a
@@ -214,7 +214,7 @@ Three rules for a consumer:
 1. **Check `IsInstallDetectionAvailable()` before offering an installed/missing filter.**
    Detection needs CET, and on a machine without it every location answers `Unknown`.
 2. **Do not render `Unknown` as "not installed".** It means detection did not run, or the
-   location cannot be detected at all — an AMM location mod ships only a `.json` into CET's own
+   location cannot be detected at all - an AMM location mod ships only a `.json` into CET's own
    sandboxed folder, which no mod can read, so those are `Unknown` permanently.
 3. **A consumer calling these must require NCZoningCore 0.3.0+.** Calling a function that does
    not exist is a compile error, and that takes down every redscript mod on the machine.
@@ -324,7 +324,7 @@ safe to call inline: `TagCount()` / `TagAt(i)`, `AuthorCount()` / `AuthorAt(i)`,
 `ArchiveCount()` / `ArchiveAt(i)`.
 
 `Archives()` is the `.archive` / `.xl` filenames the mod installs. An empty list means "cannot
-say", never "not installed" — see [Installed-mod detection](#installed-mod-detection).
+say", never "not installed" - see [Installed-mod detection](#installed-mod-detection).
 
 ### Player's current district
 

@@ -1,10 +1,10 @@
 [center][color=#00f0ff][size=6][b]NC ZONING BOARD[/b][/size][/color]
 [color=#8892b0]NIGHT CORP // URBAN PLANNING DIVISION[/color]
-[color=#00f0ff][size=5][b]INSTRUMENT NC-ZB-01 — THE SURVEY REGISTER[/b][/size][/color]
-[i]NCZoningCore — the NC Zoning registry, in game, for other mods to build on.[/i][/center]
+[color=#00f0ff][size=5][b]INSTRUMENT NC-ZB-01 - THE SURVEY REGISTER[/b][/size][/color]
+[i]NCZoningCore - the NC Zoning registry, in game, for other mods to build on.[/i][/center]
 [line]
 [color=#00f0ff][size=5][b]0. NATURE OF THIS INSTRUMENT[/b][/size][/color]
-[b]NCZoningCore[/b] is a framework — a modder's resource. It fetches the [b]NC Zoning[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
+[b]NCZoningCore[/b] is a framework - a modder's resource. It fetches the [b]NC Zoning[/b] registry, an interactive map of Cyberpunk 2077 location mods, and exposes it in game as a read-only API that other mods can use: each mapped location's name, authors, world coordinates, category, tags, and district.
 
 [color=#ffb300][b]It has no menu and does nothing on its own.[/b][/color] You only need it if another mod lists it as a requirement. Installing it by itself has no visible effect.
 [line]
@@ -74,7 +74,7 @@ You should see [font=Courier New]locations.json[/font], around 260 KB (it grows 
 
 The overwrite route is the same place the mod writes to anyway: with RedHttpClient installed, the game's write passes through the virtual filesystem and MO2 drops it in [font=Courier New]overwrite\r6\storages\NCZoningCore\[/font]. So if you add RedHttpClient later, it refreshes the file you already put there instead of creating a second copy elsewhere.
 
-[color=#00f0ff][size=5][b]6a. OPTIONAL — A ONE-CLICK REFRESH[/b][/size][/color]
+[color=#00f0ff][size=5][b]6a. OPTIONAL - A ONE-CLICK REFRESH[/b][/size][/color]
 [i]For anyone comfortable creating a small batch file. Entirely optional - the single command above is all you actually need.[/i]
 
 Save this as [font=Courier New]refresh-nczoning-data.bat[/font]. Nothing in it is specific to your machine: [font=Courier New]%~dp0[/font] is the file's own folder, so it works out its own paths and there is nothing to edit.
@@ -100,7 +100,7 @@ pause[/code]
 [*][b]Vortex or a manual install:[/b] put it in your Cyberpunk 2077 folder, and change the [font=Courier New]DEST[/font] line to [font=Courier New]set "DEST=%~dp0r6\storages\NCZoningCore\locations.json"[/font] - there is no [font=Courier New]overwrite\[/font] involved. Then just double-click it.
 [/list]
 
-Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.exe[/font]. Put the whole command in a launcher's Arguments box and it often does nothing at all — no file, no error, no clue, because the console window closes the instant it exits. The batch file writes a log beside itself on every run and holds the window open, so a failure tells you what went wrong.
+Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.exe[/font]. Put the whole command in a launcher's Arguments box and it often does nothing at all - no file, no error, no clue, because the console window closes the instant it exits. The batch file writes a log beside itself on every run and holds the window open, so a failure tells you what went wrong.
 
 [i]This is a convenience, not a substitute for RedHttpClient.[/i] The mod still treats the file as a permanent snapshot and will say so. Re-run the button when you want newer data.
 [line]
@@ -113,7 +113,7 @@ Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.e
 [/list]
 Works with mod managers, or install manually.
 [line]
-[color=#00f0ff][size=5][b]8. FOR MOD AUTHORS — BUILDING ON THE REGISTER[/b][/size][/color]
+[color=#00f0ff][size=5][b]8. FOR MOD AUTHORS - BUILDING ON THE REGISTER[/b][/size][/color]
 Build on NCZoningCore from redscript or CET Lua. The full consumer guide and worked examples for both are in the GitHub repository linked on this page.
 
 In short: redscript consumers [font=Courier New]import NCZoning.Api.*[/font] (or guard with [font=Courier New]@if(ModuleExists("NCZoning.Api"))[/font] for a soft dependency) and subscribe to the [font=Courier New]NCZoning-DataReady[/font] / [font=Courier New]-DataRefreshed[/font] / [font=Courier New]-DataError[/font] events. CET Lua consumers call the [font=Courier New]NCZoningApi[/font] facade and observe [font=Courier New]NCZoningApi.OnDataReady[/font] for the data-ready signal.
@@ -134,6 +134,6 @@ NCZoningCore is pure redscript and survives game patches on its own, but its plu
 [color=#00f0ff][size=5][b]11. DISCLAIMER[/b][/size][/color]
 This mod was developed with the assistance of an LLM. All in-game testing and code validation was performed by a human. No rogue AIs were permitted through the Blackwall.
 [line]
-[center][color=#8892b0][i]Filed with the NC Zoning Board — Night Corp Urban Planning Division.
+[center][color=#8892b0][i]Filed with the NC Zoning Board - Night Corp Urban Planning Division.
 The Board records what is built. It does not build it.[/i][/color]
 [url=https://nczoning.net]nczoning.net[/url][/center]

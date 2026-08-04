@@ -23,7 +23,7 @@ result, and writes three outputs:
 | in  | `game-districts.json` | slim, self-contained copy of the 132 `gamedataDistrict` records (`enumName`, TweakDB `path`, `parentDistrict`, `localizedName`). Extracted from the map project's TweakDB dump. |
 | in  | `/v1/districts` | fetched live with `curl` (Python's UA gets a 403 from the API WAF), or a local json passed as an argument. |
 | out | `district-map.json` | the verified table (source of truth, human-readable). |
-| out | `../../r6/scripts/NCZoningCore/NCZoningDistricts.reds` | **GENERATED — do not hand-edit.** The shipped `NCZDistrictMap.Lookup(TweakDBID)` Layer-1 lookup. |
+| out | `../../r6/scripts/NCZoningCore/NCZoningDistricts.reds` | **GENERATED - do not hand-edit.** The shipped `NCZDistrictMap.Lookup(TweakDBID)` Layer-1 lookup. |
 | out | `district-resolution-audit.txt` | reachability report: every one of the 132 game districts and the API name it resolves to (direct or via the simulated parent walk). |
 
 The reds keys on the record's TweakDB **path**, not its enum name. The two differ in
@@ -50,23 +50,23 @@ non-zero if any of these break, so re-run it whenever the API district list chan
 Everything else matches mechanically. These four sets live at the top of
 `build-district-map.py`:
 
-- **`OVERRIDE`** — API ids the matcher cannot resolve mechanically:
+- **`OVERRIDE`** - API ids the matcher cannot resolve mechanically:
   `ncx_morro_rock` -> `MorroRock` (the API renamed "Morro Rock" to "NCX Spaceport /
   Morro Rock"), `socal_border_crossing` -> `Badlands_SoCalBorderCrossing` (casing).
-- **`SKIP`** — API POIs with no game district: `north_oaks_casino`, a map POI that a
+- **`SKIP`** - API POIs with no game district: `north_oaks_casino`, a map POI that a
   player's `DistrictManager` never reports.
-- **`EXTRA`** — game enums that fold into an API district but have no API entry of
+- **`EXTRA`** - game enums that fold into an API district but have no API entry of
   their own: `NorthBadlands` / `SouthBadlands` (the map does not split the Badlands),
   `MorroRock_NCX`, and `Badlands_Spaceport` (`Districts.NCSpaceport`, which the game
   parents under Badlands, so it must map directly or a parent walk reports "Badlands").
-- **`_EXCLUDED`** — game enums that must map to nothing: `Dogtown_Brooklyn`, an NPC
+- **`_EXCLUDED`** - game enums that must map to nothing: `Dogtown_Brooklyn`, an NPC
   flashback location in Brooklyn, a different city. It is never reported in Night City,
   so `Lookup` returns `null` for it.
 
 ## Layers
 
 This tool builds **Layer 1** only: the static game-district -> API-string table.
-A consumer walks **Layer 2** at runtime — read `DistrictManager.GetCurrentDistrict()`,
+A consumer walks **Layer 2** at runtime - read `DistrictManager.GetCurrentDistrict()`,
 call `NCZDistrictMap.Lookup(district.GetDistrictID())`, and if it returns `null`
 walk up the parent chain and retry. Layer 2 lives in the consumer, not here.
 
@@ -74,6 +74,6 @@ walk up the parent chain and retry. Layer 2 lives in the consumer, not here.
 
 `../../docs/district-console-commands.md` has the CET console one-liners for checking
 the map live: current district -> API name, a batch table test, LocKey display-name
-lookup, and an accessor probe. Those commands also document the live access path — the
+lookup, and an accessor probe. Those commands also document the live access path - the
 `districtManager` field, `GetCurrentDistrict()` / `GetDistrictID()`, and the
 `NCZoning_Api_NCZDistrictMap` Lua global.
