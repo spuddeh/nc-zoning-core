@@ -82,7 +82,7 @@ Save this as [font=Courier New]refresh-nczoning-data.bat[/font]. Nothing in it i
 [code]@echo off
 set "DEST=%~dp0overwrite\r6\storages\NCZoningCore\locations.json"
 set "LOG=%~dp0refresh-nczoning-data.log"
-echo [%DATE% %TIME%] fetching NC Zoning registry> "%LOG%"
+echo [%DATE% %TIME%] fetching NC Zoning Board registry> "%LOG%"
 curl.exe -L --fail --create-dirs -o "%DEST%" "https://api.nczoning.net/v1/locations" >> "%LOG%" 2>&1
 if errorlevel 1 (
   echo   FAILED - see %LOG%

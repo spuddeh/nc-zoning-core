@@ -41,8 +41,8 @@ and CET Lua mods can react.
 - [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.1.0 or newer
 - Cyberpunk 2077 2.31
 
-RedLogger is required, not optional, and mods built on NCZoningCore inherit that
-requirement. NCZoningCore writes every line through it, to
+RedLogger is required, not optional, and mods built on the Core inherit that
+requirement. The Core writes every line through it, to
 `r6\logs\mods\NCZoningCore__<date_time>.log` - one file per session, with the five
 most recent kept.
 
@@ -54,12 +54,12 @@ Optional:
 ## Installed-mod detection needs CET, and only for that
 
 The registry publishes the `.archive` / `.xl` filenames each location mod installs, so
-NCZoningCore can tell a consumer which mods are present. That means reading
+The Core can tell a consumer which mods are present. That means reading
 `archive/pc/mod/`, and nothing reachable from redscript can look there: RedFileSystem
 confines every mod to `r6/storages/<name>/`, and the engine exposes no archive surface
 to script. CET's Lua `ModArchiveExists` is the only route.
 
-NCZoningCore ships one small CET Lua component that does the scan and hands the result
+The Core ships one small CET Lua component that does the scan and hands the result
 back to redscript. **Consumers stay pure redscript and never touch Lua.**
 
 Without CET the component never runs and every location reports `Unknown`, which is
@@ -77,12 +77,12 @@ that window.
 ## RedHttpClient is optional
 
 RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the
-only reason NCZoningCore touches the network. It is a **soft dependency**: the mod
+only reason the Core touches the network. It is a **soft dependency**: the mod
 compiles and runs without it.
 
-- **With RedHttpClient.** NCZoningCore downloads the registry once per session,
+- **With RedHttpClient.** The Core downloads the registry once per session,
   caches it, and revalidates with an ETag on later launches. Nothing for you to do.
-- **Without RedHttpClient.** NCZoningCore never opens a socket. It reads the
+- **Without RedHttpClient.** The Core never opens a socket. It reads the
   registry from a file you supply yourself (see below), and serves it as
   permanently stale data. It cannot refresh, so you re-download when you want
   newer data.
@@ -106,7 +106,7 @@ curl.exe -L "https://api.nczoning.net/v1/locations" --create-dirs -o "r6\storage
 
 The finished path is `Cyberpunk 2077\r6\storages\NCZoningCore\locations.json`.
 That folder is fixed: RedFileSystem sandboxes every mod to `r6\storages\<mod name>\`
-and NCZoningCore cannot read from anywhere else.
+and the Core cannot read from anywhere else.
 
 The path is relative, so check the file landed where you meant - downloading it into
 the wrong folder produces no error:
