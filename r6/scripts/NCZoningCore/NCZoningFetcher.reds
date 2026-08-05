@@ -85,7 +85,6 @@ public class NCZoningFetcher extends ScriptableSystem {
   @if(ModuleExists("RedHttpClient"))
   public func DoFetch() -> Void {
     // No ?full=1. The API serves one representation now, and the parameter is a no-op alias.
-    // [[NC-Zoning-Board/wiki/decisions/api-per-location-records]]
     let url = "https://api.nczoning.net/v1/locations";
     let headers: array<HttpHeader>;
     let svc = NCZoningService.Get();

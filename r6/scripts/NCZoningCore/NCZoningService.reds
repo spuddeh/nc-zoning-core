@@ -39,7 +39,6 @@ import RedLogger.*
 //   Log   - the mod is working, and a player would recognise what happened
 //   Warn  - degraded but still serving: stale data, a soft dependency absent, a retry pending
 //   Error - this session cannot do the thing at all
-// [[CP2077-Mods/wiki/decisions/redlogger-is-the-shipping-logging-path]]
 public func NCZoningLog(value: script_ref<String>) -> Void {
   RedLog.AppendLevel("NCZoningCore", "INFO", s"\(value)");
 }
