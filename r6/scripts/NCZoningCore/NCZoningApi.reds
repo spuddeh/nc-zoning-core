@@ -8,7 +8,7 @@
 //              signal as an Observe-able instance method (Observe('NCZoningApi','OnDataReady')).
 //              A ScriptableService so it has a singleton for the instance hook. Read-only
 //              forwarders to the internal service; redscript consumers use `import NCZoning.Api.*`.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: psiberx (Codeware)
 // ======================================================================================
 
@@ -22,7 +22,7 @@ public class NCZoningApi extends ScriptableService {
   }
 
   // --- version handshake (static; Lua: NCZoningApi.Version()) -------------------
-  public static func Version() -> String { return "0.3.0"; }
+  public static func Version() -> String { return "1.0.0"; }
   public static func ApiVersion() -> Int32 { return 1; }
 
   // --- status ------------------------------------------------------------------

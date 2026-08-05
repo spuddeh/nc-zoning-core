@@ -17,7 +17,7 @@
 //
 //              A MISSING KEY RENDERS AS THE KEY. Returning "" would make a failure state
 //              pass for live data - GetStatusMessage's contract is "" = nothing wrong.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: psiberx (Codeware)
 // ======================================================================================
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0 - 2026-08-05
+
+First public release, on Nexus and GitHub together with NC Zoning Board - District Guide 1.0.0.
+The 0.x sections below are the pre-release development history; none of them shipped.
+
+- Public title: "NC Zoning Board - Core". Folder, module, storage and log names stay
+  `NCZoningCore`.
+- Localisation via Codeware for the four status sentences (see 0.3.0 below - landed after the
+  0.3.0 heading was cut but before any release).
+
 ## 0.3.0 (pre-release)
 
 - Localisation via Codeware's ModLocalizationPackage: the four status sentences

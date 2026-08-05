@@ -5,7 +5,7 @@
 // Description: NCZoning.Api - the public contract. This is the ONLY module consumers
 //              import. Every function is a thin, null-safe forwarder to the internal
 //              NCZoningService singleton.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 
@@ -22,16 +22,16 @@ import NCZoning.Data.*
 // There is no @if(FunctionExists). A consumer that calls a function added in a later core
 // fails to COMPILE against an older one, which takes every redscript mod on that machine
 // down with it. A consumer must require the core version that introduced what it calls.
-public func Version() -> String { return "0.3.0"; }
+public func Version() -> String { return "1.0.0"; }
 public func ApiVersion() -> Int32 { return 1; }
 
-// --- installed-mod detection (0.3.0+) --------------------------------------------
+// --- installed-mod detection (1.0.0+) --------------------------------------------
 //
 // Check IsInstallDetectionAvailable() BEFORE offering the player any installed/missing
 // filter. Detection needs CET (nothing reachable from redscript can read archive/pc/mod/),
 // so on a machine without it every record answers Unknown.
 //
-// A consumer calling these must require NCZoningCore 0.3.0+: calling a function that does
+// A consumer calling these must require NCZoningCore 1.0.0+: calling a function that does
 // not exist is a COMPILE error that takes down every redscript mod on the machine.
 public func IsInstallDetectionAvailable() -> Bool {
   let r = NCZInstalledRegistry.Get();

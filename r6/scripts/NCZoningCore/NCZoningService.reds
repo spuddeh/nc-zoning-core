@@ -5,7 +5,7 @@
 // Description: NCZoningService - the internal ScriptableService that owns the
 //              RedFileSystem storage and the in-memory registry store. NCZoning.Api
 //              forwards to this singleton; consumers never import NCZoning.Core.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 

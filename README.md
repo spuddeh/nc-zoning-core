@@ -19,9 +19,9 @@ interactive map of Cyberpunk 2077 location mods.
 
 ## Status
 
-v0.3.0, pre-release. Fetch, offline cache with ETag revalidation, the public API
-and events, the CET Lua bridge and installed-mod detection are all implemented and
-tested in game. Preparing the first public release.
+v1.0.0, the first public release. Fetch, offline cache with ETag revalidation, the
+public API and events, the CET Lua bridge and installed-mod detection are all
+implemented and tested in game.
 
 ## What consumers get
 

@@ -12,7 +12,7 @@
 //
 //              {file} is the registry cache filename (NCZ_LocationsFile), substituted at
 //              the call site. Keep the placeholder; never spell the filename out here.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: psiberx (Codeware)
 // ======================================================================================
 

@@ -24,7 +24,7 @@
 //              installed": it is either an AMM mod, permanently undetectable because CET
 //              sandboxes its own mods folder, or a record the API has not filled yet. Those
 //              are indistinguishable from here, so both read Unknown.
-// Mod Version: 0.3.0 (Pre-release)
+// Mod Version: 1.0.0
 // Credits: Spuddeh
 // ======================================================================================
 

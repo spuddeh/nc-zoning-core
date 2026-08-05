@@ -18,7 +18,7 @@
 --              RESULTS ARE NOT PERSISTED, here or on the redscript side. Install state is
 --              what changes between sessions, so a cached answer would claim a mod is
 --              present after the player removed it.
--- Mod Version: 0.3.0 (Pre-release)
+-- Mod Version: 1.0.0
 -- Credits: Spuddeh
 -- ======================================================================================
 
@@ -33,8 +33,8 @@ end
 local function scan(reason)
   if scanned or not hasNCZ() or not NCZoningApi.IsReady() then return end
   if NCZoningApi.BeginInstallScan == nil then
-    -- Core is older than 0.3.0. Say so once rather than erroring on every call.
-    print("[NCZoningCore] install detection needs NCZoningCore 0.3.0+ - skipping")
+    -- Core's redscript half is older than 1.0.0. Say so once rather than erroring on every call.
+    print("[NCZoningCore] install detection needs NCZoningCore 1.0.0+ - skipping")
     scanned = true
     return
   end
