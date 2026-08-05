@@ -13,8 +13,13 @@ NCZoningCore itself needs, at runtime:
 
 - RED4ext 1.29.0+, redscript 0.5.31+, and Cyberpunk 2077 2.31
 - Codeware, RedData 0.9+, RedFileSystem 0.15+
-- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.1.0+
+- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.3.0+
 - RedHttpClient 0.7.1+, **optional** (see [When there is no network](#when-there-is-no-network))
+
+**The 1.3.0 floor is set by the Redscript Configuration Framework, not by NCZoningCore.** RCF 2.1.0
+calls RedLogger functions that 1.1.0 and 1.2.0 do not have, behind a guard that can only test whether
+RedLogger is installed, not which build. A player with an older RedLogger and RCF 2.1.0 gets a
+compile failure across every redscript mod on the machine. State 1.3.0+ in your own requirements too.
 
 **RedLogger is a hard dependency, and it becomes one of yours too.** NCZoningCore imports it
 unguarded, so anything depending on NCZoningCore inherits it - list it in your own

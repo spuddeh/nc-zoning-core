@@ -37,13 +37,19 @@ and CET Lua mods can react.
 - Codeware
 - RedData 0.9 or newer
 - RedFileSystem 0.15 or newer
-- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.1.0 or newer
+- [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.3.0 or newer
 - Cyberpunk 2077 2.31
 
 RedLogger is required, not optional, and mods built on the Core inherit that
 requirement. The Core writes every line through it, to
 `r6\logs\mods\NCZoningCore__<date_time>.log` - one file per session, with the five
 most recent kept.
+
+**RedLogger must be 1.3.0 or newer if the Redscript Configuration Framework 2.1.0
+is also installed.** RCF calls RedLogger functions that older builds do not have,
+and redscript compiles every installed mod as one unit, so the mismatch takes down
+every redscript mod on your machine. Updating RedLogger is the fix; removing it is
+not, because the Core requires it.
 
 Optional:
 
