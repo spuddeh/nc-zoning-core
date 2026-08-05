@@ -118,10 +118,7 @@ Build on NCZoningCore from redscript or CET Lua. The full consumer guide and wor
 
 In short: redscript consumers [font=Courier New]import NCZoning.Api.*[/font] (or guard with [font=Courier New]@if(ModuleExists("NCZoning.Api"))[/font] for a soft dependency) and subscribe to the [font=Courier New]NCZoning-DataReady[/font] / [font=Courier New]-DataRefreshed[/font] / [font=Courier New]-DataError[/font] events. CET Lua consumers call the [font=Courier New]NCZoningApi[/font] facade and observe [font=Courier New]NCZoningApi.OnDataReady[/font] for the data-ready signal.
 [line]
-[color=#00f0ff][size=5][b]9. A NOTE ON GAME UPDATES[/b][/size][/color]
-The Core is pure redscript and survives game patches on its own, but its plugin requirements (Codeware and the Red* plugins) usually need a rebuild by their authors after each Cyberpunk update. Right after a game update the framework can be temporarily unavailable until those catch up. Mods that depend on it with a soft dependency keep working in that window.
-[line]
-[color=#00f0ff][size=5][b]10. ACKNOWLEDGEMENTS[/b][/size][/color]
+[color=#00f0ff][size=5][b]9. ACKNOWLEDGEMENTS[/b][/size][/color]
 [list]
 [*][b][url=https://www.nexusmods.com/profile/Kaoziun]Kaoziun[/url][/b] for the original NC Zoning vision and community leadership.
 [*][b][url=https://www.nexusmods.com/profile/Akiway]Akiway[/url][/b] for improvements to the NC Zoning map UI and UX.
@@ -130,7 +127,7 @@ The Core is pure redscript and survives game patches on its own, but its plugin 
 [*]The location-mod authors the registry maps, and the Locations Hub community.
 [/list]
 [line]
-[color=#00f0ff][size=5][b]11. DISCLAIMER[/b][/size][/color]
+[color=#00f0ff][size=5][b]10. DISCLAIMER[/b][/size][/color]
 This mod was developed with the assistance of an LLM. All in-game testing and code validation was performed by a human. No rogue AIs were permitted through the Blackwall.
 [line]
 [center][color=#8892b0][i]Filed with the NC Zoning Board - Night Corp Urban Planning Division.
