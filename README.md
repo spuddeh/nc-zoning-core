@@ -33,7 +33,6 @@ and CET Lua mods can react.
 
 ## Requirements
 
-- RED4ext 1.29 or newer
 - redscript 0.5.31 or newer
 - Codeware
 - RedData 0.9 or newer
