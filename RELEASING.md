@@ -27,12 +27,14 @@ upload cannot come from CI. Do this once:
    ```pwsh
    # from the repo root; produces NCZoningCore_v1.0.0.zip with r6/... at the zip root
    $stage = New-Item -ItemType Directory -Force -Path (Join-Path $env:TEMP "nczc_stage")
-   Remove-Item -Recurse -Force $stage\*; New-Item -ItemType Directory -Force -Path "$stage\r6\scripts\NCZoningCore" | Out-Null
-   Copy-Item -Recurse "r6\scripts\NCZoningCore\*" "$stage\r6\scripts\NCZoningCore\"
-   Compress-Archive -Path "$stage\r6" -DestinationPath "NCZoningCore_v1.0.0.zip" -Force
+   Remove-Item -Recurse -Force $stage\* -ErrorAction SilentlyContinue
+   Copy-Item -Recurse "r6" "$stage\r6"
+   Copy-Item -Recurse "bin" "$stage\bin"
+   Compress-Archive -Path "$stage\r6","$stage\bin" -DestinationPath "NCZoningCore_v1.0.0.zip" -Force
    ```
-   (The zip must contain `r6\scripts\NCZoningCore\*.reds`. The user extracts it into their
-   Cyberpunk 2077 root.)
+   (The zip must contain every tree the manifest's `contentDir` lists: `r6\scripts` (the mod),
+   `r6\storages` (the in-game docs page) and `bin\` (the CET detection component). The user
+   extracts it into their Cyberpunk 2077 root.)
 3. **Read the file id and set it as a repository VARIABLE.** On the mod page open the **Files**
    tab > **API Info** (or the Manage Files edit menu) and copy the id - Nexus labels it
    **"Group ID"** there, but it is what the upload action's `file_id` input wants. Set it as the
