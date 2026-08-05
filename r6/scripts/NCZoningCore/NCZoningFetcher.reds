@@ -105,7 +105,7 @@ public class NCZoningFetcher extends ScriptableSystem {
   @if(ModuleExists("RedHttpClient"))
   private cb func OnHttpResponse(response: ref<HttpResponse>) -> Void {
     if !IsDefined(response) {
-      NCZoningLog("no response");
+      NCZoningWarn("no response");
       this.ScheduleRetry();
       return;
     }
@@ -122,7 +122,7 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
 
     if !Equals(status, HttpStatus.OK) {
-      NCZoningLog(s"fetch failed (status \(response.GetStatusCode()))");
+      NCZoningWarn(s"fetch failed (status \(response.GetStatusCode()))");
       this.ScheduleRetry();
       return;
     }
@@ -131,13 +131,13 @@ public class NCZoningFetcher extends ScriptableSystem {
     let body = response.GetText();
     let obj = ParseJson(body) as JsonObject;
     if !IsDefined(obj) {
-      NCZoningLog("response body did not parse as a JSON object");
+      NCZoningWarn("response body did not parse as a JSON object");
       this.ScheduleRetry();
       return;
     }
     let dataArr = obj.GetKey("data") as JsonArray;
     if !IsDefined(dataArr) {
-      NCZoningLog("response has no data array");
+      NCZoningWarn("response has no data array");
       this.ScheduleRetry();
       return;
     }
@@ -176,11 +176,11 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
     if svc.IsReady() {
       svc.SetStatusReason(NCZ_REASON_OFFLINE_SNAPSHOT());   // stale forever; nothing can revalidate it
-      NCZoningLog(s"RedHttpClient not installed; serving \(svc.GetLocationCount()) locations from the manual snapshot (permanently stale)");
+      NCZoningWarn(s"RedHttpClient not installed; serving \(svc.GetLocationCount()) locations from the manual snapshot (permanently stale)");
       return;
     }
     // LoadCache already recorded why (cache_missing / cache_invalid / storage_unavailable).
-    NCZoningLog(s"RedHttpClient not installed and no usable locations.json (\(svc.GetStatusReason()))");
+    NCZoningError(s"RedHttpClient not installed and no usable locations.json (\(svc.GetStatusReason()))");
     this.ReportNoData(svc.GetStatusReason());
   }
 
@@ -190,7 +190,7 @@ public class NCZoningFetcher extends ScriptableSystem {
   public func ApplyResult(r: ref<NCZApplyResult>) -> Void {
     let svc = NCZoningService.Get();
     if !IsDefined(svc) {
-      NCZoningLog("apply: NCZoningService missing");
+      NCZoningError("apply: NCZoningService missing");
       return;
     }
     if r.m_error {
@@ -200,9 +200,9 @@ public class NCZoningFetcher extends ScriptableSystem {
       if svc.IsReady() {
         NCZoningDataEvent.Dispatch(n"NCZoning-DataError", svc.GetDataVersion(), svc.GetLocationCount(), r.m_reason);
         NCZoningApi.NotifyDataError(r.m_reason);
-        NCZoningLog(s"DataError dispatched (\(r.m_reason)); still serving \(svc.GetLocationCount()) cached locations");
+        NCZoningWarn(s"DataError dispatched (\(r.m_reason)); still serving \(svc.GetLocationCount()) cached locations");
       } else {
-        NCZoningLog(s"DataError dispatched (\(r.m_reason)); no data available");
+        NCZoningError(s"DataError dispatched (\(r.m_reason)); no data available");
         this.ReportNoData(r.m_reason);
       }
       return;
@@ -256,7 +256,9 @@ public class NCZoningFetcher extends ScriptableSystem {
 
   private func ScheduleRetry() -> Void {
     if this.m_retries >= 3 {
-      NCZoningLog("fetch giving up after 3 retries");
+      // WARN, not ERROR: ApplyResult decides whether this session is actually dead, and logs the
+      // ERROR only in the branch where the cache is not serving either.
+      NCZoningWarn("fetch giving up after 3 retries");
       // Bounce a DataError to the game thread (event dispatch must not run on the worker).
       let err = new NCZApplyResult();
       err.m_fetcher = this;
@@ -267,7 +269,7 @@ public class NCZoningFetcher extends ScriptableSystem {
     }
     this.m_retries += 1;
     let backoff = Cast<Float>(this.m_retries) * 2.0;   // 2s, 4s, 6s
-    NCZoningLog(s"scheduling retry \(this.m_retries)/3 in \(backoff)s");
+    NCZoningWarn(s"scheduling retry \(this.m_retries)/3 in \(backoff)s");
     let retry = new NCZRetry();
     retry.m_fetcher = this;
     GameInstance.GetDelaySystem(this.m_gi).DelayCallback(retry, backoff);

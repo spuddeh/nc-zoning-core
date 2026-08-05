@@ -26,10 +26,30 @@ import RedLogger.*
 // RedLogger's signature ships once, inside the plugin, so callers cannot collide. Logs.reds is
 // still never shipped.
 //
-// RedLog.Append has no level parameter; encode any level in the line text.
+// The level goes through RedLog.AppendLevel, which writes it as a tag RedLogger owns, and is set
+// at the wrapper rather than at a call site so it cannot be typed wrong. An unrecognised level
+// string normalises to INFO, so a typo could only ever downgrade a line, never drop it.
+//
+// REQUIRES REDLOGGER 1.2.0+, where AppendLevel arrives. The stated floor is 1.3.0 because RCF
+// 2.1.0 needs that much, so this adds no new requirement - but the tag is not dressing, it is the
+// call an older RedLogger cannot resolve.
+//
+// RCF 2.1.0 colours on the tag and its SHOWING filter selects on it, so the level decides whether
+// a line is findable in the in-game viewer. Pick it at the call site accordingly:
+//   Log   - the mod is working, and a player would recognise what happened
+//   Warn  - degraded but still serving: stale data, a soft dependency absent, a retry pending
+//   Error - this session cannot do the thing at all
 // [[CP2077-Mods/wiki/decisions/redlogger-is-the-shipping-logging-path]]
 public func NCZoningLog(value: script_ref<String>) -> Void {
-  RedLog.Append("NCZoningCore", s"\(value)");
+  RedLog.AppendLevel("NCZoningCore", "INFO", s"\(value)");
+}
+
+public func NCZoningWarn(value: script_ref<String>) -> Void {
+  RedLog.AppendLevel("NCZoningCore", "WARN", s"\(value)");
+}
+
+public func NCZoningError(value: script_ref<String>) -> Void {
+  RedLog.AppendLevel("NCZoningCore", "ERROR", s"\(value)");
 }
 
 // The registry cache filename, in ONE place. It is part of the user-facing contract - players

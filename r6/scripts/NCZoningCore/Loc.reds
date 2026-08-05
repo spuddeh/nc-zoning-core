@@ -39,7 +39,7 @@ public class NCZLocCache extends ScriptableService {
   public func Bind(gi: GameInstance) -> Void {
     this.m_loc = LocalizationSystem.GetInstance(gi);
     if !IsDefined(this.m_loc) {
-      NCZoningLog("[ERROR] Codeware LocalizationSystem not found - status sentences will render as their keys");
+      NCZoningError("Codeware LocalizationSystem not found - status sentences will render as their keys");
     }
   }
 
