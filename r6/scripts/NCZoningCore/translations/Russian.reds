@@ -1,7 +1,7 @@
 // ======================================================================================
 // Mod Name: NCZoningCore
-// File: translations/English.reds
-// Author: Spuddeh
+// File: translations/Russian.reds
+// Author: Parasitko
 // Description: The source of truth for every player-facing string - the four status
 //              sentences the no-data banner shows and GetStatusMessage() hands to
 //              consumers. Codeware's ModLocalizationPackage.
@@ -20,7 +20,7 @@ module NCZoning.Translations
 
 import Codeware.Localization.*
 
-public class NCZ_English extends ModLocalizationPackage {
+public class NCZ_Russian extends ModLocalizationPackage {
   protected func DefineTexts() -> Void {
     // Usable data that can never refresh. Informational, not an error.
     this.Text("NCZ.statusSnapshot",    "NC Zoning: использование локальной копии. Без RedHttpClient обновление невозможно.");
