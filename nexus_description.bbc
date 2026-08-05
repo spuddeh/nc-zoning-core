@@ -22,6 +22,8 @@ The Core is the in-game half of [b]NC Zoning Board[/b], the interactive map of C
 [color=#00f0ff][size=5][b]2. DO I NEED TO FILE THIS?[/b][/size][/color]
 Only if a mod you want tells you to. The Core is a shared dependency, like Codeware or RED4ext: it sits in the background and provides data to the mods that ask for it.
 
+Built on the Core: [b][url=https://www.nexusmods.com/cyberpunk2077/mods/32278]NC Zoning Board - District Guide[/url][/b].
+
 [color=#00f0ff][size=5][b]3. WHAT IT DOES UNDER THE HOOD[/b][/size][/color]
 [list]
 [*]Downloads the registry once per game session over HTTPS.
