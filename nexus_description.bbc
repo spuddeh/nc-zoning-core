@@ -47,8 +47,11 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [list]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/14192]RedHttpClient[/url]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/107]Cyber Engine Tweaks[/url]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/30726]Redscript Configuration Framework[/url]
 [/list]
 [i]Cyber Engine Tweaks is [b]not[/b] required by the Core itself. It is needed for installed-mod detection, and by any consumer mod that is itself a CET Lua mod.[/i]
+
+[i]With the Redscript Configuration Framework installed, this documentation and the Core's log are readable in game: press F8 and open the RCF hub's DOCS and LOGS pages. The Core has no settings there - it just files its paperwork.[/i]
 [line]
 [color=#00f0ff][size=5][b]5. RedHttpClient IS OPTIONAL[/b][/size][/color]
 RedHttpClient is the plugin that lets the game make HTTPS requests, and it is the only reason the Core touches the network at all. It is a [b]soft dependency[/b]: the Core installs and runs without it.

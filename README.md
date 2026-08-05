@@ -50,6 +50,9 @@ Optional:
 
 - RedHttpClient 0.7.1 or newer
 - **Cyber Engine Tweaks** - only for installed-mod detection (see below)
+- **Redscript Configuration Framework** 2.0.0 or newer - with it installed, the mod's
+  documentation page and its log are readable in game (F8 > RCF hub > DOCS / LOGS).
+  The Core registers no settings there.
 
 ## Installed-mod detection needs CET, and only for that
 
