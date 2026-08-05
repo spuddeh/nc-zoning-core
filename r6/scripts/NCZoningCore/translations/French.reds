@@ -1,12 +1,12 @@
 // ======================================================================================
 // Mod Name: NCZoningCore
-// File: translations/Russian.reds
+// File: translations/French.reds
 // Author: Spuddeh
-// Description: The Russian slot. EMPTY ON PURPOSE - every key falls through to English.
+// Description: The French slot. EMPTY ON PURPOSE - every key falls through to English.
 //
 //              THIS FILE EXISTS SO IT CAN BE REPLACED. A translation ships as a separate
 //              mod carrying this same path, this same module and this same class name;
-//              the mod manager hides this copy, so redscript compiles one NCZ_Russian
+//              the mod manager hides this copy, so redscript compiles one NCZ_French
 //              and there is no duplicate class. A translation cannot add a case to
 //              Provider.reds, which is why the slot has to be here before anyone can fill
 //              it. [[CP2077-Mods/wiki/concepts/redscript-translation-as-a-separate-mod]]
@@ -27,6 +27,6 @@ module NCZoning.Translations
 
 import Codeware.Localization.*
 
-public class NCZ_Russian extends ModLocalizationPackage {
+public class NCZ_French extends ModLocalizationPackage {
   protected func DefineTexts() -> Void {}
 }
