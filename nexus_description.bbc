@@ -114,7 +114,7 @@ Use the batch file rather than pointing MO2 straight at [font=Courier New]curl.e
 Works with mod managers, or install manually.
 [line]
 [color=#00f0ff][size=5][b]8. FOR MOD AUTHORS - BUILDING ON THE REGISTER[/b][/size][/color]
-Build on NCZoningCore from redscript or CET Lua. The full consumer guide and worked examples for both are in the GitHub repository linked on this page.
+Build on NCZoningCore from redscript or CET Lua. The full consumer guide and worked examples for both are in the [url=https://github.com/spuddeh/nc-zoning-core]GitHub repository[/url].
 
 In short: redscript consumers [font=Courier New]import NCZoning.Api.*[/font] (or guard with [font=Courier New]@if(ModuleExists("NCZoning.Api"))[/font] for a soft dependency) and subscribe to the [font=Courier New]NCZoning-DataReady[/font] / [font=Courier New]-DataRefreshed[/font] / [font=Courier New]-DataError[/font] events. CET Lua consumers call the [font=Courier New]NCZoningApi[/font] facade and observe [font=Courier New]NCZoningApi.OnDataReady[/font] for the data-ready signal.
 [line]
