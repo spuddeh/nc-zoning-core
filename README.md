@@ -190,6 +190,7 @@ Install it once as a standalone dependency, like Codeware.
 - [Akiway](https://www.nexusmods.com/profile/Akiway) for improvements to the NC Zoning
   map UI and UX.
 - [psiberx](https://www.nexusmods.com/profile/psiberx/mods) for Codeware.
+- [DigitalVixen](https://www.nexusmods.com/profile/DigitalVixen) for the Redscript Configuration Framework and RedLogger.
 - [rayshader](https://www.nexusmods.com/profile/RayshaderFR) for RedHttpClient,
   RedData, and RedFileSystem.
 - The location-mod authors the registry maps, and the Locations Hub community.
