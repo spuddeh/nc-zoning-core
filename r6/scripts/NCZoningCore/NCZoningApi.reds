@@ -22,7 +22,7 @@ public class NCZoningApi extends ScriptableService {
   }
 
   // --- version handshake (static; Lua: NCZoningApi.Version()) -------------------
-  public static func Version() -> String { return "1.0.0"; }
+  public static func Version() -> String { return "1.1.0"; }
   public static func ApiVersion() -> Int32 { return 1; }
 
   // --- status ------------------------------------------------------------------

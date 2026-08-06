@@ -22,7 +22,7 @@ import NCZoning.Data.*
 // There is no @if(FunctionExists). A consumer that calls a function added in a later core
 // fails to COMPILE against an older one, which takes every redscript mod on that machine
 // down with it. A consumer must require the core version that introduced what it calls.
-public func Version() -> String { return "1.0.0"; }
+public func Version() -> String { return "1.1.0"; }
 public func ApiVersion() -> Int32 { return 1; }
 
 // --- installed-mod detection (1.0.0+) --------------------------------------------
