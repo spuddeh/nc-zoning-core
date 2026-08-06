@@ -119,6 +119,14 @@ public class NCZoningApi extends ScriptableService {
     return out;
   }
 
+  // The recency window in days, from the response envelope. Per-record recency is on the
+  // location itself (loc:RecentlyUpdated()); this is the number behind it, for UI text.
+  public static func GetRecencyWindowDays() -> Int32 {
+    let s = NCZoningService.Get();
+    if IsDefined(s) { return s.GetRecencyWindowDays(); }
+    return 7;
+  }
+
   // --- installed-mod detection: READ ONLY, in both directions -------------------
   //
   // The scan runs in redscript against RedFunctions and needs nothing pushed in, so Lua reads

@@ -161,6 +161,7 @@ public class NCZoningFetcher extends ScriptableSystem {
     apply.m_notModified = false;
     apply.m_locations = locs;
     apply.m_datasetVersion = obj.GetKeyString("dataset_version");
+    apply.m_recencyDays = Cast<Int32>(obj.GetKeyInt64("recently_updated_days"));
     apply.m_etag = response.GetHeader("ETag");
     apply.m_body = body;
     GameInstance.GetDelaySystem(this.m_gi).DelayCallback(apply, 0.0);
@@ -215,6 +216,7 @@ public class NCZoningFetcher extends ScriptableSystem {
       return;
     }
     // 200: swap the store and persist, then signal Ready (first) or Refreshed (subsequent).
+    svc.SetRecencyWindowDays(r.m_recencyDays);
     svc.SetStore(r.m_locations, r.m_datasetVersion, false);
     svc.WriteCache(r.m_body, r.m_etag, r.m_datasetVersion);
     let count = svc.GetLocationCount();
@@ -292,6 +294,7 @@ public class NCZApplyResult extends DelayCallback {
   public let m_datasetVersion: String;
   public let m_etag: String;
   public let m_body: String;                          // raw response body, for the cache write
+  public let m_recencyDays: Int32;                    // envelope recently_updated_days; 0 = absent
 
   public func Call() -> Void {
     if IsDefined(this.m_fetcher) {

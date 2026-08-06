@@ -55,6 +55,23 @@ public func GetInstalledCount() -> Int32 {
   return IsDefined(r) ? r.InstalledCount() : 0;
 }
 
+// --- recency (1.1.0+) ------------------------------------------------------------
+//
+// The window the API applies, in days, from the response envelope. Per-record recency is
+// NCZLocation.RecentlyUpdated(); this is the number behind it, for UI text such as
+// "updated in the last 7 days". Defaults to 7 when the payload omits it.
+//
+// A consumer wanting "how long ago" rather than "recently or not" reads
+// NCZLocation.UpdatedAtEpoch() and compares against RedFunc.RealTimestamp(). Both are Unix
+// seconds as Double; an epoch of 0.0 means the API sent no usable date.
+public func GetRecencyWindowDays() -> Int32 {
+  let s = NCZoningService.Get();
+  if !IsDefined(s) {
+    return 7;
+  }
+  return s.GetRecencyWindowDays();
+}
+
 // --- status --------------------------------------------------------------------
 
 public func IsReady() -> Bool {

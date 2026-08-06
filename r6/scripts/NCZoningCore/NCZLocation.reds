@@ -24,15 +24,62 @@ import RedData.Json.*
 // consumers must be able to name it and they never import NCZoning.Core, and redscript requires
 // a return type to be imported even when it is never written out.
 //
-// THREE STATES. Unknown means detection did not run (it needs CET; nothing reachable from
-// redscript can read archive/pc/mod/) or the location cannot be detected at all - an AMM mod
-// ships only a .json into CET's own sandboxed folder, which no mod can read. Do not render
-// Unknown as "not installed". Unknown is the zero value, so an unpopulated registry answers it
-// by default.
+// THREE STATES. Unknown means the scan has not run, or the location cannot be detected at all -
+// an AMM mod ships no archive, and an ArchiveXL .xl is a manifest rather than a mounted archive,
+// so neither can ever be matched. Do not render Unknown as "not installed". Unknown is the zero
+// value, so an unpopulated registry answers it by default.
 public enum NCZInstallState {
   Unknown = 0,
   Installed = 1,
   NotInstalled = 2,
+}
+
+// "YYYY-MM-DDTHH:MM:SSZ" -> Unix epoch seconds. Returns 0.0d for anything else.
+//
+// LENGTH-LOCKED TO 20 CHARACTERS, UTC, no offset and no fractional seconds - the one shape the
+// API serves. An offset or a millisecond field would parse to a wrong instant rather than fail,
+// so the shape is rejected outright instead of being guessed at.
+//
+// Returns Double, not Int32: epoch seconds pass Int32's ceiling in January 2038.
+//
+// The date arithmetic is days-from-civil, which is exact for every Gregorian date and needs no
+// leap-year table - the /4, /100 and /400 terms ARE the leap rule. Verified against all 294
+// dated records plus 2000-02-29, 2024-02-29, 2100-03-01 and the 2038 boundary.
+public func NCZ_Iso8601ToEpoch(value: String) -> Double {
+  if StrLen(value) != 20 {
+    return 0.0d;
+  }
+  let y = StringToInt(StrMid(value, 0, 4), -1);
+  let mo = StringToInt(StrMid(value, 5, 2), -1);
+  let d = StringToInt(StrMid(value, 8, 2), -1);
+  let h = StringToInt(StrMid(value, 11, 2), -1);
+  let mi = StringToInt(StrMid(value, 14, 2), -1);
+  let se = StringToInt(StrMid(value, 17, 2), -1);
+  // The 1970 floor is not cosmetic: it keeps every division below positive, so truncation and
+  // floor agree and the era term needs no negative-year branch.
+  if y < 1970 || mo < 1 || mo > 12 || d < 1 || d > 31
+      || h < 0 || h > 23 || mi < 0 || mi > 59 || se < 0 || se > 60 {
+    return 0.0d;
+  }
+
+  // March-based year: February's length stops being a special case when it is the last month.
+  let shifted = y;
+  let mp = mo - 3;
+  if mo <= 2 {
+    shifted -= 1;
+    mp = mo + 9;
+  }
+  let era = shifted / 400;
+  let yoe = shifted - era * 400;                       // [0, 399]
+  let doy = (153 * mp + 2) / 5 + d - 1;                // [0, 365]
+  let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;     // [0, 146096]
+  let days = era * 146097 + doe - 719468;              // 719468 = days from 0000-03-01 to 1970-01-01
+
+  // Cast BEFORE multiplying. days * 86400 overflows Int32 from 2038 on.
+  return Cast<Double>(days) * 86400.0d
+       + Cast<Double>(h) * 3600.0d
+       + Cast<Double>(mi) * 60.0d
+       + Cast<Double>(se);
 }
 
 // A single registry entry. The API has one representation, so every field below arrives on
@@ -55,12 +102,13 @@ public class NCZLocation {
   let thumbnail_url: String;
   let picture_url: String;
   let updated_at: String;         // nullable -> "" when absent
-  let recently_updated: Bool;     // server-computed; true when updated within the API's recency window
+  let updated_at_epoch: Double;   // updated_at as Unix seconds; 0.0 when absent or malformed
+  let recently_updated: Bool;     // recomputed against the live clock at store time; see RecentlyUpdated()
   // The .archive / .xl filenames this mod installs into archive/pc/mod/, for installed-mod
-  // detection (API v1.5.0+). EMPTY MEANS "CANNOT SAY", NEVER "NOT INSTALLED" - it is either an
-  // AMM mod, permanently undetectable because CET sandboxes its folder, or a record the API has
-  // not fetched yet. Those two are indistinguishable from here, so both read Unknown. See
-  // NCZInstallState.
+  // detection (API v1.5.0+). NOTHING MATCHABLE MEANS "CANNOT SAY", NEVER "NOT INSTALLED" - an
+  // AMM mod, which ships no archive; a record listing only .xl manifests, which are not mounted
+  // archives; or a record the API has not fetched yet. All read Unknown, and
+  // DetectableArchiveCount() is the test, not ArraySize. See NCZInstallState.
   let archives: array<String>;
 
   // --- camelCase accessors (the public surface consumers read) -----------------
@@ -79,10 +127,26 @@ public class NCZLocation {
   public func Credits() -> String { return this.credits; }
   public func ThumbnailUrl() -> String { return this.thumbnail_url; }
   public func PictureUrl() -> String { return this.picture_url; }
-  // Server-computed recency: true when the mod was updated within the API's recency window. The
-  // window itself (recently_updated_days) rides the response envelope, not the record; consumers
-  // read this bool rather than compute recency, since redscript has no wall clock.
+  // The raw ISO-8601 timestamp the API served, and the same instant as Unix seconds.
+  //
+  // UpdatedAtEpoch() is 0.0d when the API sent no date, or sent one that is not exactly
+  // "YYYY-MM-DDTHH:MM:SSZ". Test for 0.0d before comparing: it means "no date", not 1970.
+  public func UpdatedAt() -> String { return this.updated_at; }
+  public func UpdatedAtEpoch() -> Double { return this.updated_at_epoch; }
+
+  // True when the mod was updated within the recency window.
+  //
+  // Computed against the live clock when the store is built, so a cache loaded a fortnight later
+  // answers for today rather than for the day it was written. Where no clock or no date is
+  // available it keeps the bool the API served, which ages with the cache - see
+  // NCZoningService.RecomputeRecency.
+  //
+  // The window is not per-record: read it from RecencyWindowDays().
   public func RecentlyUpdated() -> Bool { return this.recently_updated; }
+
+  // Written by NCZoningService when it recomputes recency against the clock. Nothing else may
+  // call this: two writers and the value depends on which ran last.
+  public func SetRecentlyUpdated(value: Bool) -> Void { this.recently_updated = value; }
 
   // Raw CET coordinates as a Vector4 (W = 1). Returns the zero vector if the array
   // is malformed (fewer than 3 entries) rather than indexing out of bounds.
@@ -166,6 +230,7 @@ public class NCZLocation {
     loc.thumbnail_url = item.GetKeyString("thumbnail_url");
     loc.picture_url = item.GetKeyString("picture_url");
     loc.updated_at = item.GetKeyString("updated_at");
+    loc.updated_at_epoch = NCZ_Iso8601ToEpoch(loc.updated_at);
     loc.recently_updated = item.GetKeyBool("recently_updated");
 
     let coords = item.GetKey("coordinates") as JsonArray;

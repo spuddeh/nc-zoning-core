@@ -15,6 +15,7 @@ import NCZoning.Data.*
 import RedFileSystem.*
 import RedData.Json.*
 import RedLogger.*
+import RedFunctions.*
 
 // The log wrapper, and it SHIPS. RedLogger is a hard dependency (a bare import of an absent
 // module does not compile). Lines land in r6/logs/mods/NCZoningCore__<date_time>.log, one file
@@ -97,6 +98,9 @@ public class NCZoningService extends ScriptableService {
   private let m_datasetVersion: String;
   private let m_etag: String;                 // last ETag (verbatim, incl. quotes + -full)
   private let m_statusReason: String;         // "" once live data is in hand; see NCZ_REASON_* above
+  // The recency window, in days, from the response envelope. Defaults to 7 so a payload that
+  // omits it still answers; the API is what owns the real number.
+  private let m_recencyDays: Int32 = 7;
 
   // --- lifecycle ---------------------------------------------------------------
 
@@ -177,6 +181,7 @@ public class NCZoningService extends ScriptableService {
       }
       k += 1u;
     }
+    this.SetRecencyWindowDays(Cast<Int32>(obj.GetKeyInt64("recently_updated_days")));
     this.SetStore(locs, obj.GetKeyString("dataset_version"), true);   // stale until revalidated
 
     // Load the stored ETag (meta.json) so the next fetch can send If-None-Match.
@@ -222,6 +227,55 @@ public class NCZoningService extends ScriptableService {
     this.m_stale = stale;
     this.m_ready = true;
     this.m_statusReason = "";   // caller re-stamps an informational reason if one still applies
+    this.RecomputeRecency();
+  }
+
+  // --- recency -----------------------------------------------------------------
+
+  public func GetRecencyWindowDays() -> Int32 {
+    return this.m_recencyDays;
+  }
+
+  // Set from the envelope's recently_updated_days BEFORE SetStore, so the recompute uses this
+  // payload's window rather than the last one's. A missing or nonsense value keeps the default.
+  public func SetRecencyWindowDays(days: Int32) -> Void {
+    if days > 0 {
+      this.m_recencyDays = days;
+    }
+  }
+
+  // Re-answer "was this updated recently" against the clock, for the store just swapped in.
+  //
+  // The API computes the same bool, but it computes it when the payload is BUILT. A cache is
+  // offline-first and can be read weeks later, and the bool inside it does not age - so an
+  // offline session would keep flagging a mod as recently updated long after it stopped being
+  // true. The date does not have that problem, and RedFunctions supplies the missing half.
+  //
+  // Two cases keep the API's answer instead: a record with no usable date (epoch 0.0), and a
+  // clock that answers nothing. Neither can be improved on locally, and the served bool is
+  // still right for a payload fetched this session.
+  private func RecomputeRecency() -> Void {
+    let now = RedFunc.RealTimestamp();
+    if now <= 0.0d {
+      NCZoningWarn("no wall clock; recency stays as the API computed it");
+      return;
+    }
+    let cutoff = now - Cast<Double>(this.m_recencyDays) * 86400.0d;
+    let changed = 0;
+    let i = 0;
+    let total = ArraySize(this.m_locations);
+    while i < total {
+      let stamp = this.m_locations[i].UpdatedAtEpoch();
+      if stamp > 0.0d {
+        let recent = stamp > cutoff;
+        if NotEquals(recent, this.m_locations[i].RecentlyUpdated()) {
+          changed += 1;
+        }
+        this.m_locations[i].SetRecentlyUpdated(recent);
+      }
+      i += 1;
+    }
+    NCZoningLog(s"recency recomputed against the clock: window=\(this.m_recencyDays)d, \(changed) record(s) differed from the API");
   }
 
   // --- location queries (pure; operate on the in-memory store) -----------------
