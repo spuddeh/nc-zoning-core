@@ -36,10 +36,21 @@
   so the level is a tag RedLogger owns and RCF 2.1.0 colours on it - errors red, warnings amber -
   and its SHOWING filter selects on it. Needs RedLogger 1.2.0+; the stated floor is 1.3.0 because
   RCF 2.1.0 needs that much. (Verified in-game.)
-- Installed-mod detection, via a bundled CET Lua component: parses the API's archives field and
-  answers Installed / NotInstalled / Unknown per location. (Verified in-game: 10 installed of 291
-  tested, from 297 records. The 6 untested are the API's 5 AMM entries and 1 WIP, which carry no
-  archive names and cannot be detected.)
+- Installed-mod detection in pure redscript, over RedFunc.ArchiveExists: parses the API's archives
+  field and answers Installed / NotInstalled / Unknown per location. RedFunctions is a hard
+  dependency and CET is not involved. Re-scans when the store swaps, because the network payload can
+  carry records the cache did not. (Verified in-game: 4 installed of 288 detectable from 295
+  records, no false positives from the 10 mounted archives that are not registry locations. The 7
+  undetectable are 5 AMM entries and 1 WIP id carrying no archive names, plus 1 record listing only
+  an ArchiveXL .xl, which is a manifest rather than a mounted archive and can never be matched.)
+- Recency computed against a real clock: NCZ_Iso8601ToEpoch parses the API's updated_at and
+  RecomputeRecency re-answers RecentlyUpdated() at every store swap, using the envelope's
+  recently_updated_days as the window. A cache read weeks later answers for today rather than for
+  the day it was written. (Verified in-game: 0 of 294 dated records differed from the API's own
+  answer, on both a cache read and a fresh fetch.)
+- updated_at, its parsed epoch and the recency window exposed to consumers - UpdatedAt(),
+  UpdatedAtEpoch() and GetRecencyWindowDays() on the redscript API and the CET Lua facade - so a
+  consumer can render "updated 3 days ago" rather than only "recent or not".
 - RedHttpClient as a soft dependency: the mod compiles and runs with the plugin absent, in which
   case it has no networking component at all and reads the registry from a hand-supplied
   locations.json. Every RedHttpClient reference, the import included, is gated behind

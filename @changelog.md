@@ -2,10 +2,27 @@
 
 ## [Unreleased] - 1.1.0
 
-Prepared, not released. Core and the District Guide ship together, and one further Guide feature is
-still to land.
+Prepared, not released. Core and the District Guide ship together.
 
 ### Added
+
+- `NCZ_Iso8601ToEpoch()` in `NCZLocation.reds`: `"YYYY-MM-DDTHH:MM:SSZ"` to Unix seconds as a
+  `Double`, length-locked to that exact 20-character UTC shape and returning `0.0d` for anything
+  else. Days-from-civil arithmetic, so the `/4`, `/100` and `/400` terms are the leap rule and no
+  table is needed. Checked against all 294 dated records plus 2000-02-29, 2024-02-29, 2100-03-01
+  and the 2038 boundary. Returns `Double` rather than `Int32`: epoch seconds pass `Int32`'s ceiling
+  in January 2038.
+- `NCZoningService.RecomputeRecency()`, called from `SetStore()` - the one place both the cache
+  load and the network swap pass through. Re-answers `recently_updated` as
+  `updated_at_epoch > now - windowDays * 86400` using `RedFunc.RealTimestamp()`. Keeps the API's
+  bool where a record has no usable date or the clock answers nothing.
+- `NCZLocation.UpdatedAt()`, `UpdatedAtEpoch()` and `SetRecentlyUpdated()`; `GetRecencyWindowDays()`
+  on both `NCZoning.Api` and the `NCZoningApi` CET facade. `updated_at` was parsed into the DTO with
+  no accessor and `recently_updated_days` was read by nobody, so both were reaching the mod and
+  going nowhere. Additive: `ApiVersion()` stays at 1.
+- `NCZLocation.DetectableArchiveCount()` - how many of `archives` a mounted-archive query could
+  match. Read by both the scan and `StateOf`, so the two cannot disagree about which records were
+  tested.
 
 - Nineteen language slots under `translations/`, all empty but English, each wired into
   `Provider.reds`. A translation replaces one slot file and ships as its own mod, so anyone can
@@ -17,6 +34,23 @@ still to land.
 
 ### Changed
 
+- Installed-mod detection runs in redscript against `RedFunc.ArchiveExists`. **RedFunctions 0.4.0 is
+  a hard dependency**, unguarded import, and CET leaves the requirement list entirely. RED4ext was
+  already in the chain via RedLogger, so no new layer is added. Verified in game: 4 installed of 288
+  detectable from 295 records, with no false positives from the 10 mounted archives that are not
+  registry locations.
+- `NCZInstalledRegistry` scans itself on `NCZoning-DataReady` and again when the store swaps, since
+  the network payload can carry records the cache did not; an untested record with archives reads
+  NotInstalled, not Unknown. Caught in game: a record's archive list resolved between the cache read
+  and the fetch, and the count moved 287 to 288 within one session.
+- A record whose `archives` are all `.xl` reads Unknown. An `.xl` is an ArchiveXL manifest, not a
+  mounted archive, so no query can ever match one - true of CET's `ModArchiveExists` as much as of
+  `RedFunc.ArchiveExists`, since both walk ResourceDepot's Mod-scope groups. One live record is in
+  that shape and was reporting NotInstalled.
+- `RecentlyUpdated()` answers from the clock rather than from the bool the API shipped. The API
+  computes its bool when the payload is BUILT, and the cache does not age it, so an offline session
+  kept flagging mods as recently updated long after they were not. Verified in game: 0 of 294 dated
+  records differed from the API's answer on a fresh fetch.
 - `NCZoningLog` writes through `RedLog.AppendLevel`, and `NCZoningWarn` / `NCZoningError` join it.
   Twelve of twenty-one call sites re-levelled: degraded-but-still-serving is WARN, the session
   cannot do the thing at all is ERROR. Needs RedLogger 1.2.0+.
@@ -25,6 +59,21 @@ still to land.
   older RedLogger beside RCF 2.1.0 fails the whole redscript compile.
 - `release.yml`: `archive_existing_version` is false. A superseded file belongs in OLD FILES, which
   stays downloadable; archived does not.
+
+### Removed
+
+- `bin/x64/plugins/cyber_engine_tweaks/mods/NCZoningCore/init.lua`, the mod's only Lua, and the
+  `bin` tree from `release-manifest.json`. The mod ships one tree now.
+- `NCZoningApi.BeginInstallScan` / `ReportInstalled` / `EndInstallScan`. They existed so the CET
+  component could write its scan result back into redscript; nothing writes into the Core from Lua
+  any more. The read side (`GetInstallStateInt`, `IsInstallDetectionAvailable`) is unchanged.
+
+### Fixed
+
+- `Version()` returned `"1.0.0"` in both `Api.reds` and `NCZoningApi.reds` on a 1.1.0 mod. The 1.1.0
+  prep bumped the `Mod Version:` headers in those files and left the handshake bodies, and
+  `release-check` read headers and changelogs but never a function body, so the mod reported READY.
+  The gate now covers a `Version()` returning a bare semver literal.
 - Vault wikilinks removed from shipped source. Redscript ships as plaintext and the vault has no
   remote, so they resolved for nobody who downloaded the mod.
 
