@@ -29,7 +29,7 @@ Built on the Core: [b][url=https://www.nexusmods.com/cyberpunk2077/mods/32278]NC
 [*]Downloads the registry once per game session over HTTPS.
 [*]Caches it on disk, so it works offline after the first online launch and revalidates efficiently (no re-download when nothing changed).
 [*]Serves the data to redscript and CET Lua mods through a small, stable API.
-[*]Tells a consumer mod which location mods you already have installed, so it can mark what is present and what is missing. This part needs [url=https://www.nexusmods.com/cyberpunk2077/mods/107]Cyber Engine Tweaks[/url]; without it, every location reads as "unknown".
+[*]Tells a consumer mod which location mods you already have installed, so it can mark what is present and what is missing. Some mods cannot be checked this way and read as "unknown" rather than missing: AMM location mods, and mods that ship only ArchiveXL .xl files.
 [/list]
 It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tracking. Its only piece of UI is the alert that tells you the registry failed to load.
 [line]
@@ -41,7 +41,9 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/14139]RedData[/url]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/13378]RedFileSystem[/url]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/31920]RedLogger[/url] 1.3.0 or newer
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/32312]RedFunctions[/url] 0.4.0 or newer
 [/list]
+[i]RedFunctions is what lets the Core check which location mods you have installed. Cyber Engine Tweaks is no longer needed for that, or for anything else.[/i]
 [i]RedLogger is what the Core writes its log to. It gives this mod its own file at [font=Courier New]r6\logs\mods\NCZoningCore__<date_time>.log[/font], one per session, keeping the five most recent. That file is what to attach to a bug report.[/i]
 
 [color=#ffb300][b]If you also run the Redscript Configuration Framework 2.1.0, RedLogger must be 1.3.0 or newer.[/b][/color] RCF calls RedLogger functions that older builds do not have. Redscript compiles every installed mod as one unit, so the mismatch is a compile failure that takes down [i]every[/i] redscript mod on your machine, not just this one. Update RedLogger.
@@ -49,10 +51,9 @@ It makes [b]no[/b] changes to your game: no writes, no telemetry, no position tr
 [b]Optional:[/b]
 [list]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/14192]RedHttpClient[/url]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/107]Cyber Engine Tweaks[/url]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/30726]Redscript Configuration Framework[/url]
 [/list]
-[i]Cyber Engine Tweaks is [b]not[/b] required by the Core itself. It is needed for installed-mod detection, and by any consumer mod that is itself a CET Lua mod.[/i]
+[i]Cyber Engine Tweaks is only needed by a consumer mod that is itself a CET Lua mod. The Core does not use it.[/i]
 
 [i]With the Redscript Configuration Framework installed, this documentation and the Core's log are readable in game: press F8 and open the RCF hub's DOCS and LOGS pages. The Core has no settings there - it just files its paperwork.[/i]
 [line]

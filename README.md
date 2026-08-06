@@ -38,7 +38,11 @@ and CET Lua mods can react.
 - RedData 0.9 or newer
 - RedFileSystem 0.15 or newer
 - [RedLogger](https://www.nexusmods.com/cyberpunk2077/mods/31920) 1.3.0 or newer
+- [RedFunctions](https://www.nexusmods.com/cyberpunk2077/mods/32312) 0.4.0 or newer
 - Cyberpunk 2077 2.31
+
+RedFunctions is what makes installed-mod detection possible from redscript, and it
+is required, not optional. Mods built on the Core inherit that requirement.
 
 RedLogger is required, not optional, and mods built on the Core inherit that
 requirement. The Core writes every line through it, to
@@ -54,28 +58,31 @@ not, because the Core requires it.
 Optional:
 
 - RedHttpClient 0.7.1 or newer
-- **Cyber Engine Tweaks** - only for installed-mod detection (see below)
 - **Redscript Configuration Framework** 2.0.0 or newer - with it installed, the mod's
   documentation page and its log are readable in game (F8 > RCF hub > DOCS / LOGS).
   The Core registers no settings there.
 
-## Installed-mod detection needs CET, and only for that
+## Installed-mod detection, and what it cannot see
 
 The registry publishes the `.archive` / `.xl` filenames each location mod installs, so
-The Core can tell a consumer which mods are present. That means reading
-`archive/pc/mod/`, and nothing reachable from redscript can look there: RedFileSystem
-confines every mod to `r6/storages/<name>/`, and the engine exposes no archive surface
-to script. CET's Lua `ModArchiveExists` is the only route.
+the Core can tell a consumer which mods are present. `RedFunc.ArchiveExists` answers
+that from the engine's mounted-archive list, so the scan runs in redscript and
+**consumers never touch Lua.**
 
-The Core ships one small CET Lua component that does the scan and hands the result
-back to redscript. **Consumers stay pure redscript and never touch Lua.**
+Detection answers `Unknown` until the scan has run. `Unknown` is distinct from "not
+installed" and must be rendered as such. Check `IsInstallDetectionAvailable()` before
+offering the player any installed/missing filter, and subscribe to
+`NCZoning-InstallScanComplete` for the signal that it has an answer.
 
-Without CET the component never runs and every location reports `Unknown`, which is
-distinct from "not installed" and must be rendered as such. Check
-`IsInstallDetectionAvailable()` before offering the player any installed/missing filter.
+**Two kinds of mod can never be detected**, and both must read `Unknown` rather than
+"missing":
 
-`Unknown` is also permanent for **AMM location mods**: their files live in CET's own
-sandboxed folder, which no mod can read.
+- **AMM location mods**, which ship no `.archive` at all - there is nothing for a
+  mounted-archive query to find.
+- **Mods that ship only `.xl` files.** An `.xl` is an ArchiveXL manifest, not a mounted
+  archive, so it never appears in the archive list. A record whose `archives` are all
+  `.xl` is undetectable, and the registry should leave its `archives` empty rather than
+  list one.
 
 Note: RED4ext family plugins usually need a rebuild after each game patch, so
 this mod can be temporarily unavailable right after an update until its

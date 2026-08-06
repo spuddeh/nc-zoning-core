@@ -10,7 +10,7 @@ NC Zoning Board - Core is a framework - a modder's resource. It fetches the NC Z
 [*]Downloads the registry once per game session over HTTPS.
 [*]Caches it on disk, so it works offline after the first online launch, and revalidates without re-downloading when nothing has changed.
 [*]Serves the data to redscript and CET Lua mods through a small, stable API.
-[*]Tells a consumer mod which location mods you already have installed. This part needs Cyber Engine Tweaks; without it, every location reads as "unknown".
+[*]Tells a consumer mod which location mods you already have installed. Some mods cannot be checked this way and read as "unknown" rather than missing: AMM location mods, and mods that ship only ArchiveXL .xl files.
 
 It makes no changes to your game: no writes, no telemetry, no position tracking, and exactly one piece of UI - the alert that tells you the registry failed to load.
 [line]

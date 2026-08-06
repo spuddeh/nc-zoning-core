@@ -35,10 +35,9 @@ signature ships once, inside the plugin, so callers cannot collide.
 
 The Red\* dependencies are RED4ext plugins callable from redscript; each states RED4ext as its
 own requirement, and RedData is what provides the JSON handling (see
-[References](#references)). NCZoningCore's redscript calls no CET (Cyber Engine Tweaks) API, so
-**the framework does not require CET**. CET is required only by a consumer that is itself a CET
-Lua mod (see [Consuming from CET Lua](#consuming-from-cet-lua)), and by installed-mod detection
-(see [Installed-mod detection](#installed-mod-detection)).
+[References](#references)). NCZoningCore calls no CET (Cyber Engine Tweaks) API and ships no Lua,
+so **the framework does not require CET**. CET is required only by a consumer that is itself a CET
+Lua mod (see [Consuming from CET Lua](#consuming-from-cet-lua)).
 
 The files in `examples/` are documentation. They are not loaded by the framework.
 
@@ -202,8 +201,8 @@ A full worked example is in [`examples/RedscriptConsumer.reds`](../examples/Reds
 
 ## Installed-mod detection
 
-`GetInstallState(loc)` answers whether a location's mod is present in `archive/pc/mod/` on this
-machine, as an `NCZInstallState`: `Unknown`, `Installed` or `NotInstalled`.
+`GetInstallState(loc)` answers whether a location's mod is among the archives the engine has
+mounted on this machine, as an `NCZInstallState`: `Unknown`, `Installed` or `NotInstalled`.
 
 | Function | Returns |
 | --- | --- |
@@ -216,11 +215,13 @@ CET Lua consumers use `NCZoningApi.GetInstallStateInt(id)`, which returns the en
 
 Three rules for a consumer:
 
-1. **Check `IsInstallDetectionAvailable()` before offering an installed/missing filter.**
-   Detection needs CET, and on a machine without it every location answers `Unknown`.
-2. **Do not render `Unknown` as "not installed".** It means detection did not run, or the
-   location cannot be detected at all - an AMM location mod ships only a `.json` into CET's own
-   sandboxed folder, which no mod can read, so those are `Unknown` permanently.
+1. **Check `IsInstallDetectionAvailable()` before offering an installed/missing filter.** It is
+   false until the scan has run, and every location answers `Unknown` until then. Subscribe to
+   `NCZoning-InstallScanComplete` for the signal that it has an answer.
+2. **Do not render `Unknown` as "not installed".** It means the scan has not run, or the
+   location cannot be detected at all. Two kinds are permanently undetectable: an AMM location
+   mod, which ships no `.archive`, and a mod that ships only ArchiveXL `.xl` files, which are
+   manifests rather than mounted archives and so never appear in the archive list.
 3. **A consumer calling these must require NCZoningCore 0.3.0+.** Calling a function that does
    not exist is a compile error, and that takes down every redscript mod on the machine.
 
@@ -352,9 +353,9 @@ Background, if you want to know why the Lua patterns look the way they do.
   nobody is observing, the call is a no-op. This "observe an empty stub method" pattern is the
   same one used by other redscript-plus-CET mods (see [References](#references)).
 
-The one place the traffic runs the other way is installed-mod detection: NCZoningCore's own CET
-Lua component calls `ModArchiveExists` and pushes the result back into redscript. Consumers
-never do this themselves.
+Traffic only ever runs this way: Lua reads, and nothing writes into the Core from Lua. Installed-mod
+detection is not an exception - the scan runs in redscript, and Lua reads its result through
+`GetInstallStateInt` like everything else.
 
 ## Threading and non-goals
 
