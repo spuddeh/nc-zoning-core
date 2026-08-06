@@ -12,7 +12,7 @@
 //                   area with ZERO locations still appears (deriving the list from the
 //                   locations would silently hide it).
 //              Regenerate + verify with tools/districts/build-district-map.py.
-// Mod Version: 1.0.0
+// Mod Version: 1.1.0
 // ======================================================================================
 
 module NCZoning.Api

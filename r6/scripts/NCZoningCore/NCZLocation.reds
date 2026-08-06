@@ -5,7 +5,7 @@
 // Description: NCZoning.Data DTOs - typed classes RedData.FromJson deserializes the
 //              /v1 API payload into. Field names mirror the JSON keys EXACTLY, because
 //              RedData matches keys case-sensitively with no snake_case transform.
-// Mod Version: 1.0.0
+// Mod Version: 1.1.0
 // Credits: psiberx (RedData, RedFileSystem, RedHttpClient, Codeware)
 // ======================================================================================
 

@@ -18,7 +18,7 @@
 --              RESULTS ARE NOT PERSISTED, here or on the redscript side. Install state is
 --              what changes between sessions, so a cached answer would claim a mod is
 --              present after the player removed it.
--- Mod Version: 1.0.0
+-- Mod Version: 1.1.0
 -- Credits: Spuddeh
 -- ======================================================================================
 

@@ -1,5 +1,33 @@
 # Changelog
 
+## [Unreleased] - 1.1.0
+
+Prepared, not released. Core and the District Guide ship together, and one further Guide feature is
+still to land.
+
+### Added
+
+- Nineteen language slots under `translations/`, all empty but English, each wired into
+  `Provider.reds`. A translation replaces one slot file and ships as its own mod, so anyone can
+  publish one without a release here. Empty rather than English-seeded: a package fills after the
+  English fallback, so a copied string would override newer English wording.
+- `NCZoningCore.card.json` - category, description and the Nexus header image (1300x372) for RCF
+  2.1.0's Big UI picker. Read by `DVRCF_Cards`, which is language-blind.
+- `docs/TRANSLATING.md`.
+
+### Changed
+
+- `NCZoningLog` writes through `RedLog.AppendLevel`, and `NCZoningWarn` / `NCZoningError` join it.
+  Twelve of twenty-one call sites re-levelled: degraded-but-still-serving is WARN, the session
+  cannot do the thing at all is ERROR. Needs RedLogger 1.2.0+.
+- RedLogger floor raised to 1.3.0 across README, the consumer guide and the Nexus description. Set
+  by RCF 2.1.0 rather than by this mod - `ModuleExists` reports presence and never a version, so an
+  older RedLogger beside RCF 2.1.0 fails the whole redscript compile.
+- `release.yml`: `archive_existing_version` is false. A superseded file belongs in OLD FILES, which
+  stays downloadable; archived does not.
+- Vault wikilinks removed from shipped source. Redscript ships as plaintext and the vault has no
+  remote, so they resolved for nobody who downloaded the mod.
+
 ## 1.0.0 - 2026-08-05
 
 First public release, on Nexus and GitHub together with NC Zoning Board - District Guide 1.0.0.

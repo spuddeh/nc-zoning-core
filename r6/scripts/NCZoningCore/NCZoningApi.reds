@@ -8,7 +8,7 @@
 //              signal as an Observe-able instance method (Observe('NCZoningApi','OnDataReady')).
 //              A ScriptableService so it has a singleton for the instance hook. Read-only
 //              forwarders to the internal service; redscript consumers use `import NCZoning.Api.*`.
-// Mod Version: 1.0.0
+// Mod Version: 1.1.0
 // Credits: psiberx (Codeware)
 // ======================================================================================
 

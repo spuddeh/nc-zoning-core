@@ -32,6 +32,10 @@
   per session at r6\logs\mods\NCZoningCore__<date_time>.log, five kept. Consumers of
   NCZoningCore inherit the requirement. (Verified in-game: file written, per-line timestamps, five
   sessions retained, no collision with NCZoningDistrictGuide or RCF.)
+- Levelled logging: NCZoningLog / NCZoningWarn / NCZoningError write through RedLog.AppendLevel,
+  so the level is a tag RedLogger owns and RCF 2.1.0 colours on it - errors red, warnings amber -
+  and its SHOWING filter selects on it. Needs RedLogger 1.2.0+; the stated floor is 1.3.0 because
+  RCF 2.1.0 needs that much. (Verified in-game.)
 - Installed-mod detection, via a bundled CET Lua component: parses the API's archives field and
   answers Installed / NotInstalled / Unknown per location. (Verified in-game: 10 installed of 291
   tested, from 297 records. The 6 untested are the API's 5 AMM entries and 1 WIP, which carry no
@@ -51,6 +55,14 @@
 - Localised status sentences: the four player-facing strings resolve through Codeware's
   LocalizationSystem (translations/English.reds; English is the fallback for every language).
   Consumers reading GetStatusMessage() inherit the translation for free.
+- Translation slots for all 19 game languages, each with a file and a Provider.reds case, empty but
+  English. A translation REPLACES a slot file - same path, module and class - so it ships as its own
+  mod and needs no release here. Those three names are public API from the first translation
+  onward. See docs/TRANSLATING.md.
+- RCF mod card (NCZoningCore.card.json): category, description (capped at 110 characters on load)
+  and the Nexus header image at 1300x372, for RCF 2.1.0's Big UI picker. The Core registers no
+  settings panel, so its card shows in the WIKI list rather than the settings picker. Unlike the
+  translation slots, the card and the docs page are language-blind.
 - NCZoningApi.OnDataError Observe hook for CET Lua, mirroring OnDataReady.
 - District vocabulary enumeration: GetDistricts() and GetSubdistricts(district) list the registry's
   area names (empty areas included) from the static Layer-1 map, on both the redscript and CET surfaces,

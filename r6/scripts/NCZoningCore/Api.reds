@@ -5,7 +5,7 @@
 // Description: NCZoning.Api - the public contract. This is the ONLY module consumers
 //              import. Every function is a thin, null-safe forwarder to the internal
 //              NCZoningService singleton.
-// Mod Version: 1.0.0
+// Mod Version: 1.1.0
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 

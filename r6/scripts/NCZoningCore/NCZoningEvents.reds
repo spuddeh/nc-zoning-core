@@ -5,7 +5,7 @@
 // Description: NCZoningDataEvent - the payload carried by the three data lifecycle
 //              events. A CallbackSystemEvent subclass so it is consumable from BOTH
 //              redscript and CET Lua through Codeware's CallbackSystem.
-// Mod Version: 1.0.0
+// Mod Version: 1.1.0
 // Credits: psiberx (Codeware CallbackSystem)
 // ======================================================================================
 
