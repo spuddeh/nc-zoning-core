@@ -27,9 +27,10 @@ public func ApiVersion() -> Int32 { return 1; }
 
 // --- installed-mod detection (1.0.0+) --------------------------------------------
 //
-// Check IsInstallDetectionAvailable() BEFORE offering the player any installed/missing
-// filter. Detection needs CET (nothing reachable from redscript can read archive/pc/mod/),
-// so on a machine without it every record answers Unknown.
+// Detection runs against RedFunctions, a hard dependency, so it is always possible.
+// IsInstallDetectionAvailable() reports whether the scan has RUN: it answers false until the
+// registry has loaded and the scan has swept it, and everything reads Unknown until then.
+// NCZoning-InstallScanComplete is the signal that it has an answer.
 //
 // A consumer calling these must require NCZoningCore 1.0.0+: calling a function that does
 // not exist is a COMPILE error that takes down every redscript mod on the machine.
@@ -38,8 +39,8 @@ public func IsInstallDetectionAvailable() -> Bool {
   return IsDefined(r) && r.IsAvailable();
 }
 
-// Unknown means either detection never ran (no CET) or the location cannot be detected at all
-// - AMM location mods ship only a .json into CET's own sandboxed folder, which no mod can read.
+// Unknown means either the scan has not run yet or the location cannot be detected at all -
+// AMM location mods ship no archive, so there is nothing for a mounted-archive query to find.
 // Do not render Unknown as "not installed".
 public func GetInstallState(loc: ref<NCZLocation>) -> NCZInstallState {
   let r = NCZInstalledRegistry.Get();

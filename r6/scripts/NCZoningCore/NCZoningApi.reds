@@ -119,37 +119,14 @@ public class NCZoningApi extends ScriptableService {
     return out;
   }
 
-  // --- installed-mod detection: the CET Lua component writes THROUGH here -------
+  // --- installed-mod detection: READ ONLY, in both directions -------------------
   //
-  // Traffic runs the other way here. Elsewhere Lua READS the registry; these three let it
-  // WRITE the scan result back, because ModArchiveExists is a CET Lua global with no redscript
-  // equivalent - nothing reachable from redscript can see archive/pc/mod/.
-  //
-  // Static, and called from Lua with a DOT (see examples/cet_lua_consumer.lua):
-  //   NCZoningApi.BeginInstallScan()
-  //   NCZoningApi.ReportInstalled(id)   -- once per installed location
-  //   NCZoningApi.EndInstallScan(tested)
-  //
-  // Static rather than instance: nothing here needs observing, and a static avoids a
-  // service-handle lookup from Lua. Ids go one at a time because passing an array<String>
-  // across the CET boundary is the fragile part of this route.
-  public static func BeginInstallScan() -> Void {
-    let r = NCZInstalledRegistry.Get();
-    if IsDefined(r) { r.BeginScan(); }
-  }
+  // The scan runs in redscript against RedFunctions and needs nothing pushed in, so Lua reads
+  // the result the same way it reads everything else. BeginInstallScan / ReportInstalled /
+  // EndInstallScan are gone with the CET component that called them.
 
-  public static func ReportInstalled(locationId: String) -> Void {
-    let r = NCZInstalledRegistry.Get();
-    if IsDefined(r) { r.ReportInstalled(locationId); }
-  }
-
-  public static func EndInstallScan(tested: Int32) -> Void {
-    let r = NCZInstalledRegistry.Get();
-    if IsDefined(r) { r.EndScan(tested); }
-  }
-
-  // Read side, for Lua consumers. Returns the enum as Int32 (0 Unknown / 1 Installed /
-  // 2 NotInstalled), since Lua has no enum type.
+  // Returns the enum as Int32 (0 Unknown / 1 Installed / 2 NotInstalled), since Lua has no
+  // enum type.
   public static func GetInstallStateInt(id: String) -> Int32 {
     let r = NCZInstalledRegistry.Get();
     let s = NCZoningService.Get();

@@ -75,6 +75,8 @@ public class NCZoningFetcher extends ScriptableSystem {
       NCZoningDataEvent.Dispatch(n"NCZoning-DataReady", svc.GetDataVersion(), count, "");   // reds consumers
       NCZoningApi.NotifyDataReady(count, svc.GetDataVersion(), false);                       // CET Lua consumers
       this.m_readyDispatched = true;
+      let reg = NCZInstalledRegistry.Get();
+      if IsDefined(reg) { reg.ScanOnce(); }
     }
     this.DoFetch();
   }
@@ -225,6 +227,8 @@ public class NCZoningFetcher extends ScriptableSystem {
       NCZoningApi.NotifyDataReady(count, r.m_datasetVersion, false);
       this.m_readyDispatched = true;
       NCZoningLog(s"store ready + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
+      let reg = NCZInstalledRegistry.Get();
+      if IsDefined(reg) { reg.ScanOnce(); }
     }
   }
 
