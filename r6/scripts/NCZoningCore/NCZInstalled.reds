@@ -53,21 +53,18 @@ public class NCZInstalledRegistry extends ScriptableService {
 
   // --- the scan ------------------------------------------------------------------------
 
-  // Called on NCZoning-DataReady, and runs once per session.
+  // Runs whenever the store changes: the cache load at launch, and again when the network
+  // fetch swaps a newer registry in behind it.
   //
-  // A later network refresh re-sends the same records with the same archive names, and a
-  // running game cannot change what is mounted - so a re-scan would answer identically for
-  // every record it already tested. A refresh that ADDS records leaves those untested and
-  // reading Unknown until the next launch; the per-call cost of ArchiveExists is unmeasured,
-  // so that is not traded for a mid-session sweep yet.
+  // It re-runs on that swap because the RECORD LIST can grow, not because the answers can
+  // change - archives cannot be added to a running game. Scanning only at cache load leaves
+  // any record the network added untested, and an untested record with archives reads
+  // NotInstalled, which tells the player to download a mod they already have.
   //
   // Dispatches NCZoning-InstallScanComplete, which is a consumer's only signal that
   // detection has an answer. Must run on the game thread - the condition
   // NCZoningDataEvent.Dispatch requires.
-  public func ScanOnce() -> Void {
-    if this.m_available {
-      return;
-    }
+  public func Scan() -> Void {
     let svc = NCZoningService.Get();
     if !IsDefined(svc) {
       return;

@@ -76,7 +76,7 @@ public class NCZoningFetcher extends ScriptableSystem {
       NCZoningApi.NotifyDataReady(count, svc.GetDataVersion(), false);                       // CET Lua consumers
       this.m_readyDispatched = true;
       let reg = NCZInstalledRegistry.Get();
-      if IsDefined(reg) { reg.ScanOnce(); }
+      if IsDefined(reg) { reg.Scan(); }
     }
     this.DoFetch();
   }
@@ -227,9 +227,11 @@ public class NCZoningFetcher extends ScriptableSystem {
       NCZoningApi.NotifyDataReady(count, r.m_datasetVersion, false);
       this.m_readyDispatched = true;
       NCZoningLog(s"store ready + cache written: \(count) locations, dataset=\(r.m_datasetVersion)");
-      let reg = NCZInstalledRegistry.Get();
-      if IsDefined(reg) { reg.ScanOnce(); }
     }
+    // After the store swap, in both branches: the cache-load scan tested the records the CACHE
+    // held, and this payload can carry records it did not.
+    let reg = NCZInstalledRegistry.Get();
+    if IsDefined(reg) { reg.Scan(); }
   }
 
   // No data and no way to get any. Signal consumers, then tell the player on screen - the only
