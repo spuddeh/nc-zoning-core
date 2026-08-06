@@ -19,10 +19,11 @@
 //              between sessions, so a cached answer would claim a mod is present after the
 //              player removed it.
 //
-//              THREE STATES. An empty archives list means "cannot say", never "not
-//              installed": it is either an AMM mod, whose files are not archives at all and
-//              so can never be seen this way, or a record the API has not filled yet. Those
-//              are indistinguishable from here, so both read Unknown.
+//              THREE STATES. Nothing a query could match means "cannot say", never "not
+//              installed": an AMM mod, whose files are not archives at all; a record listing
+//              only ArchiveXL .xl manifests, which are not mounted archives either; or a
+//              record the API has not filled yet. Those are indistinguishable from here, so
+//              all three read Unknown.
 // Mod Version: 1.1.0
 // Credits: Spuddeh
 // ======================================================================================
@@ -79,17 +80,20 @@ public class NCZInstalledRegistry extends ScriptableService {
     let i = 0;
     while i < total {
       let loc = all[i];
-      let archives = loc.ArchiveCount();
-      // An empty archives list is deliberately NOT tested and NOT recorded. It means "cannot
-      // say", and recording it as absent would tell players to download mods they already have.
-      if archives > 0 {
+      // Nothing a query could match is deliberately NOT tested and NOT recorded. It means
+      // "cannot say", and recording it as absent would tell players to download mods they
+      // already have. DetectableArchiveCount, not ArchiveCount: a record listing only .xl
+      // manifests has archives and is still unmatchable.
+      if loc.DetectableArchiveCount() > 0 {
         tested += 1;
         // ANY match counts. A player who installed the main archive but none of the mod's
         // optional archives still has the mod.
+        let entries = loc.ArchiveCount();
         let found = false;
         let j = 0;
-        while j < archives && !found {
-          if RedFunc.ArchiveExists(loc.ArchiveAt(j)) {
+        while j < entries && !found {
+          let name = loc.ArchiveAt(j);
+          if StrEndsWith(StrLower(name), ".archive") && RedFunc.ArchiveExists(name) {
             found = true;
           }
           j += 1;
@@ -126,8 +130,10 @@ public class NCZInstalledRegistry extends ScriptableService {
     if ArrayContains(this.m_installed, loc.Id()) {
       return NCZInstallState.Installed;
     }
-    // Nothing to test against - an AMM mod, or a record the API has not filled yet.
-    if loc.ArchiveCount() == 0 {
+    // Nothing a query could have matched - an AMM mod, a record listing only .xl manifests,
+    // or a record the API has not filled yet. The SAME test the scan skipped on, so the two
+    // cannot disagree: a record the scan never tested must never read NotInstalled here.
+    if loc.DetectableArchiveCount() == 0 {
       return NCZInstallState.Unknown;
     }
     return NCZInstallState.NotInstalled;

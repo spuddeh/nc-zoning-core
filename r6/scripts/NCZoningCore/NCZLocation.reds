@@ -116,6 +116,29 @@ public class NCZLocation {
     return "";
   }
   public func ArchiveCount() -> Int32 { return ArraySize(this.archives); }
+
+  // How many of `archives` a mounted-archive query could ever match.
+  //
+  // An .xl is an ArchiveXL manifest, not a mounted archive, so it never appears in the
+  // engine's archive list and no query can match it. A record whose archives are ALL .xl is
+  // therefore undetectable in exactly the way a record with no archives at all is, and both
+  // must read Unknown - saying NotInstalled tells the player to download a mod they have.
+  //
+  // The test is "is a .archive", not "is not a .xl": an unrecognised extension must fall out
+  // as undetectable rather than be assumed matchable, because a wrong Unknown costs nothing
+  // and a wrong NotInstalled is the lie this whole distinction exists to prevent.
+  public func DetectableArchiveCount() -> Int32 {
+    let n = 0;
+    let i = 0;
+    let total = ArraySize(this.archives);
+    while i < total {
+      if StrEndsWith(StrLower(this.archives[i]), ".archive") {
+        n += 1;
+      }
+      i += 1;
+    }
+    return n;
+  }
   public func ArchiveAt(idx: Int32) -> String {
     if idx >= 0 && idx < ArraySize(this.archives) {
       return this.archives[idx];
