@@ -33,7 +33,7 @@ upload cannot come from CI. Do this once:
    Compress-Archive -Path "$stage\r6","$stage\bin" -DestinationPath "NCZoningCore_v1.0.0.zip" -Force
    ```
    (The zip must contain every tree the manifest's `contentDir` lists: `r6\scripts` (the mod),
-   `r6\storages` (the in-game docs page) and `bin\` (the CET detection component). The user
+   `r6\storages` (the in-game docs page). The user
    extracts it into their Cyberpunk 2077 root.)
 3. **Read the file id and set it as a repository VARIABLE.** On the mod page open the **Files**
    tab > **API Info** (or the Manage Files edit menu) and copy the id - Nexus labels it

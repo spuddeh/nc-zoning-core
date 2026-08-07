@@ -151,7 +151,8 @@ private cb func OnReady(event: ref<NCZoningDataEvent>) -> Void {
   codes in [When there is no network](#when-there-is-no-network); `IsReady()` may still be true
   if the offline cache is serving.
 - `NCZoning-InstallScanComplete` - installed-mod detection has finished; `event.Count()` is how
-  many locations are installed. Fires only when CET is present. Do not block on it.
+  many locations are installed. Fires once the scan completes; a session with no registry data
+  never fires it. Do not block on it.
 
 If your system attaches after the event already fired, check `IsReady()` and use the data
 directly.

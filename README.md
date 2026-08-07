@@ -19,9 +19,13 @@ interactive map of Cyberpunk 2077 location mods.
 
 ## Status
 
-v1.0.0, the first public release. Fetch, offline cache with ETag revalidation, the
-public API and events, the CET Lua bridge and installed-mod detection are all
+v1.1.0. Fetch, offline cache with ETag revalidation, the public API and events, the
+CET Lua consumer bridge, installed-mod detection and clock-based recency are all
 implemented and tested in game.
+
+Installed-mod detection runs in redscript over RedFunctions; the CET Lua bridge that
+remains is the one *consumers* read the registry through, and the framework itself
+calls no CET API.
 
 ## What consumers get
 
