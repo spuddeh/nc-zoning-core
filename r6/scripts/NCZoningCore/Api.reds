@@ -202,3 +202,67 @@ public func GetDistricts() -> array<String> {
 public func GetSubdistricts(district: String) -> array<String> {
   return NCZDistrictMap.SubdistrictsOf(district);
 }
+
+// --- area names in the player's language (1.1.0+) --------------------------------
+// A district or subdistrict name from the registry is DATA, and it is published in English only.
+// Render one straight onto a widget and every player reads English, whatever their game language.
+//
+// THE TRANSLATION COMES FROM THE GAME, NOT FROM A TABLE HERE. Cyberpunk already names all but one
+// of these areas in each of its twelve languages, so this resolves the game's own district record
+// and asks it. That is a smaller thing to maintain than 36 names in every language, and it makes
+// the guide agree with the world map and the fast-travel screen, which a separate translation
+// would drift from.
+//
+// LocalizedName() RETURNS A LocKey, NOT TEXT ("LocKey#10962"), and GetLocalizedText resolves it.
+// The global resolver is correct here and NCZ_T is not: NCZ_T reads Codeware's provider table for
+// this mod's own NCZ.* keys, and the base game's table is exactly what it cannot see (Loc.reds).
+//
+// `subdistrict` is "" to name the district itself. Pass the area you want named, not the area the
+// player is standing in - naming Kabuki is LocalizeArea("Watson", "Kabuki").
+//
+// FALLS BACK TO THE REGISTRY'S OWN NAME whenever the game cannot answer. English is the honest
+// answer for an area the game has never heard of, and a name the registry publishes after this
+// build is exactly that.
+public func LocalizeArea(district: String, subdistrict: String) -> String {
+  let raw = StrLen(subdistrict) > 0 ? subdistrict : district;
+  // Bind before ArraySize: measuring the call directly measures a temporary and answers 0.
+  let ids = NCZDistrictMap.RecordIdsFor(district, subdistrict);
+  let count = ArraySize(ids);
+  if count <= 0 {
+    return NCZAreaOwnName(raw);
+  }
+  // More than one id means the registry's name is a composite of the game's, and it is rebuilt
+  // here in the player's language rather than translated as a phrase.
+  let out = "";
+  let i = 0;
+  while i < count {
+    let record = TweakDBInterface.GetDistrictRecord(ids[i]);
+    if !IsDefined(record) {
+      return NCZAreaOwnName(raw);
+    }
+    let part = GetLocalizedText(record.LocalizedName());
+    // A district record CAN carry an empty name - the game's own map checks for this before
+    // drawing the subdistrict line. An empty part would silently eat half a composite.
+    if StrLen(part) <= 0 {
+      return NCZAreaOwnName(raw);
+    }
+    out += i > 0 ? " / " + part : part;
+    i += 1;
+  }
+  return out;
+}
+
+// The areas the game cannot name, which today is North Oaks Casino alone: the registry attributes
+// locations to it, and it is a POI rather than a district, so no district record exists to ask.
+//
+// NCZ_T ECHOES THE KEY when the string is missing or Codeware has not bound yet, and a nav row
+// reading "NCZ.area.northOaksCasino" is worse than one reading English. The echo is the signal
+// that the lookup failed, so it is what selects the fallback.
+func NCZAreaOwnName(raw: String) -> String {
+  if UnicodeStringEqual(raw, "North Oaks Casino") {
+    let key = "NCZ.area.northOaksCasino";
+    let text = NCZ_T(key);
+    return UnicodeStringEqual(text, key) ? raw : text;
+  }
+  return raw;
+}

@@ -75,6 +75,11 @@
   settings panel, so its card shows in the WIKI list rather than the settings picker. Unlike the
   translation slots, the card and the docs page are language-blind.
 - NCZoningApi.OnDataError Observe hook for CET Lua, mirroring OnDataReady.
+- Area names in the player's language: LocalizeArea(district, subdistrict) answers from the game's
+  own District_Record, so 35 of the 36 areas are translated wherever Cyberpunk is and match the
+  world map's wording. North Oaks Casino is the exception - a registry POI with no district record -
+  and is the only area name carried in the translation slots.
+
 - District vocabulary enumeration: GetDistricts() and GetSubdistricts(district) list the registry's
   area names (empty areas included) from the static Layer-1 map, on both the redscript and CET surfaces,
   plus GetStatusMessage() for a human-readable status line.

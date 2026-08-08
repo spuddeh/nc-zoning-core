@@ -2,7 +2,7 @@
 // Mod Name: NCZoningCore
 // File: NCZoningDistricts.reds
 // Author: Spuddeh
-// Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:
+// Description: GENERATED - do not hand-edit. Three things, all derived from /v1/districts:
 //                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID
 //                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict
 //                   strings, for the cases where the two vocabularies differ.
@@ -11,6 +11,11 @@
 //                   consumer can render a district picker before the fetch lands, and an
 //                   area with ZERO locations still appears (deriving the list from the
 //                   locations would silently hide it).
+//                3. RecordIdsFor() - which game district record NAMES an area, for
+//                   LocalizeArea(). A DIFFERENT question to Lookup, and not derivable
+//                   from it in either direction: a fold like NorthBadlands maps to
+//                   Badlands without naming it, and a composite area is named by two
+//                   records while the player stands in only one of them.
 //              Regenerate + verify with tools/districts/build-district-map.py.
 // Mod Version: 1.1.0
 // ======================================================================================
@@ -136,6 +141,52 @@ public class NCZDistrictMap {
       ArrayPush(out, "North Oaks Casino");
       return out;
     }
+    return out;
+  }
+
+  // The game district record(s) whose LocalizedName() names this area, for LocalizeArea().
+  // TWO ids means the API's name is a composite of the game's, joined in this order.
+  //
+  // EMPTY IS AN ANSWER, not a miss: the game has no record for this area, so the caller
+  // supplies the name itself. That covers 1 of the 36 areas here, and any
+  // subdistrict the registry publishes after this build.
+  public static func RecordIdsFor(district: String, subdistrict: String) -> array<TweakDBID> {
+    let out: array<TweakDBID>;
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Badlands"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Biotechnica Flats") { ArrayPush(out, t"Districts.BiotechnicaFlats"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Jackson Plains") { ArrayPush(out, t"Districts.JacksonPlains"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Laguna Bend") { ArrayPush(out, t"Districts.LagunaBend"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "North Sunrise Oil Field") { ArrayPush(out, t"Districts.NorthSunriseOilField"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Rattlesnake Creek") { ArrayPush(out, t"Districts.RattlesnakeCreek"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Red Peaks") { ArrayPush(out, t"Districts.RedPeaks"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Rocky Ridge") { ArrayPush(out, t"Districts.RockyRidge"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Sierra Sonora") { ArrayPush(out, t"Districts.SierraSonora"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "SoCal Border Crossing") { ArrayPush(out, t"Districts.SoCalBorderCrossing"); return out; }
+    if UnicodeStringEqual(district, "Badlands") && UnicodeStringEqual(subdistrict, "Vasquez Pass") { ArrayPush(out, t"Districts.VasquezPass"); return out; }
+    if UnicodeStringEqual(district, "City Center") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.CityCenter"); return out; }
+    if UnicodeStringEqual(district, "City Center") && UnicodeStringEqual(subdistrict, "Corpo Plaza") { ArrayPush(out, t"Districts.CorpoPlaza"); return out; }
+    if UnicodeStringEqual(district, "City Center") && UnicodeStringEqual(subdistrict, "Downtown") { ArrayPush(out, t"Districts.Downtown"); return out; }
+    if UnicodeStringEqual(district, "Dogtown") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Dogtown"); return out; }
+    if UnicodeStringEqual(district, "Heywood") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Heywood"); return out; }
+    if UnicodeStringEqual(district, "Heywood") && UnicodeStringEqual(subdistrict, "The Glen") { ArrayPush(out, t"Districts.Glen"); return out; }
+    if UnicodeStringEqual(district, "Heywood") && UnicodeStringEqual(subdistrict, "Vista Del Rey") { ArrayPush(out, t"Districts.VistaDelRey"); return out; }
+    if UnicodeStringEqual(district, "Heywood") && UnicodeStringEqual(subdistrict, "Wellsprings") { ArrayPush(out, t"Districts.Wellsprings"); return out; }
+    if UnicodeStringEqual(district, "NCX Spaceport / Morro Rock") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.NCSpaceport"); ArrayPush(out, t"Districts.MorroRock"); return out; }
+    if UnicodeStringEqual(district, "Pacifica") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Pacifica"); return out; }
+    if UnicodeStringEqual(district, "Pacifica") && UnicodeStringEqual(subdistrict, "Coastview") { ArrayPush(out, t"Districts.Coastview"); return out; }
+    if UnicodeStringEqual(district, "Pacifica") && UnicodeStringEqual(subdistrict, "West Wind Estate") { ArrayPush(out, t"Districts.WestWindEstate"); return out; }
+    if UnicodeStringEqual(district, "Santo Domingo") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.SantoDomingo"); return out; }
+    if UnicodeStringEqual(district, "Santo Domingo") && UnicodeStringEqual(subdistrict, "Arroyo") { ArrayPush(out, t"Districts.Arroyo"); return out; }
+    if UnicodeStringEqual(district, "Santo Domingo") && UnicodeStringEqual(subdistrict, "Rancho Coronado") { ArrayPush(out, t"Districts.RanchoCoronado"); return out; }
+    if UnicodeStringEqual(district, "Watson") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Watson"); return out; }
+    if UnicodeStringEqual(district, "Watson") && UnicodeStringEqual(subdistrict, "Arasaka Waterfront") { ArrayPush(out, t"Districts.ArasakaWaterfront"); return out; }
+    if UnicodeStringEqual(district, "Watson") && UnicodeStringEqual(subdistrict, "Kabuki") { ArrayPush(out, t"Districts.Kabuki"); return out; }
+    if UnicodeStringEqual(district, "Watson") && UnicodeStringEqual(subdistrict, "Little China") { ArrayPush(out, t"Districts.LittleChina"); return out; }
+    if UnicodeStringEqual(district, "Watson") && UnicodeStringEqual(subdistrict, "Northside Industrial District") { ArrayPush(out, t"Districts.Northside"); return out; }
+    if UnicodeStringEqual(district, "Westbrook") && UnicodeStringEqual(subdistrict, "") { ArrayPush(out, t"Districts.Westbrook"); return out; }
+    if UnicodeStringEqual(district, "Westbrook") && UnicodeStringEqual(subdistrict, "Charter Hill") { ArrayPush(out, t"Districts.CharterHill"); return out; }
+    if UnicodeStringEqual(district, "Westbrook") && UnicodeStringEqual(subdistrict, "Japantown") { ArrayPush(out, t"Districts.JapanTown"); return out; }
+    if UnicodeStringEqual(district, "Westbrook") && UnicodeStringEqual(subdistrict, "North Oak") { ArrayPush(out, t"Districts.NorthOaks"); return out; }
     return out;
   }
 

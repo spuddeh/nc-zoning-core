@@ -28,6 +28,24 @@ Prepared, not released. Core and the District Guide ship together.
   `Provider.reds`. A translation replaces one slot file and ships as its own mod, so anyone can
   publish one without a release here. Empty rather than English-seeded: a package fills after the
   English fallback, so a copied string would override newer English wording.
+
+- `LocalizeArea(district, subdistrict)` on `NCZoning.Api`, and `NCZDistrictMap.RecordIdsFor()`
+  behind it. The registry publishes area names in English only, so a consumer rendering one raw
+  showed English whatever the game language. This resolves the game's own `District_Record` and
+  reads `LocalizedName()`, which returns a LocKey that `GetLocalizedText` resolves - so all
+  twelve of the game's languages come free, and the name agrees with the world map and the
+  fast-travel screen. Additive: `ApiVersion()` stays at 1.
+
+  `RecordIdsFor` is generated alongside `Lookup`, and answers a different question: which record
+  *names* an area, not which area a player standing in a record is in. Neither direction follows
+  from the other - `NorthBadlands` maps to Badlands without naming it, and NCX Spaceport / Morro
+  Rock is one API area named by two game records, so it emits both and they are joined. The
+  generator hard-fails on an area with neither a record nor a key, which is what stops one
+  shipping English silently.
+
+- `NCZ.area.northOaksCasino`, the one area name Core carries itself. North Oaks Casino is a
+  registry POI with no district record behind it, so nothing in the game names it. The other 35
+  areas need no key at all.
 - `NCZoningCore.card.json` - category, description and the Nexus header image (1300x372) for RCF
   2.1.0's Big UI picker. Read by `DVRCF_Cards`, which is language-blind.
 - `docs/TRANSLATING.md`.

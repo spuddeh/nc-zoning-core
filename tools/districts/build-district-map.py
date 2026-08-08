@@ -70,6 +70,29 @@ EXTRA = [
     # reports "Badlands".
     ("Badlands_Spaceport", "NCX Spaceport / Morro Rock", ""),
 ]
+
+# --- naming: which game record NAMES an area, which is a different question to the map ----
+# The map above answers "the player is standing here, which API area is that". The table below
+# answers "what does the game call this API area", so a consumer can show the player a name in
+# their own language. The two disagree in both directions, so neither is derivable from the other:
+# a fold like NorthBadlands maps to Badlands but does not NAME it, and a composite is named by
+# two records while the player stands in only one of them.
+#
+# Everything not listed here takes the game path of its own API-derived map entry. The folds in
+# EXTRA are never used for naming.
+#
+# API areas the game names with MORE THAN ONE district record, in the order the API joins them.
+# Emitting both lets a consumer rebuild the composite in the player's language rather than
+# hand-translating a name the game already ships in all twelve.
+COMPOSITE = {
+    ("NCX Spaceport / Morro Rock", ""): ["Districts.NCSpaceport", "Districts.MorroRock"],
+}
+# API areas with NO game district record at all, so the game cannot name them and the core
+# carries its own string. Keyed by the API name, valued by the core's LocKey.
+OWN_NAME = {
+    "North Oaks Casino": "NCZ.area.northOaksCasino",
+}
+
 # game enums that must NOT map to any API district (documented so a future regen keeps them out):
 # - Dogtown_Brooklyn: an NPC memory-flashback location in Brooklyn, a different city; a player's
 #   DistrictManager never legitimately reports it in Night City, so Lookup should return null.
@@ -119,12 +142,15 @@ def main():
 
     api = load_api(sys.argv)
     entries, unmapped = [], []
+    api_path = {}    # (district, subdistrict) -> game path, API-derived entries ONLY (no EXTRA folds)
     for d in api:
         if d["id"] not in SKIP:
             en = OVERRIDE.get(d["id"]) or find(d["id"], d["name"])
             (entries if en else unmapped).append(
                 {"gameEnum": en, "gamePath": enums.get(en), "district": d["name"], "subdistrict": ""}
                 if en else ("top", d["id"], d["name"]))
+            if en:
+                api_path[(d["name"], "")] = enums.get(en)
         for s in d.get("subdistricts", []):
             if s["id"] in SKIP:
                 continue
@@ -132,6 +158,8 @@ def main():
             (entries if en else unmapped).append(
                 {"gameEnum": en, "gamePath": enums.get(en), "district": d["name"], "subdistrict": s["name"]}
                 if en else ("sub", s["id"], s["name"]))
+            if en:
+                api_path[(d["name"], s["name"])] = enums.get(en)
     for en, dist, sub in EXTRA:
         if en in enums:
             entries.append({"gameEnum": en, "gamePath": enums[en], "district": dist, "subdistrict": sub})
@@ -186,6 +214,28 @@ def main():
         errs.append(f"reachability: {p} resolves to NO api district (add a mapping or KNOWN_UNMAPPED)")
     write_audit(audit)
 
+    # ---- NAMING TABLE ----
+    # Every area in the API vocabulary, paired with the game record(s) that NAME it. An area with
+    # no record is left empty and the consumer falls back; it is a hard failure unless OWN_NAME
+    # says the core carries its own string for it, because a silent empty ships English.
+    naming, own, nameless = [], [], []
+    for d in sorted(api, key=lambda x: x["name"]):
+        for area in [(d["name"], "")] + [(d["name"], s["name"])
+                                         for s in sorted(d.get("subdistricts") or [], key=lambda x: x["name"])]:
+            paths = COMPOSITE.get(area) or ([api_path[area]] if area in api_path else [])
+            naming.append((area[0], area[1], paths))
+            if paths:
+                for p in paths:
+                    if p not in by_path:
+                        errs.append(f"naming: {area} names itself with {p}, which is not a game district")
+            else:
+                label = area[1] or area[0]
+                (own if label in OWN_NAME else nameless).append(label)
+    for label in nameless:
+        errs.append(f"naming: '{label}' has no game record and no OWN_NAME key - it would ship English")
+
+    print(f"naming: {len(naming)} areas, {sum(1 for n in naming if n[2])} named by the game, "
+          f"{len(own)} by the core ({', '.join(own) or 'none'})")
     print(f"entries: {len(entries)}")
     print(f"verify errors: {errs or 'NONE'}")
     print(f"uncovered API districts: {miss_d or 'none'}")
@@ -200,7 +250,7 @@ def main():
               open(os.path.join(HERE, "district-map.json"), "w", encoding="utf-8"),
               indent=2, ensure_ascii=False)
 
-    write_reds(entries, api)
+    write_reds(entries, api, naming)
 
     if errs or miss_d or miss_s or unexpected:
         print("FAILED", file=sys.stderr)
@@ -228,7 +278,7 @@ def esc(s):
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def write_reds(entries, api):
+def write_reds(entries, api, naming):
     version = read_version()
     # The vocabulary, A-Z. ALL subdistricts, canonical or not (see the module docstring).
     districts = sorted(d["name"] for d in api)
@@ -240,7 +290,7 @@ def write_reds(entries, api):
         "// Mod Name: NCZoningCore",
         "// File: NCZoningDistricts.reds",
         "// Author: Spuddeh",
-        "// Description: GENERATED - do not hand-edit. Two things, both derived from /v1/districts:",
+        "// Description: GENERATED - do not hand-edit. Three things, all derived from /v1/districts:",
         "//                1. Lookup()  - the static (Layer 1) map from the game's district TweakDBID",
         "//                   (District.GetDistrictID()) to the NC Zoning API district / subdistrict",
         "//                   strings, for the cases where the two vocabularies differ.",
@@ -249,8 +299,13 @@ def write_reds(entries, api):
         "//                   consumer can render a district picker before the fetch lands, and an",
         "//                   area with ZERO locations still appears (deriving the list from the",
         "//                   locations would silently hide it).",
+        "//                3. RecordIdsFor() - which game district record NAMES an area, for",
+        "//                   LocalizeArea(). A DIFFERENT question to Lookup, and not derivable",
+        "//                   from it in either direction: a fold like NorthBadlands maps to",
+        "//                   Badlands without naming it, and a composite area is named by two",
+        "//                   records while the player stands in only one of them.",
         "//              Regenerate + verify with tools/districts/build-district-map.py.",
-        f"// Mod Version: {version} (Pre-release)",
+        f"// Mod Version: {version}",
         "// ======================================================================================",
         "",
         "module NCZoning.Api",
@@ -295,6 +350,23 @@ def write_reds(entries, api):
             lines.append(f'      ArrayPush(out, "{esc(s)}");')
         lines.append("      return out;")
         lines.append("    }")
+    named = [n for n in naming if n[2]]
+    lines += [
+        "    return out;",
+        "  }",
+        "",
+        "  // The game district record(s) whose LocalizedName() names this area, for LocalizeArea().",
+        "  // TWO ids means the API's name is a composite of the game's, joined in this order.",
+        "  //",
+        "  // EMPTY IS AN ANSWER, not a miss: the game has no record for this area, so the caller",
+        f"  // supplies the name itself. That covers {len(naming) - len(named)} of the {len(naming)} areas here, and any",
+        "  // subdistrict the registry publishes after this build.",
+        "  public static func RecordIdsFor(district: String, subdistrict: String) -> array<TweakDBID> {",
+        "    let out: array<TweakDBID>;",
+    ]
+    for d, s, paths in named:
+        push = " ".join(f'ArrayPush(out, t"{p}");' for p in paths)
+        lines.append(f'    if UnicodeStringEqual(district, "{esc(d)}") && UnicodeStringEqual(subdistrict, "{esc(s)}") {{ {push} return out; }}')
     lines += [
         "    return out;",
         "  }",

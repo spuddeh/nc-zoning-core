@@ -29,5 +29,12 @@ public class NCZ_English extends ModLocalizationPackage {
     this.Text("NCZ.statusFetchFailed", "NC Zoning: could not download the location registry, and no local copy exists. See the mod page.");
     // No network layer and no hand-supplied file.
     this.Text("NCZ.statusNoData",      "NC Zoning: no location data. Install RedHttpClient, or download {file} by hand - see the mod page.");
+
+    // --- area names ------------------------------------------------------------------
+    // ONE KEY, not thirty-six. LocalizeArea names an area from the game's own district record,
+    // so every district and subdistrict is already translated wherever the game is. North Oaks
+    // Casino is a registry POI with no district record behind it, so it is the only area name
+    // that has to live here.
+    this.Text("NCZ.area.northOaksCasino", "North Oaks Casino");
   }
 }
