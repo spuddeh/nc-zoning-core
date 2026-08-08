@@ -43,6 +43,12 @@
   records, no false positives from the 10 mounted archives that are not registry locations. The 7
   undetectable are 5 AMM entries and 1 WIP id carrying no archive names, plus 1 record listing only
   an ArchiveXL .xl, which is a manifest rather than a mounted archive and can never be matched.)
+
+- Shared archives excluded from detection: a file listed by locations from two different Nexus pages
+  identifies none of them, so it is ignored and only files unique to one mod count. Two PAGES, not
+  two records - one download can add two locations. Three names qualify today, reaching nine
+  locations, all prop packs an author bundled instead of requiring. No location loses detection:
+  every affected one also ships an archive of its own.
 - Recency computed against a real clock: NCZ_Iso8601ToEpoch parses the API's updated_at and
   RecomputeRecency re-answers RecentlyUpdated() at every store swap, using the envelope's
   recently_updated_days as the window. A cache read weeks later answers for today rather than for

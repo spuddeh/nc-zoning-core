@@ -138,7 +138,7 @@ public class NCZDistrictMap {
       ArrayPush(out, "Charter Hill");
       ArrayPush(out, "Japantown");
       ArrayPush(out, "North Oak");
-      ArrayPush(out, "North Oaks Casino");
+      ArrayPush(out, "North Oak Casino");
       return out;
     }
     return out;

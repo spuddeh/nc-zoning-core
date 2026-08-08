@@ -94,6 +94,26 @@ Prepared, not released. Core and the District Guide ship together.
   The gate now covers a `Version()` returning a bare semver literal.
 - Vault wikilinks removed from shipped source. Redscript ships as plaintext and the vault has no
   remote, so they resolved for nobody who downloaded the mod.
+- An archive shared between mods marked all of them installed. Some authors bundle a prop pack into
+  their own download rather than requiring it, so six unrelated locations each ship a copy of
+  `proximas_propshop_v4.archive`; installing any one of them mounted that file and the scan, which
+  counts ANY match, marked all six. Three names are affected across the registry today
+  (`proximas_propshop_v4`, `proximas_phantomliberty_propshop_v1`, `rjc_custom_scooter_prop`),
+  reaching nine locations.
+
+  `Scan()` now pairs every `.archive` name with the Nexus page it came from and ignores any name
+  seen under two different pages, so only files unique to one mod are evidence. **Two PAGES, not
+  two records** - one download can add two locations and they really are installed together, so a
+  record-level test would break that shape. A record with no numeric `nexus_id` keys on its own id
+  instead, or every `WIP` record would pool into one mod.
+
+  Verified against the live registry: the five false positives clear, the real install still reads
+  Installed, and no record loses detection - every affected location has at least one archive of
+  its own.
+- The scan and `StateOf` no longer derive "could this be tested" separately. The scan records what
+  it could decide in `m_tested` and `StateOf` reads it, so a record the scan skipped cannot read
+  NotInstalled. It could not before either, but the two tests had to be kept in step by hand, and
+  the shared-archive rule added a third reason to skip a record.
 
 ## 1.0.0 - 2026-08-05
 

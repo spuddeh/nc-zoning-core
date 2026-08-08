@@ -21,6 +21,10 @@ and to the mod authors building on it. The full technical detail lives in `@chan
 - New: District and subdistrict names can be shown in your game's language. The registry publishes
   them in English, so Core now asks Cyberpunk for its own name for the area - which means all
   twelve of the game's languages, and the same wording you see on the world map.
+- Fix: Locations no longer show as installed because a different mod shipped the same file. Some
+  authors bundle a shared prop pack into their download, so installing one location could mark five
+  others you had never downloaded. Files that more than one mod ships are now ignored, and only
+  files unique to a mod count.
 - New: A mod card for the Redscript Configuration Framework 2.1.0. The Core now appears in RCF's
   new picker with its header image, category and a short description.
 - New: Translation slots for all 19 game languages. A translation is a single file, and anyone can
