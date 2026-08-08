@@ -12,7 +12,7 @@
 //              @if(ModuleExists("RedHttpClient")), so the mod builds without the plugin.
 //              That build has no network layer and serves only a locations.json the
 //              player supplies by hand; if it is absent, ReportNoData tells them so.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // Credits: psiberx (Codeware), rayshader (RedHttpClient, RedData, RedFileSystem)
 // ======================================================================================
 

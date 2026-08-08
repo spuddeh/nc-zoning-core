@@ -19,7 +19,7 @@ interactive map of Cyberpunk 2077 location mods.
 
 ## Status
 
-v1.1.0. Fetch, offline cache with ETag revalidation, the public API and events, the
+v1.2.0. Fetch, offline cache with ETag revalidation, the public API and events, the
 CET Lua consumer bridge, installed-mod detection and clock-based recency are all
 implemented and tested in game.
 

@@ -5,7 +5,7 @@
 // Description: NCZoning.Data DTOs - typed classes RedData.FromJson deserializes the
 //              /v1 API payload into. Field names mirror the JSON keys EXACTLY, because
 //              RedData matches keys case-sensitively with no snake_case transform.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // Credits: psiberx (RedData, RedFileSystem, RedHttpClient, Codeware)
 // ======================================================================================
 
@@ -103,7 +103,7 @@ public class NCZLocation {
   let picture_url: String;
   let updated_at: String;         // nullable -> "" when absent
   let updated_at_epoch: Double;   // updated_at as Unix seconds; 0.0 when absent or malformed
-  let recently_updated: Bool;     // recomputed against the live clock at store time; see RecentlyUpdated()
+  let recently_updated: Bool;     // computed locally at store time, never parsed; see RecomputeRecency
   // The .archive / .xl filenames this mod installs into archive/pc/mod/, for installed-mod
   // detection (API v1.5.0+). NOTHING MATCHABLE MEANS "CANNOT SAY", NEVER "NOT INSTALLED" - an
   // AMM mod, which ships no archive; a record listing only .xl manifests, which are not mounted
@@ -231,7 +231,10 @@ public class NCZLocation {
     loc.picture_url = item.GetKeyString("picture_url");
     loc.updated_at = item.GetKeyString("updated_at");
     loc.updated_at_epoch = NCZ_Iso8601ToEpoch(loc.updated_at);
-    loc.recently_updated = item.GetKeyBool("recently_updated");
+    // recently_updated is NOT read from the payload. The API stopped serving it at surface 0.6.0,
+    // and it was never worth reading anyway: RecomputeRecency answers it from the clock against
+    // updated_at, which is the only version of the answer that is still true when a cached payload
+    // is read a fortnight later.
 
     let coords = item.GetKey("coordinates") as JsonArray;
     if IsDefined(coords) {

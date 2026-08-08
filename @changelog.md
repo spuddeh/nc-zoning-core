@@ -1,8 +1,74 @@
 # Changelog
 
-## 1.1.0 - 2026-08-09
+## [Unreleased] - 1.2.0
 
-Released together with NC Zoning Board - District Guide 1.1.0, which requires this version.
+Requires nothing new. NC Zoning Board - District Guide 1.1.1 requires this version.
+
+### Added
+
+- `LocalizeArea(district, subdistrict)` on `NCZoning.Api`, and `NCZDistrictMap.RecordIdsFor()`
+  behind it. The registry publishes area names in English only, so a consumer rendering one raw
+  showed English whatever the game language. This resolves the game's own `District_Record` and
+  reads `LocalizedName()`, which returns a LocKey that `GetLocalizedText` resolves - so all twelve
+  of the game's languages come free, and the name agrees with the world map and the fast-travel
+  screen. Additive: `ApiVersion()` stays at 1.
+
+  `RecordIdsFor` is generated alongside `Lookup`, and answers a different question: which record
+  *names* an area, not which area a player standing in a record is in. Neither direction follows
+  from the other - `NorthBadlands` maps to Badlands without naming it, and NCX Spaceport / Morro
+  Rock is one API area named by two game records, so it emits both and they are joined. The
+  generator hard-fails on an area with neither a record nor a key, which is what stops one
+  shipping English silently.
+
+- `NCZ.area.northOaksCasino`, the one area name Core carries itself. The North Oak casino is a
+  registry POI with no district record behind it, so nothing in the game names it. The other 35
+  areas need no key at all.
+
+### Fixed
+
+- An archive shared between mods marked all of them installed. Some authors bundle a prop pack into
+  their own download rather than requiring it, so six unrelated locations each ship a copy of
+  `proximas_propshop_v4.archive`; installing any one of them mounted that file and the scan, which
+  counts ANY match, marked all six. Three names are affected across the registry, reaching nine
+  locations.
+
+  `Scan()` now pairs every `.archive` name with the Nexus page it came from and ignores any name
+  seen under two different pages, so only files unique to one mod are evidence. **Two PAGES, not
+  two records** - one download can add two locations and they really are installed together, so a
+  record-level test would break that shape. A record with no numeric `nexus_id` keys on its own id
+  instead, or every `WIP` record would pool into one mod.
+
+  Verified against the live registry: the five false positives clear, the real install still reads
+  Installed, and no record loses detection - every affected location has at least one archive of
+  its own.
+
+- The scan and `StateOf` no longer derive "could this be tested" separately. The scan records what
+  it could decide in `m_tested` and `StateOf` reads it, so a record the scan skipped cannot read
+  NotInstalled. The two tests had to be kept in step by hand, and the shared-archive rule adds a
+  third reason to skip a record.
+
+- The casino is in North Oak, singular. The game names the district `LocKey#10967` = "North Oak",
+  and it reads that way 47 times against 1 across every en-us string it ships; only the TweakDB
+  path is plural (`Districts.NorthOaks`), and no player sees a TweakDB path. The registry's POI
+  carried the plural, which put NORTH OAKS CASINO directly under the NORTH OAK nav row. Fixed at
+  the board; both spellings are accepted here, because the registry is fetched at runtime and a
+  build meets whichever name the board is serving.
+
+### Changed
+
+- The recency path no longer reads or reports a bool the API stopped serving at surface 0.6.0.
+  `NCZLocation` parsed `recently_updated` into a field that `RecomputeRecency` overwrote a moment
+  later, so the read was dead; it is gone. The log line counted how many records "differed from the
+  API", which was parity evidence while there was an API answer to differ from - against a payload
+  that carries none it only restates the recent count while reading like a fault, so it now reports
+  the count itself: `recency: window=7d, N of 296 recent, M undated`.
+
+  Behaviour is unchanged. `RecomputeRecency` has always answered from `updated_at` against the
+  clock, which is the only form of the answer still true when an offline cache is read a fortnight
+  later. With no clock nothing reads as recently updated, and the comment now says that rather than
+  describing a fallback to a served bool that no longer exists.
+
+## 1.1.0 - 2026-08-07
 
 ### Added
 
@@ -28,24 +94,6 @@ Released together with NC Zoning Board - District Guide 1.1.0, which requires th
   `Provider.reds`. A translation replaces one slot file and ships as its own mod, so anyone can
   publish one without a release here. Empty rather than English-seeded: a package fills after the
   English fallback, so a copied string would override newer English wording.
-
-- `LocalizeArea(district, subdistrict)` on `NCZoning.Api`, and `NCZDistrictMap.RecordIdsFor()`
-  behind it. The registry publishes area names in English only, so a consumer rendering one raw
-  showed English whatever the game language. This resolves the game's own `District_Record` and
-  reads `LocalizedName()`, which returns a LocKey that `GetLocalizedText` resolves - so all
-  twelve of the game's languages come free, and the name agrees with the world map and the
-  fast-travel screen. Additive: `ApiVersion()` stays at 1.
-
-  `RecordIdsFor` is generated alongside `Lookup`, and answers a different question: which record
-  *names* an area, not which area a player standing in a record is in. Neither direction follows
-  from the other - `NorthBadlands` maps to Badlands without naming it, and NCX Spaceport / Morro
-  Rock is one API area named by two game records, so it emits both and they are joined. The
-  generator hard-fails on an area with neither a record nor a key, which is what stops one
-  shipping English silently.
-
-- `NCZ.area.northOaksCasino`, the one area name Core carries itself. North Oaks Casino is a
-  registry POI with no district record behind it, so nothing in the game names it. The other 35
-  areas need no key at all.
 - `NCZoningCore.card.json` - category, description and the Nexus header image (1300x372) for RCF
   2.1.0's Big UI picker. Read by `DVRCF_Cards`, which is language-blind.
 - `docs/TRANSLATING.md`.
@@ -94,26 +142,6 @@ Released together with NC Zoning Board - District Guide 1.1.0, which requires th
   The gate now covers a `Version()` returning a bare semver literal.
 - Vault wikilinks removed from shipped source. Redscript ships as plaintext and the vault has no
   remote, so they resolved for nobody who downloaded the mod.
-- An archive shared between mods marked all of them installed. Some authors bundle a prop pack into
-  their own download rather than requiring it, so six unrelated locations each ship a copy of
-  `proximas_propshop_v4.archive`; installing any one of them mounted that file and the scan, which
-  counts ANY match, marked all six. Three names are affected across the registry today
-  (`proximas_propshop_v4`, `proximas_phantomliberty_propshop_v1`, `rjc_custom_scooter_prop`),
-  reaching nine locations.
-
-  `Scan()` now pairs every `.archive` name with the Nexus page it came from and ignores any name
-  seen under two different pages, so only files unique to one mod are evidence. **Two PAGES, not
-  two records** - one download can add two locations and they really are installed together, so a
-  record-level test would break that shape. A record with no numeric `nexus_id` keys on its own id
-  instead, or every `WIP` record would pool into one mod.
-
-  Verified against the live registry: the five false positives clear, the real install still reads
-  Installed, and no record loses detection - every affected location has at least one archive of
-  its own.
-- The scan and `StateOf` no longer derive "could this be tested" separately. The scan records what
-  it could decide in `m_tested` and `StateOf` reads it, so a record the scan skipped cannot read
-  NotInstalled. It could not before either, but the two tests had to be kept in step by hand, and
-  the shared-archive rule added a third reason to skip a record.
 
 ## 1.0.0 - 2026-08-05
 

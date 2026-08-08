@@ -5,7 +5,7 @@
 // Description: NCZoningService - the internal ScriptableService that owns the
 //              RedFileSystem storage and the in-memory registry store. NCZoning.Api
 //              forwards to this singleton; consumers never import NCZoning.Core.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
 // ======================================================================================
 
@@ -244,38 +244,45 @@ public class NCZoningService extends ScriptableService {
     }
   }
 
-  // Re-answer "was this updated recently" against the clock, for the store just swapped in.
+  // Answer "was this updated recently" against the clock, for the store just swapped in.
   //
-  // The API computes the same bool, but it computes it when the payload is BUILT. A cache is
-  // offline-first and can be read weeks later, and the bool inside it does not age - so an
-  // offline session would keep flagging a mod as recently updated long after it stopped being
-  // true. The date does not have that problem, and RedFunctions supplies the missing half.
+  // THIS IS THE ONLY PLACE THE ANSWER COMES FROM. The API served the same bool until surface
+  // 0.6.0 and no longer does, which changes nothing here: a bool is computed when the payload is
+  // BUILT, and an offline-first cache can be read a fortnight later, so it would go on claiming a
+  // mod was updated recently long after it stopped being true. `updated_at` does not go stale, and
+  // RedFunctions supplies the clock.
   //
-  // Two cases keep the API's answer instead: a record with no usable date (epoch 0.0), and a
-  // clock that answers nothing. Neither can be improved on locally, and the served bool is
-  // still right for a payload fetched this session.
+  // TWO CASES ANSWER "no" AND MEAN "cannot say": a record with no usable date (epoch 0.0), and a
+  // clock that answers nothing. Neither can be improved on locally, and claiming nothing is the
+  // honest reading - a badge drawn from a guess is worse than no badge.
   private func RecomputeRecency() -> Void {
     let now = RedFunc.RealTimestamp();
     if now <= 0.0d {
-      NCZoningWarn("no wall clock; recency stays as the API computed it");
+      NCZoningWarn("no wall clock; nothing reads as recently updated this session");
       return;
     }
     let cutoff = now - Cast<Double>(this.m_recencyDays) * 86400.0d;
-    let changed = 0;
+    let recent = 0;
+    let undated = 0;
     let i = 0;
     let total = ArraySize(this.m_locations);
     while i < total {
       let stamp = this.m_locations[i].UpdatedAtEpoch();
       if stamp > 0.0d {
-        let recent = stamp > cutoff;
-        if NotEquals(recent, this.m_locations[i].RecentlyUpdated()) {
-          changed += 1;
+        let isRecent = stamp > cutoff;
+        if isRecent {
+          recent += 1;
         }
-        this.m_locations[i].SetRecentlyUpdated(recent);
+        this.m_locations[i].SetRecentlyUpdated(isRecent);
+      } else {
+        undated += 1;
       }
       i += 1;
     }
-    NCZoningLog(s"recency recomputed against the clock: window=\(this.m_recencyDays)d, \(changed) record(s) differed from the API");
+    // Counts what the answer IS, not how many records disagree with anything. There is no served
+    // bool to compare against, so a difference count restates the recent count while reading like
+    // a fault.
+    NCZoningLog(s"recency: window=\(this.m_recencyDays)d, \(recent) of \(total) recent, \(undated) undated");
   }
 
   // --- location queries (pure; operate on the in-memory store) -----------------

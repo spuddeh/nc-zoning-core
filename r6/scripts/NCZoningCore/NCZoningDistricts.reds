@@ -17,7 +17,7 @@
 //                   Badlands without naming it, and a composite area is named by two
 //                   records while the player stands in only one of them.
 //              Regenerate + verify with tools/districts/build-district-map.py.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // ======================================================================================
 
 module NCZoning.Api

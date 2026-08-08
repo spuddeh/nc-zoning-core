@@ -35,7 +35,7 @@
 //              Shops is that shape - and they really are installed together, so the test is
 //              two mod PAGES, not two records. A record with no numeric page ("WIP", empty)
 //              is its own group, so two unfinished records never pool.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // Credits: Spuddeh
 // ======================================================================================
 
