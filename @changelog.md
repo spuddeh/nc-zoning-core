@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased] - 1.1.0
+## 1.1.0 - 2026-08-09
 
-Prepared, not released. Core and the District Guide ship together.
+Released together with NC Zoning Board - District Guide 1.1.0, which requires this version.
 
 ### Added
 
