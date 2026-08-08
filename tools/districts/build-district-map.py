@@ -52,8 +52,10 @@ OVERRIDE = {
     "ncx_morro_rock": "MorroRock",                 # API renamed "Morro Rock" -> "NCX Spaceport / Morro Rock"
     "socal_border_crossing": "Badlands_SoCalBorderCrossing",  # casing: SoCal vs socal
 }
-# API-only POIs with no game district (a player's DistrictManager never reports these):
-SKIP = {"north_oaks_casino"}
+# API-only POIs with no game district (a player's DistrictManager never reports these).
+# Both id spellings, for the same reason as OWN_NAME below: the board is renaming the casino to
+# the game's singular, and the id is slugged from the name.
+SKIP = {"north_oaks_casino", "north_oak_casino"}
 # game enums that fold into an API district but have no API entry of their own:
 EXTRA = [
     ("NorthBadlands", "Badlands", ""),      # map never splits north/south badlands
@@ -89,7 +91,14 @@ COMPOSITE = {
 }
 # API areas with NO game district record at all, so the game cannot name them and the core
 # carries its own string. Keyed by the API name, valued by the core's LocKey.
+#
+# The casino is listed under BOTH spellings while the board renames it. "North Oak" is the game's
+# own name for the district - LocKey#10967, singular, and it reads that way 47 times against 1
+# across every string the game ships. Only the TweakDB path is plural. Dropping the "Oaks" entry
+# before the API serves the singular would hard-fail this build on the very gate that exists to
+# catch an unnamed area.
 OWN_NAME = {
+    "North Oak Casino": "NCZ.area.northOaksCasino",
     "North Oaks Casino": "NCZ.area.northOaksCasino",
 }
 

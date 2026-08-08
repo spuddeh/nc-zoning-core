@@ -32,9 +32,14 @@ public class NCZ_English extends ModLocalizationPackage {
 
     // --- area names ------------------------------------------------------------------
     // ONE KEY, not thirty-six. LocalizeArea names an area from the game's own district record,
-    // so every district and subdistrict is already translated wherever the game is. North Oaks
-    // Casino is a registry POI with no district record behind it, so it is the only area name
-    // that has to live here.
-    this.Text("NCZ.area.northOaksCasino", "North Oaks Casino");
+    // so every district and subdistrict is already translated wherever the game is. The casino
+    // is a registry POI with no district record behind it, so it is the only area name that has
+    // to live here.
+    //
+    // "North Oak", not "North Oaks". The game's own name for the district is LocKey#10967,
+    // singular, and it reads that way 47 times against 1 across every string the game ships -
+    // the one plural is two characters typing at each other in a shard. Only the TweakDB path is
+    // plural (Districts.NorthOaks), and no player sees a TweakDB path.
+    this.Text("NCZ.area.northOaksCasino", "North Oak Casino");
   }
 }

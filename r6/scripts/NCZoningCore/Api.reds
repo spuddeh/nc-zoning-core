@@ -252,14 +252,21 @@ public func LocalizeArea(district: String, subdistrict: String) -> String {
   return out;
 }
 
-// The areas the game cannot name, which today is North Oaks Casino alone: the registry attributes
-// locations to it, and it is a POI rather than a district, so no district record exists to ask.
+// The areas the game cannot name, which today is the North Oak casino alone: the registry
+// attributes locations to it, and it is a POI rather than a district, so no district record
+// exists to ask.
+//
+// BOTH SPELLINGS MATCH, and that is not belt-and-braces. The registry is fetched at RUNTIME, so a
+// shipped build meets whatever the board is publishing that day - the singular is correct and is
+// what the board moves to, while an older cache or an un-regenerated vocabulary still says
+// "Oaks". Matching one of them would silently drop the translation on whichever side of the
+// rename the player happened to be.
 //
 // NCZ_T ECHOES THE KEY when the string is missing or Codeware has not bound yet, and a nav row
 // reading "NCZ.area.northOaksCasino" is worse than one reading English. The echo is the signal
 // that the lookup failed, so it is what selects the fallback.
 func NCZAreaOwnName(raw: String) -> String {
-  if UnicodeStringEqual(raw, "North Oaks Casino") {
+  if UnicodeStringEqual(raw, "North Oak Casino") || UnicodeStringEqual(raw, "North Oaks Casino") {
     let key = "NCZ.area.northOaksCasino";
     let text = NCZ_T(key);
     return UnicodeStringEqual(text, key) ? raw : text;
