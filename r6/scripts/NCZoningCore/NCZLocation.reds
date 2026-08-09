@@ -6,7 +6,7 @@
 //              /v1 API payload into. Field names mirror the JSON keys EXACTLY, because
 //              RedData matches keys case-sensitively with no snake_case transform.
 // Mod Version: 1.2.0
-// Credits: psiberx (RedData, RedFileSystem, RedHttpClient, Codeware)
+// Credits: rayshader (RedData, RedFileSystem, RedHttpClient), psiberx (Codeware)
 // ======================================================================================
 
 module NCZoning.Data

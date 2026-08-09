@@ -6,7 +6,8 @@
 //              RedFileSystem storage and the in-memory registry store. NCZoning.Api
 //              forwards to this singleton; consumers never import NCZoning.Core.
 // Mod Version: 1.2.0
-// Credits: psiberx (Codeware, RedFileSystem, RedData, RedHttpClient)
+// Credits: psiberx (Codeware), rayshader (RedHttpClient, RedData, RedFileSystem),
+//          DigitalVixen (RedFunctions)
 // ======================================================================================
 
 module NCZoning.Core
