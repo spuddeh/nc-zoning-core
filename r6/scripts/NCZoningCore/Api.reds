@@ -208,7 +208,7 @@ public func GetSubdistricts(district: String) -> array<String> {
 // Render one straight onto a widget and every player reads English, whatever their game language.
 //
 // THE TRANSLATION COMES FROM THE GAME, NOT FROM A TABLE HERE. Cyberpunk already names all but one
-// of these areas in each of its twelve languages, so this resolves the game's own district record
+// of these areas in each of the nineteen languages it ships, so this resolves its own district record
 // and asks it. That is a smaller thing to maintain than 36 names in every language, and it makes
 // the guide agree with the world map and the fast-travel screen, which a separate translation
 // would drift from.

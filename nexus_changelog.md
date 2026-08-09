@@ -7,7 +7,7 @@ and to the mod authors building on it. The full technical detail lives in `@chan
 
 - New: District and subdistrict names can be shown in your game's language. The registry publishes
   them in English, so Core now asks Cyberpunk for its own name for the area - which means all
-  twelve of the game's languages, and the same wording you see on the world map.
+  nineteen of the game's languages, and the same wording you see on the world map.
 - Fix: Locations no longer show as installed because a different mod shipped the same file. Some
   authors bundle a shared prop pack into their download, so installing one location could mark five
   others you had never downloaded. Files that more than one mod ships are now ignored, and only
@@ -72,17 +72,17 @@ carry no `-`, no markdown and no version heading: a wrapped line arrives as two 
 dash arrives inside the bullet, and the version is sent in its own field.
 
 ```text
-District and subdistrict names now show in your game's language, in all twelve the game ships. A location no longer reads as installed just because a different mod shipped the same prop pack.
+District and subdistrict names now show in your game's language, in all nineteen the game ships. A location no longer reads as installed just because a different mod shipped the same prop pack.
 
 <!-- nexus-description-end -->
 
-New: District and subdistrict names are shown in your game's language. The registry publishes them in English, so the Core now asks Cyberpunk for its own name for each area - all twelve of the game's languages, and the same wording you see on the world map.
+New: District and subdistrict names are shown in your game's language. The registry publishes them in English, so the Core now asks Cyberpunk for its own name for each area - all nineteen of the game's languages, and the same wording you see on the world map.
 Fix: A location no longer shows as installed because a different mod shipped the same file. Some authors bundle a shared prop pack into their download, so installing one location could mark five others you had never downloaded. A file that more than one mod ships is now ignored, and only files unique to a mod count.
 Fix: The North Oak casino is spelled the way the game spells it. It read "North Oaks Casino", directly under the "North Oak" row.
 Changed: Housekeeping for a registry field the board no longer sends. Nothing changes on screen.
 ```
 
-> File description: 191 / 255 characters.
+> File description: 193 / 255 characters.
 
 ---
 

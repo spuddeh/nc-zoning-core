@@ -9,7 +9,7 @@ Requires nothing new. NC Zoning Board - District Guide 1.1.1 requires this versi
 - `LocalizeArea(district, subdistrict)` on `NCZoning.Api`, and `NCZDistrictMap.RecordIdsFor()`
   behind it. The registry publishes area names in English only, so a consumer rendering one raw
   showed English whatever the game language. This resolves the game's own `District_Record` and
-  reads `LocalizedName()`, which returns a LocKey that `GetLocalizedText` resolves - so all twelve
+  reads `LocalizedName()`, which returns a LocKey that `GetLocalizedText` resolves - so all nineteen
   of the game's languages come free, and the name agrees with the world map and the fast-travel
   screen. Additive: `ApiVersion()` stays at 1.
 
