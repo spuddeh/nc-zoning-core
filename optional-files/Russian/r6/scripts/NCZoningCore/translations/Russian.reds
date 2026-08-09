@@ -2,7 +2,7 @@
 // Mod Name: NCZoningCore
 // File: translations/Russian.reds
 // Author: Parasitko
-// Description: The Russian slot. Current to Ver 1.1.0; new strings show in English until someone
+// Description: The Russian slot. Current to Ver 1.2.0; new strings show in English until someone
 //              fills this in. Filling it in is welcome, and takes no coding.
 //
 //              TO TRANSLATE - three steps:
@@ -32,7 +32,7 @@
 //              MAINTAINER: empty on purpose - a filled slot would override newer
 //              English wording. The path, module and class name are public API,
 //              because a translation mod REPLACES this file.
-// Mod Version: 1.1.0
+// Mod Version: 1.2.0
 // Credits: psiberx (Codeware)
 // ======================================================================================
 
@@ -49,5 +49,17 @@ public class NCZ_Russian extends ModLocalizationPackage {
     this.Text("NCZ.statusFetchFailed", "NC Zoning: Не удалось загрузить реестр местоположений, и локальная копия отсутствует. См. страницу мода.");
     // No network layer and no hand-supplied file.
     this.Text("NCZ.statusNoData",      "NC Zoning: Данные о местоположении отсутствуют. Установите RedHttpClient или загрузите файл {file} вручную — см. страницу модификации.");
+
+    // --- area names ------------------------------------------------------------------
+    // ONE KEY, not thirty-six. LocalizeArea names an area from the game's own district record,
+    // so every district and subdistrict is already translated wherever the game is. The casino
+    // is a registry POI with no district record behind it, so it is the only area name that has
+    // to live here.
+    //
+    // "North Oak", not "North Oaks". The game's own name for the district is LocKey#10967,
+    // singular, and it reads that way 47 times against 1 across every string the game ships -
+    // the one plural is two characters typing at each other in a shard. Only the TweakDB path is
+    // plural (Districts.NorthOaks), and no player sees a TweakDB path.
+    this.Text("NCZ.area.northOaksCasino", "Казино Норт-Оук");
   }
 }
