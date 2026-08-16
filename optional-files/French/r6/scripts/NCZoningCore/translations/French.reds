@@ -1,7 +1,7 @@
 // ======================================================================================
 // Mod Name: NCZoningCore
 // File: translations/French.reds
-// Author: Spuddeh
+// Author: Akiway
 // Description: The French slot. Empty - every string shows in English until someone
 //              fills this in. Filling it in is welcome, and takes no coding.
 //
