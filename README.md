@@ -208,10 +208,8 @@ Install it once as a standalone dependency, like Codeware.
 
 ## License
 
-Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may
-use, modify, and share this mod and its source for any noncommercial purpose,
-as long as you credit the original creator. Commercial use, including paid mods
-or selling, is not permitted.
+Licensed under the [MIT License](LICENSE). Use, change and share this mod and its source,
+including in your own mods. Keep the licence notice with any copy.
 
 ## Disclaimer
 
